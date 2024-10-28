@@ -170,7 +170,7 @@ did-verifier-server
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── LICENSE-dependencies.md
+├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
 ├── RELEASE-PROCESS.md
@@ -207,7 +207,7 @@ did-verifier-server
 | CODE_OF_CONDUCT.md      | Code of conduct for contributors             |
 | CONTRIBUTING.md         | Contribution guidelines and procedures       |
 | LICENSE                 | License                                      |
-| LICENSE-dependencies.md | License information for project dependencies |
+| dependencies-license.md | License information for project dependencies |
 | MAINTAINERS.md          | Guidelines for project maintainers           |
 | RELEASE-PROCESS.md      | Procedure for releasing a new version        |
 | SECURITY.md             | Security policy and vulnerability reporting  |
