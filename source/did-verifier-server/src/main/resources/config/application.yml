@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: Verifier
+  profiles:
+    active: sample
+    group:
+        dev:
+          - databases
+          - wallet
+          - logging
+          - spring-docs
+          - verifier
+        sample:
+          - databases-sample
+          - wallet
+          - logging
+          - spring-docs
+          - verifier
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
+
+server:
+  port: 8092
+
+tas:
+  url: http://127.0.0.1:8090/tas

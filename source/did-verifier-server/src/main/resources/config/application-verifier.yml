@@ -1,0 +1,8 @@
+verifier:
+  domain: "http://127.0.0.1:8092"
+  did: did:omn:verifier
+  cert-vc-ref: "${verifier.domain}/verifier/api/v1/certificate-vc"
+  ref: "${verifier.domain}/swagger-ui/index.html#/"
+  sample-path: "source/did-verifier-server/sample/data/vpPolicy"
+  verifier-end-points: "${verifier.domain}/verifier/api/v1/request-verify"
+  valid-seconds : 180

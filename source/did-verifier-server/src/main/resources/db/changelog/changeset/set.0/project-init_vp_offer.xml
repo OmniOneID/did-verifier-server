@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+  <changeSet id="init-vp_offer" author="yklee0911">
+    <createTable tableName="vp_offer">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="offer_id" type="varchar(40)">
+        <constraints nullable="false" unique="false"/>
+      </column>
+      <column name="service" type="varchar(40)">
+        <constraints nullable="false" unique="false"/>
+      </column>
+      <column name="device" type="varchar(40)">
+        <constraints nullable="false" unique="false"/>
+      </column>
+      <column name="payload" type="longtext">
+        <constraints nullable="false" unique="false"/>
+      </column>
+      <column name="valid_until" type="timestamp">
+        <constraints nullable="true" unique="false"/>
+      </column>
+      <column name="passcode" type="varchar(64)" >
+        <constraints nullable="true" unique="false" />
+      </column>
+      <column name="vp_policy_id" type="varchar(40)" >
+        <constraints nullable="true" unique="false" />
+      </column>
+      <column name="created_at" type="timestamp">
+        <constraints nullable="false" unique="false"/>
+      </column>
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true" unique="false"/>
+      </column>
+      <column name="transaction_id" type="bigint" >
+        <constraints nullable="false" unique="false" />
+      </column>
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>

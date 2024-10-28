@@ -1,0 +1,65 @@
+{
+  "policyId": "99999-9992",
+  "payload" : {
+    "device": "WEB",
+    "service": "signup",
+    "endpoints": [
+      "http://127.0.0.1:8092/verifier"
+    ],
+    "locked": false,
+    "mode": "Direct"
+  },
+  "profile": {
+    "id": "",
+    "type": "VerifyProfile",
+    "title": "OpenDID 가입 VP 프로파일",
+    "description": "OpenDID 가입을 위해 제출이 필요한 VP에 대한 프로파일 입니다.",
+    "encoding": "UTF-8",
+    "language": "ko",
+    "profile": {
+      "verifier": {
+        "did": "did:omn:verifier",
+        "certVcRef": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc",
+        "name": "verifier",
+        "description": "verifier",
+        "ref": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc"
+      },
+      "filter": {
+        "credentialSchemas": [
+          {
+            "id": "http://127.0.0.1:8091/issuer/api/v1/vc/vcschema?name=mdl",
+            "type": "OsdSchemaCredential",
+            "requiredClaims": [
+              "org.iso.18013.5.birth_date",
+              "org.iso.18013.5.family_name",
+              "org.iso.18013.5.given_name"
+            ],
+            "allowedIssuers":[
+              "did:omn:issuer"
+            ],
+            "displayClaims":[
+              "testId.aa"
+            ],
+            "value": "VerifiableProfile",
+            "presentAll" : false
+          }
+        ]
+      },
+      "process": {
+        "endpoints": [
+          "http://127.0.0.1:8092/verifier"
+        ],
+        "reqE2e": {
+          "nonce": "",
+          "curve": "Secp256r1",
+          "publicKey": "",
+          "cipher": "AES-256-CBC",
+          "padding": "PKCS5"
+        },
+        "verifierNonce": "",
+        "authType": 0
+      }
+    }
+  }
+}
+
