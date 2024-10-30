@@ -17,6 +17,7 @@ did-verifier-server
 ├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
+├── README_ko.md
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
@@ -28,6 +29,7 @@ did-verifier-server
 │       └── OpenDID_TableDefinition_Verifier.md
 │   └── installation
 │       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
+│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
 └── source
     └── verifier
         ├── gradle
@@ -65,12 +67,12 @@ Below is a description of each folder and file in the directory:
 | ┖ installation          | Installation and setup instructions             |
 | source                  | Server source code project                      |
 | ┖ verifier              | Verifier Server source code and build files     |
-|   ┖ gradle              | Gradle build configurations and scripts         |
-|   ┖ libs                | External libraries and dependencies             |
-|   ┖ sample              | Sample files                                    |
-|   ┖ src                 | Main source code directory                      |
-|   ┖ build.gradle        | Gradle build configuration file                 |
-|   ┖ README.md           | Overview and instructions for the source code   |
+| &nbsp;&nbsp;&nbsp;┖ gradle  | Gradle build configurations and scripts     |
+| &nbsp;&nbsp;&nbsp;┖ libs    | External libraries and dependencies         |
+| &nbsp;&nbsp;&nbsp;┖ sample  | Sample files                                |
+| &nbsp;&nbsp;&nbsp;┖ src     | Main source code directory                  |
+| &nbsp;&nbsp;&nbsp;┖ build.gradle | Gradle build configuration file        |
+| &nbsp;&nbsp;&nbsp;┖ README.md | Overview and instructions for the source code|
 
 <br/>
 
@@ -79,7 +81,7 @@ Below is a description of each folder and file in the directory:
 
 Libraries used in this project are organized into two main categories:
 
-1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](source/verifier/libs). They include:
+1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](source/did-verifier-server/libs). They include:
 
    - `did-sdk-common-1.0.0.jar`
    - `did-blockchain-sdk-server-1.0.0.jar`
@@ -88,7 +90,7 @@ Libraries used in this project are organized into two main categories:
    - `did-data-model-server-1.0.0.jar`
    - `did-wallet-sdk-server-1.0.0.jar`
 
-2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/verifier/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
+2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/did-verifier-server/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
 
 ## Installation And Operation Guide
 
