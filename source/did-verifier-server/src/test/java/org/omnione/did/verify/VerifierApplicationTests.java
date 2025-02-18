@@ -24,12 +24,12 @@ import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.base.datamodel.data.AccE2e;
 import org.omnione.did.base.datamodel.enums.PresentMode;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.verifier.v1.agent.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import org.omnione.did.verifier.v1.dto.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;

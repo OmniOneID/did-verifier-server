@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.omnione.did;
+package org.omnione.did.verifier.v1.agent.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.vc.VcMeta;
 
-@SpringBootApplication
-@ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
-@Slf4j
-@EnableFeignClients
-public class VerifierApplication {
+/**
+ * Storage service interface for finding DID document
+ */
+public interface StorageService {
 
-    public static void main(String[] args) {
-        SpringApplication.run(VerifierApplication.class, args);
-    }
+    /**
+     * Finds a DID document by its key URL.
+     *
+     * @param didKeyUrl URL of the DID key.
+     * @return Found DID document.
+     */
+    DidDocument findDidDoc(String didKeyUrl);
 
 }

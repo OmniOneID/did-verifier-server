@@ -28,5 +28,10 @@ public class UrlConstant {
         public static final String CONFIRM_VERIFY = "/confirm-verify";
         public static final String REQUEST_PROFILE = "/request-profile";
 
+
+        public static final String ADMIN = "/verifier/admin/v1";
+        public static final String VERIFIER_INFO = "/verifier-info";
+
+
     }
 }

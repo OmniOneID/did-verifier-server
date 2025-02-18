@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package org.omnione.did;
+package org.omnione.did.verifier.v1.agent.dto;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import lombok.*;
+import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
 
-@SpringBootApplication
-@ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
-@Slf4j
-@EnableFeignClients
-public class VerifierApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(VerifierApplication.class, args);
-    }
+/**
+ * Represents the response for verifying an offer.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
+public class VerifyOfferResult {
+    private VerifyOfferPayload payload;
+    private String vpPolicyId;
 
 }
