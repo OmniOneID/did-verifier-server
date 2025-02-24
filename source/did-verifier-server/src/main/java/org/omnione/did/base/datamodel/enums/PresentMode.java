@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,5 +39,21 @@ public enum PresentMode {
     @JsonValue
     public String toString() {
         return displayName;
+    }
+
+    /**
+     * Converts a display name to the corresponding PresentMode.
+     *
+     * @param displayName The display name to convert.
+     * @return The corresponding PresentMode.
+     * @throws IllegalArgumentException if no matching enum constant is found.
+     */
+    public static PresentMode fromDisplayName(String displayName) {
+        for (PresentMode mode : PresentMode.values()) {
+            if (mode.displayName.equals(displayName)) {
+                return mode;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant with display name " + displayName);
     }
 }

@@ -1,0 +1,16 @@
+package org.omnione.did.base.db.repository;
+
+import org.omnione.did.base.db.domain.Payload;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+/**
+ * Repository interface for Payload entity operations.
+ * Provides CRUD operations for Payload entities and custom query methods.
+ *
+ */
+public interface PayloadRepository extends JpaRepository<Payload, Long> {
+
+    Optional<Payload> findByPayloadId(String payloadId);
+}

@@ -2,7 +2,7 @@ spring:
   application:
     name: Verifier
   profiles:
-    active: sample
+    active: dev
     group:
         dev:
           - databases
@@ -26,3 +26,30 @@ server:
 
 tas:
   url: http://127.0.0.1:8090/tas
+
+verifier:
+  domain: "http://127.0.0.1:8092"
+  did: did:omn:verifier
+  cert-vc-ref: "${verifier.domain}/verifier/api/v1/certificate-vc"
+  ref: "${verifier.domain}/swagger-ui/index.html#/"
+  sample-path: "source/did-verifier-server/sample/data/vpPolicy/"
+  verifier-end-points: "${verifier.domain}/verifier/api/v1/request-verify"
+  valid-seconds : 180
+
+wallet:
+  file-path:
+  password:
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

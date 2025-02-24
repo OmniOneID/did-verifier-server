@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,5 +57,13 @@ public class RequestOfferReqDto {
     @Schema(example = "login")
     @NotNull(message = "service cannot be null")
     private String service;
+
+    /**
+     * Service id.
+     */
+    @NotNull(message = "payload id cannot be null")
+    private String payloadId;
+
+
 
 }

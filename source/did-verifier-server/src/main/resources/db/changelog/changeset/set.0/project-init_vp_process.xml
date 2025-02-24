@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- 테이블 생성 -->
+    <changeSet id="init-vp_process" author="jhkim6557">
+        <createTable tableName="vp_process">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="endpoints" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auth_type" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nonce" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curve" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="public_key" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cipher" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="padding" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- 초기값 삽입 -->
+    <changeSet id="insert-initial-data-vp_process" author="jhkim6557">
+        <insert tableName="vp_process">
+            <column name="id" value="1"/>
+            <column name="endpoints" value="['http://127.0.0.1:8092/verifier']"/>
+            <column name="auth_type" value="6"/>
+            <column name="nonce" value=""/>
+            <column name="curve" value="Secp256r1"/>
+            <column name="public_key" value=""/>
+            <column name="cipher" value="AES-256-CBC"/>
+            <column name="padding" value="PKCS5"/>
+        </insert>
+
+        <insert tableName="vp_process">
+            <column name="id" value="2"/>
+            <column name="endpoints" value="['http://127.0.0.1:8092/verifier']"/>
+            <column name="auth_type" value="0"/>
+            <column name="nonce" value=""/>
+            <column name="curve" value="Secp256r1"/>
+            <column name="public_key" value=""/>
+            <column name="cipher" value="AES-256-CBC"/>
+            <column name="padding" value="PKCS5"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

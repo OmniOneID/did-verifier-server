@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-  <changeSet id="init-certificate_vc" author="yklee0911">
+  <changeSet id="init-certificate_vc" author="jhkim6557">
     <createTable tableName="certificate_vc">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false" />

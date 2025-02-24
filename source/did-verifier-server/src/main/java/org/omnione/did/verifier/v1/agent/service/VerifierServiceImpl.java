@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ import org.omnione.did.base.db.constant.SubTransactionType;
 import org.omnione.did.base.db.constant.TransactionStatus;
 import org.omnione.did.base.db.constant.TransactionType;
 import org.omnione.did.base.db.domain.*;
-import org.omnione.did.base.db.repository.VpProfileRepository;
-import org.omnione.did.base.db.repository.VpSubmitRepository;
+import org.omnione.did.base.db.repository.*;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.VerifierProperty;
@@ -98,6 +97,10 @@ public class VerifierServiceImpl implements VerifierService {
     private final DidDocService didDocService;
     private final VerifierProperty verifierProperty;
 
+    private final PolicyRepository policyRepository;
+    private final PayloadRepository payloadRepository;
+    private final VpPolicyProfileRepository vpPolicyProfileRepository;
+
 
     /**
      * Requests a VP Offer via QR code.
@@ -113,18 +116,17 @@ public class VerifierServiceImpl implements VerifierService {
         try{
             log.debug("\t validate requestOfferReqDto and get VpPayload and VpPolicyId");
             VerifyOfferResult verifyOfferResult = getPolicyAndValidate(requestOfferReqDto);
-            VerifyOfferPayload payload = verifyOfferResult.getPayload();
+            VerifyOfferPayload payload = verifyOfferResult.getOfferPayload();
             log.debug("\t transaction and sub-transaction creation");
             Transaction transaction = createAndSaveTransaction();
             createAndSaveSubTransaction(transaction.getId());
             String vpOfferId = UUID.randomUUID().toString();
-            Instant validUntil = calculateValidUntil();
-            updatePayload(payload, vpOfferId, validUntil);
+            updatePayload(payload, vpOfferId);
 
             log.debug("\t Saving VP Offer");
             SaveVpOffer(transaction.getId(), vpOfferId, requestOfferReqDto,
                     verifyOfferResult.getVpPolicyId(),
-                    JsonUtil.serializeToJson(payload), validUntil);
+                    JsonUtil.serializeToJson(payload), Instant.parse(payload.getValidUntil()));
 
             log.debug("*** Finished request VpOfferbyQR ***");
 
@@ -409,14 +411,26 @@ public class VerifierServiceImpl implements VerifierService {
      * @return JsonNode The policy as a JsonNode
      * @throws OpenDidException If the policy is not found
      */
-    private VerifyOfferResult getPolicyAndValidate(RequestOfferReqDto requestOfferReqDto) {
-        VerifyOfferResult vpOfferResult = fileLoaderService.getPolicyByOfferData(requestOfferReqDto);
-        if (vpOfferResult == null) {
-            log.error("VpPolicy not found for mode: {}, service: {}, device: {}",
-                    requestOfferReqDto.getMode(), requestOfferReqDto.getService(), requestOfferReqDto.getDevice());
+    private VerifyOfferResult getPolicyAndValidate(RequestOfferReqDto requestOfferReqDto) throws JsonProcessingException {
+        //policyId 찾기
+        Optional<Policy> policy = policyRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
+        if (policy.isEmpty()) {
+            log.error("Policy not found for payloadId: {}", requestOfferReqDto.getPayloadId());
             throw new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND);
         }
-        return vpOfferResult;
+        String policyId = policy.get().getPolicyId();
+        //payload_id로 payload 찾기
+        Optional<Payload> payload = payloadRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
+        if (payload.isEmpty()) {
+            log.error("Payload not found for payloadId: {}", requestOfferReqDto.getPayloadId());
+            throw new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND);
+        }
+        VerifyOfferPayload verifyOfferPayload = policyToVerifyOfferPayload(payload);
+
+        return VerifyOfferResult.builder()
+                .vpPolicyId(policyId)
+                .offerPayload(verifyOfferPayload)
+                .build();
     }
 
     /**
@@ -470,18 +484,6 @@ public class VerifierServiceImpl implements VerifierService {
                 .build());
     }
 
-    /**
-     * Creates a VerifyOfferPayload from the extracted payload.
-     *
-     * @param extractedPayload The extracted payload
-     * @param validUntil The expiration time of the offer
-     * @return VerifyOfferPayload The created VerifyOfferPayload
-     */
-    private VerifyOfferPayload createVerifyOfferPayload(String extractedPayload, Instant validUntil) {
-        VerifyOfferPayload verifyOfferPayload = policyToVerifyOfferPayload(extractedPayload);
-        verifyOfferPayload.setValidUntil(validUntil.toString());
-        return verifyOfferPayload;
-    }
 
     /**
      * Verifies a Verifiable Presentation.
@@ -653,10 +655,18 @@ public class VerifierServiceImpl implements VerifierService {
      * @throws OpenDidException If the policy is not found or cannot be parsed
      */
     private VerifyProfile getVerifyProfileFromPolicy(String policyId) {
-        VpPolicy policyById = fileLoaderService.getPolicyById(policyId);
-        if (policyById == null || policyById.getProfile() == null) {
+        //## 1.policy 테이블에서 profile 아이디를 갖고온다
+        Optional<Policy> policy = policyRepository.findByPolicyId(policyId);
+        if (policy.isEmpty()) {
             throw new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND);
         }
+        String profileId = policy.get().getProfileId();
+        vpPolicyProfileRepository.
+
+
+        //## 2.policy_profile 테이블에서 해당 아이디의 profile을 가져온다
+        VpPolicy policyById = fileLoaderService.getPolicyById(policyId);
+
         return policyById.getProfile();
     }
 
@@ -728,14 +738,20 @@ public class VerifierServiceImpl implements VerifierService {
      * @return VerifyOfferPayload The converted VerifyOfferPayload
      * @throws OpenDidException If parsing fails
      */
-    private VerifyOfferPayload policyToVerifyOfferPayload(String payload) {
-
+    private VerifyOfferPayload policyToVerifyOfferPayload(Optional<Payload> payload) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.readValue(payload, VerifyOfferPayload.class);
-        } catch (JsonProcessingException e) {
-            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
-        }
+        ArrayList<String> endpoints = objectMapper.readValue(payload.get().getEndpoints(), ArrayList.class);
+        Instant validUntil = offerTimeValidSeconds(payload.get().getValidSecond());
+
+        return VerifyOfferPayload.builder()
+                .service(payload.get().getService())
+                .device(payload.get().getDevice())
+                .mode(PresentMode.fromDisplayName(payload.get().getMode()))
+                .endpoints(endpoints)
+                .locked(payload.get().isLocked())
+                .validUntil(validUntil.toString())
+                .build();
+
     }
 
     /**
@@ -850,14 +866,12 @@ public class VerifierServiceImpl implements VerifierService {
     }
     /**
      * Updates the payload of a VP Offer.
-     * This method is used to set the expiration time and offer ID for the VP Offer.
+     * This method is used to set offer ID for the VP Offer.
      *
      * @param payload The payload to update
      * @param vpOfferId The ID of the VP Offer
-     * @param validUntil The expiration time of the offer
      */
-    private void updatePayload(VerifyOfferPayload payload, String vpOfferId, Instant validUntil) {
-        payload.setValidUntil(validUntil.toString());
+    private void updatePayload(VerifyOfferPayload payload, String vpOfferId) {
         payload.setOfferId(vpOfferId);
         payload.setType(OfferType.VERIFY_OFFER);
         log.debug("Updated payload: {}", payload);

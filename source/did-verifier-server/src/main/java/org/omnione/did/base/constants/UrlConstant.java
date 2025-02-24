@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,17 @@ public class UrlConstant {
         public static final String CONFIRM_VERIFY = "/confirm-verify";
         public static final String REQUEST_PROFILE = "/request-profile";
 
-
+        //ADMIN urls
         public static final String ADMIN = "/verifier/admin/v1";
-        public static final String VERIFIER_INFO = "/verifier-info";
+        //Verifier Manage
+        public static final String SAVE_VERIFIER_INFO = "/save_verifier-info";
+        public static final String GET_VERIFIER_INFO = "/get_verifier-info";
+
+        //Payload Manage
+        public static final String SAVE_PAYLOAD_INFO = "/save_payload-info";
+        public static final String GET_PAYLOAD_INFO = "/get_payload-info";
+        public static final String DELETE_PAYLOAD_INFO = "/delete_payload-info";
+        public static final String UPDATE_PAYLOAD_INFO = "/update_payload-info";
 
 
     }

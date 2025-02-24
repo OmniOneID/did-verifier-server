@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,13 @@ public enum ErrorCode {
     FAILED_TO_REQUEST_VERIFY("SSRVVRF00903", "Failed to process the 'request-verify' API request.", 500),
     FAILED_TO_REQUEST_CERTIFICATE_VC("SSRVVRF00904", "Failed to process the 'get-certificate-vc' API request.", 500),
     FAILED_TO_ISSUE_CERTIFICATE_VC("SSRVVRF00905", "Failed to process the 'issue-certificate-vc' API request.", 500),
+
+
+
+    VP_PAYLOAD_NOT_FOUND("SSRVVRF00207", "VP_PAYLOAD is not found.", 400),
     ;
+
+
 
     private final String code;
     private final String message;

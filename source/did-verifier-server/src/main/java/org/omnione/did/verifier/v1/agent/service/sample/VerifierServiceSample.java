@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 /**
  * Verifier service implementation for handling Verifiable Presentations (VPs) and user verification

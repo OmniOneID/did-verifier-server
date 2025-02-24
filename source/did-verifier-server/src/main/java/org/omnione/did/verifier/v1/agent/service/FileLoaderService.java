@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ public class FileLoaderService {
         offerPayload.setEndpoints(verifierProperty.getVerifierEndPoints());
         return VerifyOfferResult.builder()
                 .vpPolicyId(vpPolicy.getPolicyId())
-                .payload(vpPolicy.getPayload())
+                .offerPayload(vpPolicy.getPayload())
                 .build();
     }
 }

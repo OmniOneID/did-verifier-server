@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-  <changeSet id="init-vp_offer" author="yklee0911">
+  <changeSet id="init-vp_offer" author="jhkim6557">
     <createTable tableName="vp_offer">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false" />
@@ -40,22 +40,6 @@
         <constraints nullable="false" unique="false" />
       </column>
     </createTable>
-  </changeSet>
-
-  <!-- 초기값 삽입 -->
-  <changeSet id="insert-initial-data" author="yklee0911">
-    <insert tableName="vp_offer">
-      <column name="offer_id" value="offer001"/>
-      <column name="service" value="service1"/>
-      <column name="device" value="device1"/>
-      <column name="payload" value="Initial Payload Data"/>
-      <column name="valid_until" valueDate="2025-12-31 23:59:59"/>
-      <column name="passcode" value="passcode001"/>
-      <column name="vp_policy_id" value="policy001"/>
-      <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-      <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
-      <column name="transaction_id" value="123456"/>
-    </insert>
   </changeSet>
 
 </databaseChangeLog>

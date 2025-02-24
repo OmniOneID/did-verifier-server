@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+  <changeSet id="init-policy" author="jhkim6557">
+    <createTable tableName="policy">
+      <!-- 정책 ID (PK) -->
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+
+      <!-- 정책(policy) ID (UUID) -->
+      <column name="policy_id" type="varchar(40)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+
+      <!-- 서비스(payload) ID (하나의 서비스는 하나의 정책에만 등록 가능) -->
+      <column name="payload_id" type="varchar(40)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+
+      <!-- 프로필 ID -->
+      <column name="profile_id" type="varchar(40)">
+        <constraints nullable="false"/>
+      </column>
+
+      <!-- 생성일시 -->
+      <column name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+
+      <!-- 업데이트 일시 -->
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <!-- payload ID 외래 키 설정 -->
+    <addForeignKeyConstraint
+            baseTableName="policy" baseColumnNames="payload_id"
+            referencedTableName="payload" referencedColumnNames="payload_id"
+            constraintName="fk_policy_payload"
+            onDelete="CASCADE" onUpdate="CASCADE"/>
+
+    <!-- 프로필 ID 외래 키 설정 -->
+    <addForeignKeyConstraint
+            baseTableName="policy" baseColumnNames="profile_id"
+            referencedTableName="vp_policy_profile" referencedColumnNames="policy_profile_id"
+            constraintName="fk_policy_profile"
+            onDelete="CASCADE" onUpdate="CASCADE"/>
+
+    <insert tableName="policy">
+      <column name="id" value="1"/>
+      <column name="policy_id" value="1a04cd9d-7487-44cd-ae55-0d509e53c48d"/>
+      <column name="payload_id" value="489b0326-0b48-4112-a0c3-23a4c45c0d71"/>
+      <column name="profile_id" value="c500950c-bf19-46d2-ba1d-255aa76d8b64"/>
+      <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+      <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+    </insert>
+
+    <insert tableName="policy">
+      <column name="id" value="2"/>
+      <column name="policy_id" value="39d5c94e-9e22-4de7-b7ce-e70e26140ec3"/>
+      <column name="payload_id" value="c4b4972a-6afb-42c6-8782-0352c7cebc82"/>
+      <column name="profile_id" value="d3b95a02-06af-407b-b958-00d7141cf7f8"/>
+      <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+      <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+    </insert>
+
+  </changeSet>
+
+</databaseChangeLog>
