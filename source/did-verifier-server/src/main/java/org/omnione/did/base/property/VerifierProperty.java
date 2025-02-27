@@ -34,7 +34,6 @@ public class VerifierProperty {
     private String did;
     private String certVcRef;
     private String ref;
-    private String samplePath;
+    private String name;
     private ArrayList<String> verifierEndPoints = new ArrayList<>();
-    private int validSeconds;
 }

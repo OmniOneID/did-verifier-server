@@ -94,7 +94,12 @@ public enum ErrorCode {
 
 
     VP_PAYLOAD_NOT_FOUND("SSRVVRF00207", "VP_PAYLOAD is not found.", 400),
+    VP_POLICY_PROFILE_NOT_FOUND("SSRVVRF00208", "VP_POLICY_PROFILE is not found.", 400),
+    VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
+    VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
+
     ;
+
 
 
 

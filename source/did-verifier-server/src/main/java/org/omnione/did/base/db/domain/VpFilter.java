@@ -2,8 +2,10 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.db.converter.StringListConverter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -24,12 +26,15 @@ public class VpFilter extends BaseEntity implements Serializable {
     private String id;
     @Column(name = "type", nullable = false, length = 40)
     private String type;
-    @Column(name = "required_claims", nullable = false, length = 40)
-    private String required_claims;
-    @Column(name = "allowed_issuers", nullable = false, length = 40)
-    private String allowed_issuers;
-    @Column(name = "display_claims", nullable = false, length = 40)
-    private String display_claims;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "required_claims")
+    private List<String> requiredClaims;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "allowed_issuers")
+    private List<String> allowedIssuers;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "display_claims")
+    private List<String> displayClaims;
     @Column(name = "value", nullable = false, length = 2000)
     private String value;
     @Column(name = "present_all", nullable = false)

@@ -17,9 +17,12 @@
 package org.omnione.did.verifier.v1.agent.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,15 +61,21 @@ import org.omnione.did.data.model.did.VerificationMethod;
 import org.omnione.did.data.model.enums.did.ProofType;
 import org.omnione.did.data.model.profile.Filter;
 import org.omnione.did.data.model.profile.ReqE2e;
+import org.omnione.did.data.model.profile.verify.InnerVerifyProfile;
 import org.omnione.did.data.model.profile.verify.VerifyProcess;
 import org.omnione.did.data.model.profile.verify.VerifyProfile;
+import org.omnione.did.data.model.provider.ProviderDetail;
 import org.omnione.did.data.model.vc.Claim;
+import org.omnione.did.data.model.vc.CredentialSchema;
 import org.omnione.did.data.model.vc.VerifiableCredential;
 import org.omnione.did.data.model.vp.VerifiablePresentation;
 import org.omnione.did.verifier.v1.agent.dto.*;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import java.io.DataInput;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.ECPrivateKey;
 import java.time.Instant;
@@ -89,7 +98,7 @@ public class VerifierServiceImpl implements VerifierService {
     private final TransactionService transactionService;
     private final E2EQueryService e2EQueryService;
     private final VpOfferQueryService vpOfferQueryService;
-    private final FileLoaderService fileLoaderService;
+//    private final FileLoaderService fileLoaderService;
     private final VpProfileRepository vpProfileRepository;
     private final VpSubmitRepository vpSubmitRepository;
     private final FileWalletService walletService;
@@ -100,6 +109,10 @@ public class VerifierServiceImpl implements VerifierService {
     private final PolicyRepository policyRepository;
     private final PayloadRepository payloadRepository;
     private final VpPolicyProfileRepository vpPolicyProfileRepository;
+    private final VpFilterRepository vpFilterRepository;
+    private final VpProcessRepository vpProcessRepository;
+
+    private final ObjectMapper objectMapper;
 
 
     /**
@@ -165,6 +178,7 @@ public class VerifierServiceImpl implements VerifierService {
             log.debug("\t --> Retrieving VP Policy by policyId in VP Offer");
             VerifyProfile verifyProfile = getVerifyProfileFromPolicy(vpOffer.getVpPolicyId());
 
+
             log.debug("\t --> Generating ReqE2e and VerifierNonce");
             String generateNonce = generateNonce();
             verifyProfile.setId(UUID.randomUUID().toString());
@@ -174,13 +188,16 @@ public class VerifierServiceImpl implements VerifierService {
             generateReqE2e(reqE2e, generateNonce, keyPair);
             process.setReqE2e(reqE2e);
             process.setVerifierNonce(generateNonce);
+            //log.debug("verifyProfile: {}", verifyProfile.toJson());
 
             log.debug("\t --> Retrieving verifier DID Document");
-            DidDocument verifierDidDoc = didDocService.getDidDocument(verifierProperty.getDid());
+            //DidDocument verifierDidDoc = didDocService.getDidDocument(verifierProperty.getDid());
 
             log.debug("\t --> Generating Verify Profile Proof");
-            verifyProfile.setProof(generatePreProof(verifierDidDoc));
+            //verifyProfile.setProof(generatePreProof(verifierDidDoc));
+            verifyProfile.setProof(generatePreProof2());
             verifyProfile.setProof(generateProof(verifyProfile));
+            log.debug("verifyProfile: {}", verifyProfile.toJson());
 
             log.debug("\t --> Saving VP Profile and E2E information");
             VpProfileSave(verifyProfile, transaction.getId());
@@ -219,6 +236,17 @@ public class VerifierServiceImpl implements VerifierService {
         }
     }
 
+    private void setVerifierProviderDetail(VerifyProfile verifyProfile) {
+        InnerVerifyProfile profile = new InnerVerifyProfile();
+        ProviderDetail providerDetail = new ProviderDetail();
+        providerDetail.setCertVcRef(verifierProperty.getCertVcRef());
+        providerDetail.setDid(verifierProperty.getDid());
+        providerDetail.setRef(verifierProperty.getRef());
+        providerDetail.setName(verifierProperty.getName());
+        profile.setVerifier(providerDetail);
+        verifyProfile.setProfile(profile);
+
+    }
 
 
     /**
@@ -654,20 +682,33 @@ public class VerifierServiceImpl implements VerifierService {
      * @return VerifyProfile The retrieved VerifyProfile
      * @throws OpenDidException If the policy is not found or cannot be parsed
      */
-    private VerifyProfile getVerifyProfileFromPolicy(String policyId) {
-        //## 1.policy 테이블에서 profile 아이디를 갖고온다
-        Optional<Policy> policy = policyRepository.findByPolicyId(policyId);
-        if (policy.isEmpty()) {
-            throw new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND);
-        }
-        String profileId = policy.get().getProfileId();
-        vpPolicyProfileRepository.
+    private VerifyProfile getVerifyProfileFromPolicy(String policyId) throws IOException {
+        // 1. Policy 테이블에서 Profile 아이디를 가져옵니다.
+        Policy policy = policyRepository.findByPolicyId(policyId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND));
+
+        String profileId = policy.getProfileId();
+
+        // 2. Profile을 Policy Profile 테이블에서 가져옵니다.
+        VpPolicyProfile policyProfile = vpPolicyProfileRepository.findByPolicyProfileId(profileId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
+
+        // 3. Profile을 JSON 문자열로 변환하고 VerifyProfile 객체로 변환합니다.
+        String jsonProfile = objectMapper.writeValueAsString(policyProfile);
+        VerifyProfile verifyProfile = objectMapper.readValue(jsonProfile, VerifyProfile.class);
 
 
-        //## 2.policy_profile 테이블에서 해당 아이디의 profile을 가져온다
-        VpPolicy policyById = fileLoaderService.getPolicyById(policyId);
+        setVerifierProviderDetail(verifyProfile);
+        setVpProcess(verifyProfile, policyProfile.getProcessId());
+        setVpFilter(verifyProfile, policyProfile.getFilterId());
+        log.debug("Verifier getFilter: {}", verifyProfile.getProfile().getFilter().toJson());
+        log.debug("Verifier getProcess: {}", verifyProfile.getProfile().getProcess().toJson());
+        log.debug("Verifier getVerifier: {}", verifyProfile.getProfile().getVerifier().toJson());
+        log.debug("Verifier getVerifier: {}", verifyProfile.getProfile().toJson());
 
-        return policyById.getProfile();
+
+        return verifyProfile;
+
     }
 
     /**
@@ -793,6 +834,15 @@ public class VerifierServiceImpl implements VerifierService {
         proof.setVerificationMethod(verificationMethod);
         return proof;
     }
+    private Proof generatePreProof2() {
+        Proof proof = new Proof();
+        proof.setType(ProofType.SECP256R1_SIGNATURE_2018.getRawValue());
+        proof.setCreated(DateTimeUtil.getCurrentUTCTimeString());
+        proof.setProofPurpose(ProofPurpose.ASSERTION_METHOD.toString());
+        String verificationMethod = "testMethod";
+        proof.setVerificationMethod(verificationMethod);
+        return proof;
+    }
 
 
     /**
@@ -876,14 +926,59 @@ public class VerifierServiceImpl implements VerifierService {
         payload.setType(OfferType.VERIFY_OFFER);
         log.debug("Updated payload: {}", payload);
     }
-    /**
-     * Calculates the expiration time for a VP Offer.
-     * This method is used to determine how long an offer should be valid.
-     *
-     * @return Instant The calculated expiration time
-     */
-    private Instant calculateValidUntil() {
-        return offerTimeValidSeconds(verifierProperty.getValidSeconds());
+
+    private void setVpFilter(VerifyProfile verifyProfile, Long filterId) throws IOException {
+        Optional<VpFilter> byFilterId = vpFilterRepository.findByFilterId(filterId);
+        if(byFilterId.isEmpty()){
+            throw new OpenDidException(ErrorCode.VP_FILTER_NOT_FOUND);
+        }
+        String filterString = objectMapper.writeValueAsString(byFilterId);
+        log.debug("FilterString: {}", filterString);
+        CredentialSchema credentialSchema = objectMapper.readValue(filterString, CredentialSchema.class);
+        log.debug("CredentialSchema: {}", credentialSchema.toJson());
+        Filter filter = new Filter();
+        filter.setCredentialSchemas(List.of(credentialSchema));
+        verifyProfile.getProfile().setFilter(filter);
+
+    }
+
+    private void setVpProcess(VerifyProfile verifyProfile, Long processId) throws JsonProcessingException {
+        Optional<VpProcess> vpProcessById = vpProcessRepository.findById(processId);
+        if (vpProcessById.isEmpty()){
+            throw new OpenDidException(ErrorCode.VP_PROCESS_NOT_FOUND);
+        }
+
+        VpProcess vpProcess = vpProcessById.get();
+
+        // DB에 저장된 process 값 가져오기
+        Object processObj = vpProcess.getProcess();
+        String processString;
+
+        // processObj가 이미 문자열인 경우 직접 사용, 그렇지 않은 경우 Jackson으로 변환
+        if (processObj instanceof String) {
+            processString = (String) processObj;
+        } else {
+            processString = objectMapper.writeValueAsString(processObj);
+        }
+
+        log.debug("ProcessString 원본: {}", processString);
+
+        // 문자열에서 따옴표가 있는 경우 처리
+        if (processString.startsWith("\"") && processString.endsWith("\"")) {
+            processString = processString.substring(1, processString.length() - 1);
+            // JSON 이스케이프 문자 처리
+            processString = processString.replace("\\\"", "\"");
+        }
+
+        log.debug("ProcessString 처리 후: {}", processString);
+
+        // Gson을 사용하여 VerifyProcess 객체로 변환
+        VerifyProcess verifyProcess = new VerifyProcess();
+        // 여기서 nonce 생성
+        verifyProcess.fromJson(processString);  // 클래스에 이미 구현된 fromJson 메서드 사용
+
+        log.debug("verifyProcess: {}", verifyProcess.toJson());
+        verifyProfile.getProfile().setProcess(verifyProcess);
     }
 
 

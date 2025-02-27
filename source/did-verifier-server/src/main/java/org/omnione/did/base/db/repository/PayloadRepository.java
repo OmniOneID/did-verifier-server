@@ -1,8 +1,10 @@
 package org.omnione.did.base.db.repository;
 
 import org.omnione.did.base.db.domain.Payload;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,4 +15,6 @@ import java.util.Optional;
 public interface PayloadRepository extends JpaRepository<Payload, Long> {
 
     Optional<Payload> findByPayloadId(String payloadId);
+
+    List<Payload> findByService(String service, Sort sort);
 }

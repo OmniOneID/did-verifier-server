@@ -55,7 +55,4 @@ public class Payload extends BaseEntity implements Serializable {
     private String endpoints;
     @Column(name = "valid_second", nullable = false)
     private Integer validSecond;
-
-
-
 }

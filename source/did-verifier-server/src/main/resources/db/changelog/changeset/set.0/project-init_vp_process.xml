@@ -5,57 +5,64 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <!-- 테이블 생성 -->
+    <!-- ChangeSet to create the vp_process table with a JSONB column -->
     <changeSet id="init-vp_process" author="jhkim6557">
         <createTable tableName="vp_process">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="endpoints" type="varchar(255)">
+            <column name="name" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="auth_type" type="int">
+            <column name="process" type="JSONB">
                 <constraints nullable="false"/>
             </column>
-            <column name="nonce" type="varchar(255)">
-                <constraints nullable="true"/>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false" unique="false"/>
             </column>
-            <column name="curve" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="public_key" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="cipher" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="padding" type="varchar(255)">
-                <constraints nullable="true"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="true" unique="false"/>
             </column>
         </createTable>
     </changeSet>
-
     <!-- 초기값 삽입 -->
     <changeSet id="insert-initial-data-vp_process" author="jhkim6557">
         <insert tableName="vp_process">
             <column name="id" value="1"/>
-            <column name="endpoints" value="['http://127.0.0.1:8092/verifier']"/>
-            <column name="auth_type" value="6"/>
-            <column name="nonce" value=""/>
-            <column name="curve" value="Secp256r1"/>
-            <column name="public_key" value=""/>
-            <column name="cipher" value="AES-256-CBC"/>
-            <column name="padding" value="PKCS5"/>
+            <column name="name" value="Verifier process1"/>
+            <column name="process" value="{
+            &quot;endpoints&quot;: [&quot;http://127.0.0.1:8092/verifier&quot;],
+            &quot;reqE2e&quot;: {
+                &quot;nonce&quot;: &quot;11&quot;,
+                &quot;curve&quot;: &quot;Secp256r1&quot;,
+                &quot;publicKey&quot;: &quot;xyz789&quot;,
+                &quot;cipher&quot;: &quot;AES-256-CBC&quot;,
+                &quot;padding&quot;: &quot;PKCS5&quot;
+            },
+            &quot;verifierNonce&quot;: &quot;11&quot;,
+            &quot;authType&quot;: 0
+        }"/>
+            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
         </insert>
 
         <insert tableName="vp_process">
             <column name="id" value="2"/>
-            <column name="endpoints" value="['http://127.0.0.1:8092/verifier']"/>
-            <column name="auth_type" value="0"/>
-            <column name="nonce" value=""/>
-            <column name="curve" value="Secp256r1"/>
-            <column name="public_key" value=""/>
-            <column name="cipher" value="AES-256-CBC"/>
-            <column name="padding" value="PKCS5"/>
+            <column name="name" value="Verifier process1"/>
+            <column name="process" value="{
+            &quot;endpoints&quot;: [&quot;http://127.0.0.1:8092/auth&quot;],
+            &quot;reqE2e&quot;: {
+                &quot;nonce&quot;:  &quot;11&quot;,
+                &quot;curve&quot;: &quot;Secp256k1&quot;,
+                &quot;publicKey&quot;: &quot;xyz789&quot;,
+                &quot;cipher&quot;: &quot;AES-128-CBC&quot;,
+                &quot;padding&quot;: &quot;PKCS7&quot;
+            },
+            &quot;verifierNonce&quot;:  &quot;11&quot;,
+            &quot;authType&quot;: 6
+        }"/>
+            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
         </insert>
 
     </changeSet>

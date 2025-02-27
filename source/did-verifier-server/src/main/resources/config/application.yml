@@ -20,6 +20,28 @@ spring:
     default-property-inclusion: non_null
     serialization:
       fail-on-empty-beans: false
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml
+    enabled: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/postgres
+    username: postgres
+    password:
+  jpa:
+    open-in-view: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    org.omnione: debug
 
 server:
   port: 8092
@@ -32,13 +54,14 @@ verifier:
   did: did:omn:verifier
   cert-vc-ref: "${verifier.domain}/verifier/api/v1/certificate-vc"
   ref: "${verifier.domain}/swagger-ui/index.html#/"
-  sample-path: "source/did-verifier-server/sample/data/vpPolicy/"
+  name : "Verifier"
+#  sample-path: "source/did-verifier-server/sample/data/vpPolicy/"
   verifier-end-points: "${verifier.domain}/verifier/api/v1/request-verify"
-  valid-seconds : 180
+#  valid-seconds : 180
 
 wallet:
-  file-path:
-  password:
+  file-path: source/did-verifier-server/verifier.wallet
+  password: 12345
 
 
 springdoc:
@@ -53,3 +76,14 @@ springdoc:
   show-actuator: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, shutdown, refresh
+  endpoint:
+    shutdown:
+      enabled: true
+    startup:
+      enabled: true

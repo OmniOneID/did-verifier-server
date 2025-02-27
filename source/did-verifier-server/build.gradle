@@ -71,9 +71,15 @@ dependencies {
     implementation 'org.bouncycastle:bcutil-jdk18on:1.78.1'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
+    //Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     implementation 'org.apache.commons:commons-pool2:2.12.0'
     implementation('org.hyperledger.fabric:fabric-gateway-java:2.2.9')
     implementation fileTree(dir: "libs", includes: ["*"])
+
+    implementation 'org.modelmapper:modelmapper:3.0.0'  // 최신 버전 확인 후 사용
+
 }
 
 dependencyManagement {

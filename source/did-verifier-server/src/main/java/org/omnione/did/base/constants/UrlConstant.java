@@ -37,6 +37,7 @@ public class UrlConstant {
         //Payload Manage
         public static final String SAVE_PAYLOAD_INFO = "/save_payload-info";
         public static final String GET_PAYLOAD_INFO = "/get_payload-info";
+        public static final String GET_PAYLOAD_LIST = "/get_payload-list";
         public static final String DELETE_PAYLOAD_INFO = "/delete_payload-info";
         public static final String UPDATE_PAYLOAD_INFO = "/update_payload-info";
 
