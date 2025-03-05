@@ -24,8 +24,8 @@ import java.util.List;
 public class PayloadController {
     private final PayloadService payloadService;
 
-    @Operation(summary = "Get Verifier Info", description = "get Verifier Info")
-    @GetMapping(UrlConstant.Verifier.GET_VERIFIER_INFO)
+//    @Operation(summary = "Get Verifier Info", description = "get Verifier Info")
+//    @GetMapping(UrlConstant.Verifier.GET_VERIFIER_INFO)
     public String getVerifierInfo(){
         return payloadService.getVerifierInfo();
     }

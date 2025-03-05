@@ -32,7 +32,7 @@ public class UrlConstant {
         public static final String ADMIN = "/verifier/admin/v1";
         //Verifier Manage
         public static final String SAVE_VERIFIER_INFO = "/save_verifier-info";
-        public static final String GET_VERIFIER_INFO = "/get_verifier-info";
+//        public static final String GET_VERIFIER_INFO = "/get_verifier-info";
 
         //Payload Manage
         public static final String SAVE_PAYLOAD_INFO = "/save_payload-info";
@@ -70,6 +70,10 @@ public class UrlConstant {
         public static final String DELETE_POLICY_INFO = "/delete_policy-info";
         public static final String UPDATE_POLICY_INFO = "/update_policy-info";
 
+        //Verifier Manage
+        public static final String GET_VERIFIER_INFO = "/verifier/info";
 
+        //Session
+        public static final String LOGIN = "/login";
     }
 }

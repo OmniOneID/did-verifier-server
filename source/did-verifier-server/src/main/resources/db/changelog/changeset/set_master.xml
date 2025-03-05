@@ -16,4 +16,6 @@
   <include file="set.0/project-init_vp_process.xml" relativeToChangelogFile="true" />
   <include file="set.0/project-init_vp_policy_profile.xml" relativeToChangelogFile="true" />
   <include file="set.0/project-init_vp_policy.xml" relativeToChangelogFile="true" />
+  <include file="set.0/project-init_verifier.xml" relativeToChangelogFile="true" />
+  <include file="set.0/project-init_admin.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

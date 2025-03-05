@@ -1,0 +1,5 @@
+export enum VerifierStatus {
+    ACTIVATE = 'ACTIVATE',
+    DEACTIVATE = 'DEACTIVATE',
+    REQUIRED_ENROLL_ENTITY = 'REQUIRED_ENROLL_ENTITY',
+}

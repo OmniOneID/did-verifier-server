@@ -43,6 +43,10 @@ public enum ErrorCode {
     VP_PROFILE_PARSE_ERROR("SSRVVRF00204", "Failed to parse VP profile.", 500),
     VERIFY_PROFILE_PARSE_ERROR("SSRVVRF00205", "Failed to parse verify profile.", 500),
     VP_POLICY_READ_ERROR("SSRVVRF00206", "Failed to read VP policy.", 500),
+    VP_PAYLOAD_NOT_FOUND("SSRVVRF00207", "VP_PAYLOAD is not found.", 400),
+    VP_POLICY_PROFILE_NOT_FOUND("SSRVVRF00208", "VP_POLICY_PROFILE is not found.", 400),
+    VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
+    VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),
@@ -92,12 +96,11 @@ public enum ErrorCode {
     FAILED_TO_ISSUE_CERTIFICATE_VC("SSRVVRF00905", "Failed to process the 'issue-certificate-vc' API request.", 500),
 
 
+    // Verifier Errors (1000~1099)
+    VERIFIER_NOT_FOUND("SSRVVRF01000", "Failed to find verifier: verifier is not registered.", 500),
 
-    VP_PAYLOAD_NOT_FOUND("SSRVVRF00207", "VP_PAYLOAD is not found.", 400),
-    VP_POLICY_PROFILE_NOT_FOUND("SSRVVRF00208", "VP_POLICY_PROFILE is not found.", 400),
-    VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
-    VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
-
+    // Admin Errors (1100~1199)
+    ADMIN_INFO_NOT_FOUND("SSRVVRF01100", "Failed to find admin: admin is not registered.", 400),
     ;
 
 
