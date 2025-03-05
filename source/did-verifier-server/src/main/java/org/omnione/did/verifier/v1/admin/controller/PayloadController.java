@@ -33,7 +33,7 @@ public class PayloadController {
     //Payload Management
     @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
     @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
-    public List<PayloadDTO> getPayloadList(String service){
+    public List<PayloadDTO> getPayloadList(@RequestParam(required = false) String service){
         return payloadService.getPayloadList(service);
     }
 
@@ -64,26 +64,9 @@ public class PayloadController {
     public ResponseEntity<PayloadDTO> updatePayload(@RequestBody PayloadDTO reqPayloadDto) {
         log.info("Updating Payload: {}", reqPayloadDto);
 
-        Payload updatedPayload = payloadService.updatePayload(reqPayloadDto);
-
-        PayloadDTO updatedPayloadDto = new PayloadDTO();
-        updatedPayloadDto.setService(updatedPayload.getService());
-        updatedPayloadDto.setDevice(updatedPayload.getDevice());
-        updatedPayloadDto.setLocked(updatedPayload.isLocked());
-        updatedPayloadDto.setMode(updatedPayload.getMode());
-        updatedPayloadDto.setEndpoints(updatedPayload.getEndpoints());
-        updatedPayloadDto.setValidSecond(updatedPayload.getValidSecond());
+        PayloadDTO updatedPayloadDto = payloadService.updatePayload(reqPayloadDto);
 
         return ResponseEntity.ok(updatedPayloadDto);
     }
-
-
-
-
-
-
-
-
-
 
 }

@@ -1,6 +1,9 @@
 package org.omnione.did.base.db.repository;
 import org.omnione.did.base.db.domain.VpPolicyProfile;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,6 +16,6 @@ public interface VpPolicyProfileRepository extends JpaRepository<VpPolicyProfile
 //    Optional<VpPolicyProfile> findByPolicyIdAndPayloadId(String policyId, String payloadId);
 //    List<VpPolicyProfile> findByPolicyIdIn(List<String> policyIds);
 //    List<VpPolicyProfile> findByPayloadIdIn(List<String> payloadIds);
-
+    List<VpPolicyProfile> findByTitle(String title, Sort sort);
     Optional<VpPolicyProfile> findByPolicyProfileId(String policyProfileId);
 }

@@ -42,7 +42,6 @@
     <!-- 초기값 삽입 -->
     <changeSet id="insert-initial-data" author="jhkim6557">
         <insert tableName="payload">
-            <column name="id" value="1"/>
             <column name="payload_id" value="489b0326-0b48-4112-a0c3-23a4c45c0d71"/>
             <column name="device" value="WEB"/>
             <column name="service" value="login"/>
@@ -55,7 +54,6 @@
         </insert>
 
         <insert tableName="payload">
-            <column name="id" value="2"/>
             <column name="payload_id" value="c4b4972a-6afb-42c6-8782-0352c7cebc82"/>
             <column name="device" value="WEB"/>
             <column name="service" value="signup"/>

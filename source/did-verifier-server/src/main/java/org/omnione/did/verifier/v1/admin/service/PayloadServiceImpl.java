@@ -36,8 +36,6 @@ public class PayloadServiceImpl implements PayloadService {
     @Override
     public List<PayloadDTO> getPayloadList(String service) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-
-        // service 값이 존재하면 해당 값으로 필터링, 없으면 모든 데이터를 조회
         List<Payload> payloadList;
         if (service != null && !service.isEmpty()) {
             payloadList = payloadRepository.findByService(service, sort);
@@ -45,7 +43,6 @@ public class PayloadServiceImpl implements PayloadService {
             payloadList = payloadRepository.findAll(sort);
         }
 
-        // Payload 객체 리스트를 PayloadDTO 객체 리스트로 변환
         return payloadList.stream()
                 .map(payload -> modelMapper.map(payload, PayloadDTO.class))
                 .collect(Collectors.toList());
@@ -71,9 +68,9 @@ public class PayloadServiceImpl implements PayloadService {
 
     @Override
     @Transactional
-    public Payload updatePayload(PayloadDTO reqPayloadDto) {
+    public PayloadDTO updatePayload(PayloadDTO reqPayloadDto) {
 
-        Payload existingPayload = payloadRepository.findByPayloadId(reqPayloadDto.getPayloadId())
+        Payload existingPayload = payloadRepository.findById(reqPayloadDto.getId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND));
 
         existingPayload.setService(reqPayloadDto.getService());
@@ -83,7 +80,7 @@ public class PayloadServiceImpl implements PayloadService {
         existingPayload.setEndpoints(reqPayloadDto.getEndpoints());
         existingPayload.setValidSecond(reqPayloadDto.getValidSecond());
 
-        return payloadRepository.save(existingPayload);
+        return modelMapper.map(payloadRepository.save(existingPayload), PayloadDTO.class);
     }
 
     @Override

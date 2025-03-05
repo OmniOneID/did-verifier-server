@@ -35,5 +35,7 @@ public class VerifierProperty {
     private String certVcRef;
     private String ref;
     private String name;
+    private String domain;
+    private String tasUrl;
     private ArrayList<String> verifierEndPoints = new ArrayList<>();
 }

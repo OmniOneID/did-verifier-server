@@ -1,9 +1,9 @@
 package org.omnione.did.base.db.repository;
 
-import org.jetbrains.annotations.NotNull;
 import org.omnione.did.base.db.domain.VpProcess;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,4 +12,5 @@ import java.util.Optional;
  */
 public interface VpProcessRepository extends JpaRepository<VpProcess, Long> {
     Optional<VpProcess> findById(Long id);
+    List<VpProcess> findByTitle(String title);
 }

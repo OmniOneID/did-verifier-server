@@ -60,15 +60,18 @@ import org.omnione.did.data.model.did.Proof;
 import org.omnione.did.data.model.did.VerificationMethod;
 import org.omnione.did.data.model.enums.did.ProofType;
 import org.omnione.did.data.model.profile.Filter;
+import org.omnione.did.data.model.profile.Process;
 import org.omnione.did.data.model.profile.ReqE2e;
 import org.omnione.did.data.model.profile.verify.InnerVerifyProfile;
 import org.omnione.did.data.model.profile.verify.VerifyProcess;
 import org.omnione.did.data.model.profile.verify.VerifyProfile;
 import org.omnione.did.data.model.provider.ProviderDetail;
+import org.omnione.did.data.model.util.json.GsonWrapper;
 import org.omnione.did.data.model.vc.Claim;
 import org.omnione.did.data.model.vc.CredentialSchema;
 import org.omnione.did.data.model.vc.VerifiableCredential;
 import org.omnione.did.data.model.vp.VerifiablePresentation;
+import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.agent.dto.*;
 
 import org.springframework.context.annotation.Profile;
@@ -184,25 +187,27 @@ public class VerifierServiceImpl implements VerifierService {
             verifyProfile.setId(UUID.randomUUID().toString());
             VerifyProcess process = verifyProfile.getProfile().getProcess();
             ReqE2e reqE2e = process.getReqE2e();
-            KeyPairInterface keyPair = generateEcKeyPair(process.getReqE2e().getCurve());
+            KeyPairInterface keyPair = generateEcKeyPair(reqE2e.getCurve());
             generateReqE2e(reqE2e, generateNonce, keyPair);
             process.setReqE2e(reqE2e);
             process.setVerifierNonce(generateNonce);
             //log.debug("verifyProfile: {}", verifyProfile.toJson());
-
+            String encodedSessionKey = encodedSessionKey((ECPrivateKey) keyPair.getPrivateKey());
             log.debug("\t --> Retrieving verifier DID Document");
             //DidDocument verifierDidDoc = didDocService.getDidDocument(verifierProperty.getDid());
 
             log.debug("\t --> Generating Verify Profile Proof");
             //verifyProfile.setProof(generatePreProof(verifierDidDoc));
+            //##TEST를 위한 임시 코드 시작
             verifyProfile.setProof(generatePreProof2());
+            //##TEST를 위한 임시 코드 끝
             verifyProfile.setProof(generateProof(verifyProfile));
             log.debug("verifyProfile: {}", verifyProfile.toJson());
 
             log.debug("\t --> Saving VP Profile and E2E information");
             VpProfileSave(verifyProfile, transaction.getId());
             SubTransaction lastSubTransaction = transactionService.findLastSubTransaction(transaction.getId());
-            String encodedSessionKey = encodedSessionKey((ECPrivateKey) keyPair.getPrivateKey());
+
 
             transactionService.saveSubTransaction(SubTransaction.builder()
                     .transactionId(transaction.getId())
@@ -440,14 +445,14 @@ public class VerifierServiceImpl implements VerifierService {
      * @throws OpenDidException If the policy is not found
      */
     private VerifyOfferResult getPolicyAndValidate(RequestOfferReqDto requestOfferReqDto) throws JsonProcessingException {
-        //policyId 찾기
+
         Optional<Policy> policy = policyRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
         if (policy.isEmpty()) {
             log.error("Policy not found for payloadId: {}", requestOfferReqDto.getPayloadId());
             throw new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND);
         }
         String policyId = policy.get().getPolicyId();
-        //payload_id로 payload 찾기
+
         Optional<Payload> payload = payloadRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
         if (payload.isEmpty()) {
             log.error("Payload not found for payloadId: {}", requestOfferReqDto.getPayloadId());
@@ -699,13 +704,8 @@ public class VerifierServiceImpl implements VerifierService {
 
 
         setVerifierProviderDetail(verifyProfile);
-        setVpProcess(verifyProfile, policyProfile.getProcessId());
         setVpFilter(verifyProfile, policyProfile.getFilterId());
-        log.debug("Verifier getFilter: {}", verifyProfile.getProfile().getFilter().toJson());
-        log.debug("Verifier getProcess: {}", verifyProfile.getProfile().getProcess().toJson());
-        log.debug("Verifier getVerifier: {}", verifyProfile.getProfile().getVerifier().toJson());
-        log.debug("Verifier getVerifier: {}", verifyProfile.getProfile().toJson());
-
+        setVpProcess(verifyProfile, policyProfile.getProcessId());
 
         return verifyProfile;
 
@@ -943,39 +943,31 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     private void setVpProcess(VerifyProfile verifyProfile, Long processId) throws JsonProcessingException {
-        Optional<VpProcess> vpProcessById = vpProcessRepository.findById(processId);
-        if (vpProcessById.isEmpty()){
+        Optional<VpProcess> vpProcessOptional = vpProcessRepository.findById(processId);
+        if (vpProcessOptional.isEmpty()) {
             throw new OpenDidException(ErrorCode.VP_PROCESS_NOT_FOUND);
         }
 
-        VpProcess vpProcess = vpProcessById.get();
+        VpProcess vpProcess = vpProcessOptional.get();
 
-        // DB에 저장된 process 값 가져오기
-        Object processObj = vpProcess.getProcess();
-        String processString;
+        ProcessDTO processDTO = ProcessDTO.fromEntity(vpProcess);
+        String tempNonce = "tempNonce";
+        ProcessDTO.ReqE2e reqE2e = new ProcessDTO.ReqE2e();
+        processDTO.setVerifierNonce(tempNonce);
+        reqE2e.setNonce(tempNonce);
+        reqE2e.setCurve(vpProcess.getCurve());
+        reqE2e.setCipher(vpProcess.getCipher());
+        reqE2e.setPadding(vpProcess.getPadding());
+        reqE2e.setPublicKey("tempPubKey");
+        processDTO.setReqE2e(reqE2e);
 
-        // processObj가 이미 문자열인 경우 직접 사용, 그렇지 않은 경우 Jackson으로 변환
-        if (processObj instanceof String) {
-            processString = (String) processObj;
-        } else {
-            processString = objectMapper.writeValueAsString(processObj);
-        }
+        Process process = processDTO.toVerifyProcessEntity();
+        String processString = new GsonWrapper().toJson(process);
 
-        log.debug("ProcessString 원본: {}", processString);
+        log.debug("ProcessString with generated nonce: {}", processString);
 
-        // 문자열에서 따옴표가 있는 경우 처리
-        if (processString.startsWith("\"") && processString.endsWith("\"")) {
-            processString = processString.substring(1, processString.length() - 1);
-            // JSON 이스케이프 문자 처리
-            processString = processString.replace("\\\"", "\"");
-        }
-
-        log.debug("ProcessString 처리 후: {}", processString);
-
-        // Gson을 사용하여 VerifyProcess 객체로 변환
         VerifyProcess verifyProcess = new VerifyProcess();
-        // 여기서 nonce 생성
-        verifyProcess.fromJson(processString);  // 클래스에 이미 구현된 fromJson 메서드 사용
+        verifyProcess.fromJson(processString);
 
         log.debug("verifyProcess: {}", verifyProcess.toJson());
         verifyProfile.getProfile().setProcess(verifyProcess);

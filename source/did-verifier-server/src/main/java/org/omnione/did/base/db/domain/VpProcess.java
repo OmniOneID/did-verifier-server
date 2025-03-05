@@ -1,10 +1,9 @@
 package org.omnione.did.base.db.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Type;
 import org.omnione.did.base.db.converter.StringListConverter;
 
@@ -21,12 +20,22 @@ import java.util.List;
 @Entity
 @Table(name = "vp_process")
 public class VpProcess extends BaseEntity implements Serializable {
-
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "title", nullable = false, length = 40)
+    private String title;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "endpoints")
+    private List<String> endpoints;
+    @Column(name = "auth_type")
+    private int authType;
+    @Column(name = "curve", nullable = false, length = 40)
+    private String curve;
+    @Column(name = "cipher", nullable = false, length = 40)
+    private String cipher;
+    @Column(name = "padding", nullable = false, length = 40)
+    private String padding;
 
-    @Column(name = "process", columnDefinition = "jsonb")
-    private String process;
 }

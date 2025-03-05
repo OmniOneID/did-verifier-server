@@ -1,7 +1,10 @@
 package org.omnione.did.base.db.repository;
 
 import org.omnione.did.base.db.domain.VpFilter;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -11,4 +14,5 @@ import java.util.Optional;
 public interface VpFilterRepository extends JpaRepository<VpFilter, Long> {
     Optional<VpFilter> findByFilterId(Long filterId);
 
+    List<VpFilter> findByTitle(String title, Sort sort);
 }

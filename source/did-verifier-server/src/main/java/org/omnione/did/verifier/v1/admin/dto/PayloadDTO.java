@@ -10,7 +10,10 @@ import org.omnione.did.base.db.domain.Payload;
 
 import java.time.Instant;
 
-
+/**
+ * The PayloadDTO class is a data transfer object that is used to transfer payload data between the database and the application.
+ * It is designed to facilitate the retrieval of payload data from the database, ensuring that the data is accurate and up-to-date.
+ */
 @Getter
 @Setter
 @Builder

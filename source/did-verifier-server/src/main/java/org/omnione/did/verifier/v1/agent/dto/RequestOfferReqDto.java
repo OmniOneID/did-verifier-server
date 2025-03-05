@@ -61,6 +61,7 @@ public class RequestOfferReqDto {
     /**
      * Service id.
      */
+    @Schema(example = "c4b4972a-6afb-42c6-8782-0352c7cebc82")
     @NotNull(message = "payload id cannot be null")
     private String payloadId;
 
