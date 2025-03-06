@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import { getService } from '../../../apis/vp-policy-api';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from '@mui/material';
 
 type Props = {}
 
@@ -13,13 +13,14 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
-    endpoints: string;
+    endpoints: string[];
 }
 
 const ServiceDetailPage = (props: Props) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const dialogs = useDialogs();
+    const theme = useTheme();
 
     const numericServiceId = id ? parseInt(id, 10) : null;
     const [isLoading, setIsLoading] = useState<boolean>(true); 
@@ -28,7 +29,7 @@ const ServiceDetailPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
-        endpoints: '',
+        endpoints: [],
     });
     
     useEffect(() => {
@@ -53,7 +54,7 @@ const ServiceDetailPage = (props: Props) => {
                     locked: data.locked,
                     device: data.device,
                     mode : data.mode,
-                    endpoints : data.endpoints,
+                    endpoints : JSON.parse(data.endpoints),
                 });
                 setIsLoading(false);
             } catch (err) {
@@ -116,14 +117,25 @@ const ServiceDetailPage = (props: Props) => {
                         </Select>
                     </FormControl>
 
-                    <TextField
-                        fullWidth
-                        label="API Address"
-                        value={serviceData?.endpoints || ''}
-                        variant="standard" 
-                        margin="normal" 
-                        slotProps={{ input: { readOnly: true } }} 
-                    />
+                    <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow sx={{ backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.paper : "#f5f5f5" }}>
+                                    <TableCell>API Address</TableCell> 
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {serviceData.endpoints?.map((endpoint, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <TextField fullWidth size="small" value={endpoint} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
                         <Button variant="contained" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>

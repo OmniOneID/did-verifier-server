@@ -1,8 +1,10 @@
 import { useDialogs } from '@toolpad/core';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import { urlRegex, ipRegex } from '../../../utils/regex';
 import { postService } from "../../../apis/vp-policy-api";
@@ -15,7 +17,7 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
-    endpoints: string;
+    endpoints: string[];
 }
 
 interface ErrorState {
@@ -23,7 +25,8 @@ interface ErrorState {
     locked?: string;
     device?: string;
     mode?: string;
-    endpoints?: string;
+    endpoints?: string[];
+    errorEndpointsMessage?: string;
 }
 
 const ServiceRegistrationPage = (props: Props) => {
@@ -35,30 +38,80 @@ const ServiceRegistrationPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
-        endpoints: '',
+        endpoints: [],
     });
-    const [initialData, setInitialData] = useState<ServiceFormData>({
-        service: '',
-        locked: undefined,
-        device: '',
-        mode: '',
-        endpoints: '',
-    });
-
     const [errors, setErrors] = useState<ErrorState>({});
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (field: keyof ServiceFormData) => 
         (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
-        const newValue = event.target.value;
-        setFormData((prev) => ({ ...prev, [field]: newValue }));
+            const newValue = event.target.value;
+            setFormData((prev) => ({ ...prev, [field]: newValue }));
+    };
+
+    const handleEndpointChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        const newEndpoints = [...formData.endpoints];
+        newEndpoints[index] = event.target.value;
+        setFormData((prev) => ({ ...prev, endpoints: newEndpoints }));
+    };
+
+    const handleAddEndpoint = () => {
+        setFormData((prev) => ({ ...prev, endpoints: [...prev.endpoints, ''] }));
+    };
+
+    const handleRemoveEndpoint = (index: number) => {
+        const newEndpoints = [...formData.endpoints];
+        newEndpoints.splice(index, 1);
+        setFormData((prev) => ({ ...prev, endpoints: newEndpoints }));
     };
 
     const handleReset = () => {
         setErrors({});
         setIsButtonDisabled(true);
-        setFormData({ service: '', locked: undefined, device: '', mode: '', endpoints: '' });
+        setFormData({ service: '', locked: undefined, device: '', mode: '', endpoints: [] });
+    };
+
+    const handleSubmit = async () => {
+        if (!validate()) return;
+
+        const result = await dialogs.open(CustomConfirmDialog, {
+            title: 'Confirmation',
+            message: 'Are you sure you want to register Service?',
+            isModal: true,
+        });
+
+        if (result) {
+            setIsLoading(true);
+
+            let requestObject = {
+                service: formData.service,
+                locked: formData.locked,
+                device: formData.device,
+                mode: formData.mode,
+                endpoints: JSON.stringify(formData.endpoints),
+                validSecond: 180
+            }
+
+            await postService(requestObject).then((response) => {
+                setIsLoading(false);
+                dialogs.open(CustomDialog, {
+                    title: 'Notification',
+                    message: 'Service registration completed.',
+                    isModal: true,
+                },{
+                    onClose: async (result) =>  navigate('/vp-policy-management/service-management'),
+                });
+    
+            }).catch((error) => {
+                setIsLoading(false);
+                dialogs.open(CustomDialog, {
+                    title: 'Notification',
+                    message: `Failed to register Service: ${error}`,
+                    isModal: true,
+                });
+            });
+        }
     };
 
     const validate = () => {
@@ -68,7 +121,13 @@ const ServiceRegistrationPage = (props: Props) => {
         tempErrors.locked = validateLocked(formData.locked);
         tempErrors.device = validateDevice(formData.device);
         tempErrors.mode = validateMode(formData.mode);
-        tempErrors.endpoints = validateEndpoints(formData.endpoints);
+
+        if (formData.endpoints.length === 0) {
+            tempErrors.errorEndpointsMessage = "At least one endpoint is required.";
+        } else {
+            tempErrors.endpoints = formData.endpoints.map(validateItem).map(err => err.endpoint).filter(Boolean) as string[];
+            if (tempErrors.endpoints.length === 0) tempErrors.endpoints = undefined;
+        }
 
         setErrors(tempErrors);
         return Object.values(tempErrors).every((error) => !error);
@@ -94,74 +153,31 @@ const ServiceRegistrationPage = (props: Props) => {
     const validateMode = (mode?: string): string | undefined => {
         if (!mode) return 'Please select a submission mode.';
         return undefined;
-    };
+    }; 
 
-    const validateEndpoints = (endpoints?: string): string | undefined => {
-        if (!endpoints) return 'Please enter an API address.';
-        if (endpoints.length > 200) return 'API address must be less than 200 characters.';
-
-        if (!urlRegex.test(endpoints) && !ipRegex.test(endpoints)) {
-            return 'Please enter a valid URL or IP address.';
-        }
-
-        return undefined;
-    };
-
-    const handleSubmit = async () => {
-        if (!validate()) return;
-
-        const result = await dialogs.open(CustomConfirmDialog, {
-            title: 'Confirmation',
-            message: 'Are you sure you want to register Service?',
-            isModal: true,
-        });
-
-        if (result) {
-            setIsLoading(true);
-
-            let requestObject = {
-                service: formData.service,
-                locked: formData.locked,
-                device: formData.device,
-                mode: formData.mode,
-                endpoints: formData.endpoints,
-                validSecond: 180
-            }
-
-            await postService(requestObject).then((response) => {
-                setIsLoading(false);
-                setInitialData(response.data);
-                dialogs.open(CustomDialog, {
-                    title: 'Notification',
-                    message: 'Service registration completed.',
-                    isModal: true,
-                },{
-                    onClose: async (result) =>  navigate('/vp-policy-management/service-management'),
-                });
+    const validateItem = (item: string): { endpoint?: string } => {
+        let itemErrors: { endpoint?: string } = {};
     
-            }).catch((error) => {
-                setIsLoading(false);
-                dialogs.open(CustomDialog, {
-                    title: 'Notification',
-                    message: `Failed to register Service: ${error}`,
-                    isModal: true,
-                });
-            });
-        }
-
+        if (!item.trim()) itemErrors.endpoint = "Endpoint is required.";
+        else if (!urlRegex.test(item) && !ipRegex.test(item)) itemErrors.endpoint = "Invalid endpoint format.";
+    
+        return itemErrors;
     };
 
     useEffect(() => {
-        const isModified = JSON.stringify(formData) !== JSON.stringify(initialData);
+        const isModified = Object.values(formData).some((value) => {
+            if (Array.isArray(value)) return value.length > 0;
+            return value !== '' && value !== undefined;
+        });
         setIsButtonDisabled(!isModified);
-    }, [formData, initialData]);
+    }, [formData]);
+    
 
     return (
         <>
             <FullscreenLoader open={isLoading} />
             <Box sx={{ p: 3 }}>
                 <Typography variant="h4">Service Registration</Typography>
-
                 <Box sx={{ maxWidth: 500, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
                     <TextField 
                         fullWidth
@@ -173,7 +189,6 @@ const ServiceRegistrationPage = (props: Props) => {
                         onChange={handleChange('service')} 
                         error={!!errors.service} 
                         helperText={errors.service} 
-                        sx={{ maxLength: 50 }}
                     />
 
                     <FormControl fullWidth margin="normal" error={!!errors.locked}>
@@ -202,15 +217,14 @@ const ServiceRegistrationPage = (props: Props) => {
                         onChange={handleChange('device')} 
                         error={!!errors.device} 
                         helperText={errors.device} 
-                        sx={{ maxLength: 50 }}
                     />
 
                     <FormControl fullWidth margin="normal" error={!!errors.mode}>
-                        <InputLabel>Submittion Mode</InputLabel>
+                        <InputLabel>Submission Mode</InputLabel>
                         <Select 
                             value={formData.mode} 
                             onChange={handleChange('mode')}
-                            label="Submittion Mode"
+                            label="Submission Mode"
                         >
                             <MenuItem value="Direct">Direct</MenuItem>
                             <MenuItem value="Indirect">inDirect</MenuItem>
@@ -218,31 +232,50 @@ const ServiceRegistrationPage = (props: Props) => {
                         </Select>
                         {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
                     </FormControl>
-
-                    <TextField 
-                        fullWidth
-                        label="API Address" 
-                        variant="outlined"
-                        margin="normal" 
-                        size="small"
-                        value={formData.endpoints} 
-                        onChange={handleChange('endpoints')} 
-                        error={!!errors.endpoints} 
-                        helperText={errors.endpoints} 
-                        sx={{ maxLength: 200 }}
-                    />
-
+                    
+                    <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
+                    {errors.errorEndpointsMessage && (
+                        <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>{errors.errorEndpointsMessage}</Typography>
+                    )}
+                    <Button variant="contained" startIcon={<AddCircleOutlineIcon />} sx={{ mt: 2, mb: 2 }} onClick={handleAddEndpoint}>
+                        Add Endpoint
+                    </Button>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>API Address</TableCell>
+                                    <TableCell>Delete</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {formData.endpoints.map((endpoint, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <TextField fullWidth size="small" value={endpoint} onChange={(event) => handleEndpointChange(index, event)} error={!!errors.endpoints?.[index]} helperText={errors.endpoints?.[index]} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => handleRemoveEndpoint(index)} color="error">
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
                         <Button variant="contained" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>
                             Back
                         </Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
                         <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isButtonDisabled}>Register</Button>
-                    </Box>        
+                    </Box>
                 </Box>
             </Box>
         </>
-    )
+    );
 }
 
-export default ServiceRegistrationPage
+export default ServiceRegistrationPage;
