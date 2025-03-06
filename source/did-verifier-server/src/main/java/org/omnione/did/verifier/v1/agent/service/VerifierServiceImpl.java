@@ -787,7 +787,7 @@ public class VerifierServiceImpl implements VerifierService {
         return VerifyOfferPayload.builder()
                 .service(payload.get().getService())
                 .device(payload.get().getDevice())
-                .mode(PresentMode.fromDisplayName(payload.get().getMode()))
+                .mode(PresentMode.fromProfileMode(payload.get().getMode()))
                 .endpoints(endpoints)
                 .locked(payload.get().isLocked())
                 .validUntil(validUntil.toString())

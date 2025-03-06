@@ -18,6 +18,7 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.db.constant.ProfileMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,8 +50,9 @@ public class Payload extends BaseEntity implements Serializable {
     private String device;
     @Column(name = "locked")
     private boolean locked;
+    @Enumerated(EnumType.STRING)
     @Column(name = "mode", nullable = false, length = 40)
-    private String mode;
+    private ProfileMode mode;
     @Column(name = "endpoints", nullable = false, length = 400)
     private String endpoints;
     @Column(name = "valid_second", nullable = false)

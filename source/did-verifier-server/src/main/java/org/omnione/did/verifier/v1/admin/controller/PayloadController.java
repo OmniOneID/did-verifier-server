@@ -4,9 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
-import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.verifier.v1.admin.dto.PayloadDTO;
 import org.omnione.did.verifier.v1.admin.service.PayloadService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,16 +32,22 @@ public class PayloadController {
     }
 
     //Payload Management
-    @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
-    @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
+//    @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
+//    @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
     public List<PayloadDTO> getPayloadList(@RequestParam(required = false) String service){
         return payloadService.getPayloadList(service);
+    }
+
+    @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
+    @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
+    public Page<PayloadDTO> searchPayloadList(String searchKey, String searchValue, Pageable pageable) {
+        return payloadService.searchPayloadList(searchKey, searchValue, pageable);
     }
 
     //Payload Management
     @Operation(summary = "Get Payload info", description = "get Payload(Service) info")
     @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_INFO)
-    public PayloadDTO getPayloadInfo(long id){
+    public PayloadDTO getPayloadInfo(@RequestParam(name = "id") Long id){
         return payloadService.getPayloadInfo(id);
     }
 
@@ -53,7 +60,7 @@ public class PayloadController {
 
     @Operation(summary = "Delete Payload", description = "Delete Payload")
     @DeleteMapping(UrlConstant.Verifier.DELETE_PAYLOAD_INFO)
-    public ResponseEntity<Void> deletePayload(long id) {
+    public ResponseEntity<Void> deletePayload(@RequestParam(name = "id") Long id) {
         payloadService.deletePayload(id);
         return ResponseEntity.noContent().build();
     }

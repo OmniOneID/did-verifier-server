@@ -9,6 +9,9 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.VerifierProperty;
 import org.omnione.did.verifier.v1.admin.dto.PayloadDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 public class PayloadServiceImpl implements PayloadService {
     private final PayloadRepository payloadRepository;
     private final ModelMapper modelMapper;
+    private final PayloadQueryService payloadQueryService;
 
     private VerifierProperty verifierProperty;
 
@@ -84,7 +88,7 @@ public class PayloadServiceImpl implements PayloadService {
     }
 
     @Override
-    public PayloadDTO getPayloadInfo(long id) {
+    public PayloadDTO getPayloadInfo(Long id) {
         Payload payload = payloadRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND));
         return modelMapper.map(payload, PayloadDTO.class);
@@ -99,6 +103,8 @@ public class PayloadServiceImpl implements PayloadService {
         payloadRepository.delete(payload);
     }
 
-
-
+    @Override
+    public Page<PayloadDTO> searchPayloadList(String searchKey, String searchValue, Pageable pageable) {
+        return payloadQueryService.searchPayloadList(searchKey, searchValue, pageable);
+    }
 }

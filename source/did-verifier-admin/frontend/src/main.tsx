@@ -16,6 +16,9 @@ import ProfileManagementPage from './pages/vp-policy-management/profile-manageme
 import ServiceManagementPage from './pages/vp-policy-management/service-management/ServiceManagementPage';
 import VpPolicyManagementPage from './pages/vp-policy-management/VpPolicyManagementPage';
 import VpSubmissionManagementPage from './pages/vp-submission-management/VpSubmissionManagementPage';
+import ServiceRegistrationPage from './pages/vp-policy-management/service-management/ServiceRegistrationPage';
+import ServiceDetailPage from './pages/vp-policy-management/service-management/ServiceDetailPage';
+import ServiceEditPage from './pages/vp-policy-management/service-management/ServiceEditPage';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +35,18 @@ const router = createBrowserRouter([
           {
             path: '/verifier-management',
             Component: VerifierManagementPage,
+          },
+          {
+            path: '/vp-policy-management/service-management/service-registration',
+            Component: ServiceRegistrationPage,
+          },
+          {
+            path: '/vp-policy-management/service-management/service-edit/:id',
+            Component: ServiceEditPage,
+          },
+          {
+            path: '/vp-policy-management/service-management/:id',
+            Component: ServiceDetailPage,
           },
           {
             path: '/vp-policy-management/service-management',

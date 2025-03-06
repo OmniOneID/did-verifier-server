@@ -17,6 +17,7 @@
 package org.omnione.did.base.datamodel.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.omnione.did.base.db.constant.ProfileMode;
 
 /**
  * Enumeration of presentation modes in the DID system.
@@ -56,4 +57,13 @@ public enum PresentMode {
         }
         throw new IllegalArgumentException("No enum constant with display name " + displayName);
     }
+
+    public static PresentMode fromProfileMode(ProfileMode profileMode) {
+        return switch (profileMode) {
+            case Direct -> PresentMode.DIRECT;
+            case Indirect -> PresentMode.INDIRECT;
+            case Proxy -> PresentMode.PROXY;
+        };
+    }
+
 }

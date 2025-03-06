@@ -6,9 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.constant.ProfileMode;
 import org.omnione.did.base.db.domain.Payload;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * The PayloadDTO class is a data transfer object that is used to transfer payload data between the database and the application.
@@ -25,7 +29,7 @@ public class PayloadDTO {
     private String service;
     private String device;
     private boolean locked;
-    private String mode;
+    private ProfileMode mode;
     private String endpoints;
     private Integer validSecond;
     private Instant createdAt;
@@ -54,6 +58,28 @@ public class PayloadDTO {
     public Payload toEntity() {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(this, Payload.class);
+    }
+
+    public static PayloadDTO fromPayload(Payload payload) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return PayloadDTO.builder()
+                .id(payload.getId())
+                .payloadId(payload.getPayloadId())
+                .service(payload.getService())
+                .device(payload.getDevice())
+                .locked(payload.isLocked())
+                .mode(payload.getMode())
+                .endpoints(payload.getEndpoints())
+                .validSecond(payload.getValidSecond())
+                .createdAt(payload.getCreatedAt())
+                .updatedAt(payload.getUpdatedAt())
+                .build();
+    }
+
+    private static String formatInstant(Instant instant, DateTimeFormatter formatter) {
+        if (instant == null) return null;
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter);
     }
 
 }
