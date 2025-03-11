@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Type;
+import org.omnione.did.base.datamodel.enums.EccCurveType;
+import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
+import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
 import org.omnione.did.base.db.converter.StringListConverter;
 
 import java.io.Serializable;
@@ -32,10 +35,10 @@ public class VpProcess extends BaseEntity implements Serializable {
     @Column(name = "auth_type")
     private int authType;
     @Column(name = "curve", nullable = false, length = 40)
-    private String curve;
+    private EccCurveType curve;
     @Column(name = "cipher", nullable = false, length = 40)
-    private String cipher;
+    private SymmetricCipherType cipher;
     @Column(name = "padding", nullable = false, length = 40)
-    private String padding;
+    private SymmetricPaddingType padding;
 
 }

@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.omnione.did.verifier.v1.admin.service.FilterService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * The FilterController class provides methods for managing filters in the DID Verifier application.
@@ -25,13 +25,13 @@ public class FilterController {
 
     @Operation(summary = "Get Filter List", description = "Get a list of filters by title (optional).")
     @GetMapping(UrlConstant.Verifier.GET_FILTER_LIST)
-    public List<FilterDTO> getFilterList(@RequestParam(required = false) String title) {
-        return filterService.getFilterList(title);
+    public Page<FilterDTO> searchFilterList(String searchKey, String searchValue, Pageable pageable) {
+        return filterService.searchFilterList(searchKey, searchValue, pageable);
     }
 
     @Operation(summary = "Get Filter Info", description = "Get a single filter's information.")
     @GetMapping(UrlConstant.Verifier.GET_FILTER_INFO)
-    public FilterDTO getFilterInfo(@RequestParam long filterId) {
+    public FilterDTO getFilterInfo(@PathVariable Long filterId) {
         return filterService.getFilterInfo(filterId);
     }
 
@@ -45,14 +45,13 @@ public class FilterController {
     @Operation(summary = "Update Filter", description = "Update an existing filter.")
     @PutMapping(UrlConstant.Verifier.UPDATE_FILTER_INFO)
     public ResponseEntity<FilterDTO> updateFilter(@RequestBody FilterDTO filterDTO) {
-        log.info("Updating Filter: {}", filterDTO);
         FilterDTO updatedFilterDTO = filterService.updateFilter(filterDTO);
         return ResponseEntity.ok(updatedFilterDTO);
     }
 
     @Operation(summary = "Delete Filter", description = "Delete a filter by ID.")
     @DeleteMapping(UrlConstant.Verifier.DELETE_FILTER_INFO)
-    public ResponseEntity<Void> deleteFilter(@RequestParam long filterId) {
+    public ResponseEntity<Void> deleteFilter(@PathVariable Long filterId) {
         filterService.deleteFilter(filterId);
         return ResponseEntity.noContent().build();
     }

@@ -47,6 +47,7 @@ public enum ErrorCode {
     VP_POLICY_PROFILE_NOT_FOUND("SSRVVRF00208", "VP_POLICY_PROFILE is not found.", 400),
     VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
     VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
+    VP_POLICY_UPDATE_FAILED("SSRVVRF00211", "Failed to update VP policy.", 500),
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),

@@ -32,43 +32,42 @@ public class UrlConstant {
         public static final String ADMIN = "/verifier/admin/v1";
         //Verifier Manage
         public static final String SAVE_VERIFIER_INFO = "/save_verifier-info";
-//        public static final String GET_VERIFIER_INFO = "/get_verifier-info";
 
-        //Payload Manage
-        public static final String SAVE_PAYLOAD_INFO = "/save_payload-info";
-        public static final String GET_PAYLOAD_INFO = "/get_payload-info";
-        public static final String GET_PAYLOAD_LIST = "/get_payload-list";
-        public static final String DELETE_PAYLOAD_INFO = "/delete_payload-info";
-        public static final String UPDATE_PAYLOAD_INFO = "/update_payload-info";
+        // Payload Manage
+        public static final String SAVE_PAYLOAD_INFO = "/payloads";
+        public static final String GET_PAYLOAD_INFO = "/payloads/{id}";
+        public static final String GET_PAYLOAD_LIST = "/payloads";
+        public static final String DELETE_PAYLOAD_INFO = "/payloads/{id}";
+        public static final String UPDATE_PAYLOAD_INFO = "/payloads/{id}";
 
-        //Filter Manage
-        public static final String SAVE_FILTER_INFO = "/save_filter-info";
-        public static final String GET_FILTER_INFO = "/get_filter-info";
-        public static final String GET_FILTER_LIST = "/get_filter-list";
-        public static final String DELETE_FILTER_INFO = "/delete_filter-info";
-        public static final String UPDATE_FILTER_INFO = "/update_filter-info";
+        // Filter Manage
+        public static final String SAVE_FILTER_INFO = "/filters";
+        public static final String GET_FILTER_INFO = "/filters/{filterId}";
+        public static final String GET_FILTER_LIST = "/filters";
+        public static final String DELETE_FILTER_INFO = "/filters/{filterId}";
+        public static final String UPDATE_FILTER_INFO = "/filters/{filterId}";
 
-        //Process Manage
-        public static final String SAVE_PROCESS_INFO = "/save_process-info";
-        public static final String GET_PROCESS_INFO = "/get_process-info";
-        public static final String GET_PROCESS_LIST = "/get_process-list";
-        public static final String DELETE_PROCESS_INFO = "/delete_process-info";
-        public static final String UPDATE_PROCESS_INFO = "/update_process-info";
+        // Process Manage
+        public static final String SAVE_PROCESS_INFO = "/processes";
+        public static final String GET_PROCESS_INFO = "/processes/{id}";
+        public static final String GET_PROCESS_LIST = "/processes";
+        public static final String DELETE_PROCESS_INFO = "/processes/{id}";
+        public static final String UPDATE_PROCESS_INFO = "/processes/{id}";
 
+        // Profile Manage
+        public static final String SAVE_PROFILE_INFO = "/profiles";
+        public static final String GET_PROFILE_INFO = "/profiles/{id}";
+        public static final String GET_PROFILE_LIST = "/profiles";
+        public static final String DELETE_PROFILE_INFO = "/profiles/{id}";
+        public static final String UPDATE_PROFILE_INFO = "/profiles/{id}";
 
-        //Profile Manage
-        public static final String SAVE_PROFILE_INFO = "/save_profile-info";
-        public static final String GET_PROFILE_INFO = "/get_profile-info";
-        public static final String GET_PROFILE_LIST = "/get_profile-list";
-        public static final String DELETE_PROFILE_INFO = "/delete_profile-info";
-        public static final String UPDATE_PROFILE_INFO = "/update_profile-info";
+        // Policy Manage
+        public static final String SAVE_POLICY_INFO = "/policies";
+        public static final String GET_POLICY_INFO = "/policies/{id}";
+        public static final String GET_POLICY_LIST = "/policies";
+        public static final String DELETE_POLICY_INFO = "/policies/{id}";
+        public static final String UPDATE_POLICY_INFO = "/policies/{id}";
 
-        //Policy Manage
-        public static final String SAVE_POLICY_INFO = "/save_policy-info";
-        public static final String GET_POLICY_INFO = "/get_policy-info";
-        public static final String GET_POLICY_LIST = "/get_policy-list";
-        public static final String DELETE_POLICY_INFO = "/delete_policy-info";
-        public static final String UPDATE_POLICY_INFO = "/update_policy-info";
 
         //Verifier Manage
         public static final String GET_VERIFIER_INFO = "/verifier/info";

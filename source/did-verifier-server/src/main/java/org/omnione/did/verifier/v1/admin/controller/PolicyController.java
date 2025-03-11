@@ -33,7 +33,7 @@ public class PolicyController {
 
     @Operation(summary = "Get Policy Info", description = "Get a single policy's information.")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_INFO)
-    public PolicyDTO getPolicyInfo(@RequestParam String policyId) {
+    public PolicyDTO getPolicyInfo(@PathVariable String policyId) {
         return vpPolicyService.getPolicyInfo(policyId);
     }
 
@@ -54,7 +54,7 @@ public class PolicyController {
 
     @Operation(summary = "Delete Policy", description = "Delete a policy by ID.")
     @DeleteMapping(UrlConstant.Verifier.DELETE_POLICY_INFO)
-    public ResponseEntity<Void> deletePolicy(@RequestParam String policyId) {
+    public ResponseEntity<Void> deletePolicy(@PathVariable String policyId) {
         vpPolicyService.deletePolicy(policyId);
         return ResponseEntity.noContent().build();
     }

@@ -13,21 +13,21 @@ export const fetchServices = async (page: number, size: number, searchKey: strin
         params.append("searchValue", searchValue);
     }
 
-    return getData(API_BASE_URL, `get_payload-list?${params.toString()}`);
+    return getData(API_BASE_URL, `payloads?${params.toString()}`);
 };
 
 export const postService = async (data: any) => {
-    return postData(API_BASE_URL, "save_payload-info", data);
+    return postData(API_BASE_URL, "payloads", data);
 }
 
 export const getService = async (id: number) => {
-    return getData(API_BASE_URL, `get_payload-info?id=${id}`);
+    return getData(API_BASE_URL, `payloads/${id}`);
 }
 
 export const putService = async (data: any) => {
-    return putData(API_BASE_URL, `update_payload-info`, data);
+    return putData(API_BASE_URL, `payloads/${data.id}`, data);
 }
 
 export const deleteService = async (id: number) => {    
-    return deleteData(API_BASE_URL, `delete_payload-info?id=${id}`);
+    return deleteData(API_BASE_URL, `payloads/${id}`);
 }

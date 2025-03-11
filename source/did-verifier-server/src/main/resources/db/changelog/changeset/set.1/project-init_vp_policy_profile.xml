@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+<changeSet id="init-vp_policy_profile" author="jhkim6557">
+  <createTable tableName="vp_policy_profile">
+    <column name="id" type="bigint" autoIncrement="true">
+      <constraints primaryKey="true" nullable="false" />
+    </column>
+    <column name="policy_profile_id" type="varchar(40)">
+      <constraints nullable="false" unique="true"/>
+    </column>
+    <column name="type" type="varchar(10)">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="title" type="varchar(100)">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="description" type="varchar(1000)">
+      <constraints nullable="true" unique="false"/>
+    </column>
+    <column name="encoding" type="varchar(10)">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="language" type="varchar(10)">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="format" type="varchar(40)">
+      <constraints nullable="true" unique="false"/>
+    </column>
+    <column name="link" type="varchar(100)">
+        <constraints nullable="true" unique="false"/>
+    </column>
+    <column name="value" type="varchar(1000)">
+        <constraints nullable="true" unique="false"/>
+    </column>
+    <column name="process_id" type="bigint">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="filter_id" type="bigint">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="created_at" type="timestamp">
+      <constraints nullable="false" unique="false"/>
+    </column>
+    <column name="updated_at" type="timestamp">
+      <constraints nullable="true" unique="false"/>
+    </column>
+  </createTable>
+</changeSet>
+
+  <changeSet id="insert-initial-data-vp_policy_profile" author="jhkim6557">
+    <insert tableName="vp_policy_profile">
+        <column name="policy_profile_id" value="c500950c-bf19-46d2-ba1d-255aa76d8b64"/>
+        <column name="type" value="VP"/>
+        <column name="title" value="VP Policy Profile"/>
+        <column name="description" value="VP Policy Profile Description"/>
+        <column name="encoding" value="UTF-8"/>
+        <column name="language" value="en"/>
+        <column name="process_id" value="1"/>
+        <column name="filter_id" value="1"/>
+        <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+        <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+    </insert>
+
+    <insert tableName="vp_policy_profile">
+        <column name="policy_profile_id" value="d3b95a02-06af-407b-b958-00d7141cf7f8"/>
+        <column name="type" value="VP"/>
+        <column name="title" value="VP Policy Profile 2"/>
+        <column name="description" value="VP Policy Profile Description 2"/>
+        <column name="encoding" value="UTF-8"/>
+        <column name="language" value="en"/>
+        <column name="process_id" value="2"/>
+        <column name="filter_id" value="2"/>
+        <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+        <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+    </insert>
+  </changeSet>
+
+</databaseChangeLog>

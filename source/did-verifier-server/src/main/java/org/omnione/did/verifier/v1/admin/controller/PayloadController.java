@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 /**
  * The AdminController class provides methods for saving and getting verifier information.
@@ -25,18 +23,6 @@ import java.util.List;
 public class PayloadController {
     private final PayloadService payloadService;
 
-//    @Operation(summary = "Get Verifier Info", description = "get Verifier Info")
-//    @GetMapping(UrlConstant.Verifier.GET_VERIFIER_INFO)
-    public String getVerifierInfo(){
-        return payloadService.getVerifierInfo();
-    }
-
-    //Payload Management
-//    @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
-//    @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
-    public List<PayloadDTO> getPayloadList(@RequestParam(required = false) String service){
-        return payloadService.getPayloadList(service);
-    }
 
     @Operation(summary = "Get Payload List", description = "get Payload(Service) List")
     @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_LIST)
@@ -47,7 +33,7 @@ public class PayloadController {
     //Payload Management
     @Operation(summary = "Get Payload info", description = "get Payload(Service) info")
     @GetMapping(UrlConstant.Verifier.GET_PAYLOAD_INFO)
-    public PayloadDTO getPayloadInfo(@RequestParam(name = "id") Long id){
+    public PayloadDTO getPayloadInfo(@PathVariable Long id){
         return payloadService.getPayloadInfo(id);
     }
 
@@ -60,7 +46,7 @@ public class PayloadController {
 
     @Operation(summary = "Delete Payload", description = "Delete Payload")
     @DeleteMapping(UrlConstant.Verifier.DELETE_PAYLOAD_INFO)
-    public ResponseEntity<Void> deletePayload(@RequestParam(name = "id") Long id) {
+    public ResponseEntity<Void> deletePayload(@PathVariable Long id) {
         payloadService.deletePayload(id);
         return ResponseEntity.noContent().build();
     }

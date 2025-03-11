@@ -2,6 +2,9 @@ package org.omnione.did.verifier.v1.admin.dto;
 
 import lombok.*;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.datamodel.enums.EccCurveType;
+import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
+import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
 import org.omnione.did.base.db.domain.VpProcess;
 import org.omnione.did.data.model.profile.verify.VerifyProcess;
 import java.util.List;
@@ -26,10 +29,10 @@ public class ProcessDTO {
     @Setter
     @Getter
     public static class ReqE2e {
-        private String curve;
+        private EccCurveType curve;
         private String nonce;
-        private String cipher;
-        private String padding;
+        private SymmetricCipherType cipher;
+        private SymmetricPaddingType padding;
         private String publicKey;
 
     }

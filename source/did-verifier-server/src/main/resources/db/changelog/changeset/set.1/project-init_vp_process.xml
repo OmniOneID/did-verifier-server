@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- 테이블 생성 -->
+    <changeSet id="init-vp_process" author="jhkim6557">
+        <createTable tableName="vp_process">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="endpoints" type="varchar(400)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auth_type" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="curve" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cipher" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="padding" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- 초기값 삽입 -->
+    <changeSet id="insert-initial-data-vp_process" author="jhkim6557">
+        <insert tableName="vp_process">
+            <column name="title" value="초기 프로세스 입니다."/>
+            <column name="endpoints" value='["http://127.0.0.1:8092/verifier"]'/>
+            <column name="auth_type" value="6"/>
+            <column name="curve" value="Secp256r1"/>
+            <column name="cipher" value="AES-256-CBC"/>
+            <column name="padding" value="PKCS5"/>
+            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+        </insert>
+
+        <insert tableName="vp_process">
+            <column name="title" value="초기 프로세스 입니다."/>
+            <column name="endpoints" value='["http://127.0.0.1:8092/verifier"]'/>
+            <column name="auth_type" value="0"/>
+            <column name="curve" value="Secp256r1"/>
+            <column name="cipher" value="AES-256-CBC"/>
+            <column name="padding" value="PKCS5"/>
+            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -25,6 +25,13 @@ const modeMapping: { [key: string]: string } = {
   Proxy: "Proxy",
 };
 
+const lockedMapping: { [key: string]: string } = {
+  true: "locked",
+  false: "unlocked",
+};
+
+
+
 const ServiceManagementPage = (props: Props) => {
   const navigate = useNavigate();
   const dialogs = useDialogs();
@@ -110,7 +117,9 @@ const ServiceManagementPage = (props: Props) => {
                 </Link>),
             },
             { field: 'device', headerName: "Device", width: 100},
-            { field: 'locked', headerName: "Lock Status", width: 100},
+            { field: 'locked', headerName: "Lock Status", width: 100,
+              renderCell: (params) => lockedMapping[params.value],
+            },
             { field: 'mode', headerName: "Submissin Mode", width: 200,
               renderCell: (params) => modeMapping[params.value],
             },

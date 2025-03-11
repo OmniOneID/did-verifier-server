@@ -2,7 +2,6 @@ package org.omnione.did.verifier.v1.admin.dto;
 
 import lombok.*;
 import org.modelmapper.ModelMapper;
-import org.omnione.did.base.datamodel.data.VpPolicy;
 import org.omnione.did.base.db.domain.Policy;
 
 import java.time.Instant;
@@ -19,7 +18,7 @@ import java.time.Instant;
 public class PolicyDTO {
     private Long id;
     private String policyId;
-    private String serviceId;
+    private String payloadId;
     private String profileId;
     private Instant createdAt;
     private Instant updatedAt;

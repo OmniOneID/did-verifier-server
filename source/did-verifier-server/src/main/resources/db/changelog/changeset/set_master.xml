@@ -11,11 +11,11 @@
   <include file="set.0/project-init_vp_profile.xml" relativeToChangelogFile="true" />
   <include file="set.0/project-init_vp_submit.xml" relativeToChangelogFile="true" />
   <include file="set.0/project-init_certificate_vc.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_payload.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_vp_filter.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_vp_process.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_vp_policy_profile.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_vp_policy.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_verifier.xml" relativeToChangelogFile="true" />
-  <include file="set.0/project-init_admin.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_payload.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_vp_filter.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_vp_process.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_vp_policy_profile.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_vp_policy.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_verifier.xml" relativeToChangelogFile="true" />
+  <include file="set.1/project-init_admin.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

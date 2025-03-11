@@ -19,6 +19,10 @@ import VpSubmissionManagementPage from './pages/vp-submission-management/VpSubmi
 import ServiceRegistrationPage from './pages/vp-policy-management/service-management/ServiceRegistrationPage';
 import ServiceDetailPage from './pages/vp-policy-management/service-management/ServiceDetailPage';
 import ServiceEditPage from './pages/vp-policy-management/service-management/ServiceEditPage';
+import FilterEditPage from './pages/vp-policy-management/filter-management/FilterEditPage';
+import FilterDetailPage from './pages/vp-policy-management/filter-management/FilterDetailPage';
+import FilterRegistrationPage from './pages/vp-policy-management/filter-management/FilterRegistrationPage';
+
 
 const router = createBrowserRouter([
   {
@@ -59,6 +63,18 @@ const router = createBrowserRouter([
           {
             path: '/vp-policy-management/filter-management',
             Component: FilterManagementPage,
+          },
+          {
+            path: '/vp-policy-management/filter-management/filter-edit/:id',
+            Component: FilterEditPage,            
+          },
+          {
+            path: '/vp-policy-management/filter-management/filter-registration',
+            Component: FilterRegistrationPage,
+          },
+          {
+            path: '/vp-policy-management/filter-management/:id',
+            Component: FilterDetailPage,
           },
           {
             path: '/vp-policy-management/process-management',
