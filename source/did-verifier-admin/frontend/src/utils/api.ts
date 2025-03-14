@@ -14,8 +14,7 @@ const requestApi = async (
   body?: any
 ): Promise<ApiResponse> => {
   const fullUrl = `${baseUrl}/${endpoint}`;
-  const isFormData = body instanceof FormData;
-  console.log("fullUrl", fullUrl);
+  const isFormData = body instanceof FormData;  
   const options: RequestInit = {
     method,
     headers: isFormData ? undefined : { "Content-Type": "application/json" },

@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * The FilterController class provides methods for managing filters in the DID Verifier application.
  * It is designed to facilitate the retrieval, creation, updating, and deletion of filters in the application.
@@ -54,5 +56,11 @@ public class FilterController {
     public ResponseEntity<Void> deleteFilter(@PathVariable Long filterId) {
         filterService.deleteFilter(filterId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Search Filter List", description = "Get a list of filters by title (optional).")
+    @GetMapping(UrlConstant.Verifier.GET_POPUP_FILTER_LIST)
+    public List<FilterDTO> getFilterList(@PathVariable String searchValue) {
+        return filterService.getFilterList(searchValue);
     }
 }

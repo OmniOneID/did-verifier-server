@@ -17,9 +17,12 @@ import java.time.Instant;
 @NoArgsConstructor
 public class PolicyDTO {
     private Long id;
+    private String policyTitle;
     private String policyId;
     private String payloadId;
+    private String payloadService;
     private String profileId;
+    private String profileTitle;
     private Instant createdAt;
     private Instant updatedAt;
 

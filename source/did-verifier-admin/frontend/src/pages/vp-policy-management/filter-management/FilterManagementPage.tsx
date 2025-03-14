@@ -18,8 +18,7 @@ type FilterRow = {
   type: string;
   requiredClaims: string[];
   allowedIssuers: string[];
-  displayClaims: string[];
-  value: string;
+  displayClaims: string[];  
   presentAll: boolean;
   createdAt: string;
 };
@@ -136,7 +135,7 @@ const FilterManagementPage = (props: Props) => {
         totalRows={totalRows} 
         paginationModel={paginationModel} 
         setPaginationModel={setPaginationModel} 
-        getRowId={(row) => row.filterId} 
+        getRowId={(row: { filterId: number; }) => row.filterId} 
       />
     </>
   );

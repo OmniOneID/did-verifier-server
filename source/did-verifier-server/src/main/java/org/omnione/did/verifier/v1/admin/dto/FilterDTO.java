@@ -1,5 +1,6 @@
 package org.omnione.did.verifier.v1.admin.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,10 @@ import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.VpFilter;
 import org.omnione.did.data.model.profile.Filter;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -58,7 +63,7 @@ public class FilterDTO {
         return modelMapper.map(this, Filter.class);
     }
     public static FilterDTO fromVpFilter(VpFilter filter) {
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return FilterDTO.builder()
                 .filterId(filter.getFilterId())
                 .title(filter.getTitle())
@@ -69,7 +74,12 @@ public class FilterDTO {
                 .displayClaims(filter.getDisplayClaims())
                 .value(filter.getValue())
                 .presentAll(filter.isPresent_all())
-                .createdAt(String.valueOf(filter.getCreatedAt()))
+                .createdAt(formatInstant(filter.getCreatedAt(), formatter))
                 .build();
+    }
+
+    private static String formatInstant(@NotNull Instant instant, DateTimeFormatter formatter) {
+        if (instant == null) return null;
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter);
     }
 }

@@ -20,7 +20,7 @@ interface FilterFormData {
     createdAt: string;
 }
 
-const ServiceDetailPage = (props: Props) => {
+const FilterDetailData = (props: Props) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const dialogs = useDialogs();
@@ -70,7 +70,7 @@ const ServiceDetailPage = (props: Props) => {
                 });                                    
                 setIsLoading(false);
             } catch (err) {
-                  console.error('Failed to fetch Serivce information:', err);
+                  console.error('Failed to fetch Filter information:', err);
                   setIsLoading(false);
                   navigate('/error', { state: { message: `Failed to namespace information: ${err}` } });
             }
@@ -83,8 +83,7 @@ const ServiceDetailPage = (props: Props) => {
         <>
             <FullscreenLoader open={isLoading} />
             <Box sx={{ p: 3 }}>
-                <Typography variant="h4">Service Detail Information</Typography>
-
+                <Typography variant="h4">Filter Detail Information</Typography>
                 <Box sx={{ maxWidth: 500, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
                     <TextField
                         fullWidth
@@ -195,4 +194,4 @@ const ServiceDetailPage = (props: Props) => {
     )
 }
 
-export default ServiceDetailPage
+export default FilterDetailData

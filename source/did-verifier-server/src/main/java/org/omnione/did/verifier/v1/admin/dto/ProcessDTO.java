@@ -67,9 +67,6 @@ public class ProcessDTO {
     }
 
     public static ProcessDTO fromEntity(VpProcess vpProcess) {
-        if (vpProcess == null) {
-            return null;
-        }
 
         // Create ReqE2e inner object
         ProcessDTO.ReqE2e reqE2e = new ProcessDTO.ReqE2e();

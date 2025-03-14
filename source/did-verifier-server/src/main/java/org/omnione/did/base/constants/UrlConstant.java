@@ -46,6 +46,7 @@ public class UrlConstant {
         public static final String GET_FILTER_LIST = "/filters";
         public static final String DELETE_FILTER_INFO = "/filters/{filterId}";
         public static final String UPDATE_FILTER_INFO = "/filters/{filterId}";
+        public static final String GET_POPUP_FILTER_LIST = "/filters/popups/{searchValue}";
 
         // Process Manage
         public static final String SAVE_PROCESS_INFO = "/processes";
@@ -53,6 +54,7 @@ public class UrlConstant {
         public static final String GET_PROCESS_LIST = "/processes";
         public static final String DELETE_PROCESS_INFO = "/processes/{id}";
         public static final String UPDATE_PROCESS_INFO = "/processes/{id}";
+        public static final String GET_POPUP_PROCESS_LIST = "/processes/popups/{searchValue}";
 
         // Profile Manage
         public static final String SAVE_PROFILE_INFO = "/profiles";

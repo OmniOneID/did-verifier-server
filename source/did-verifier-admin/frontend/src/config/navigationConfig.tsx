@@ -25,10 +25,10 @@ export const getNavigationByStatus = (serverStatus: string | null): Navigation=>
       title: 'VP Policy Management', 
       icon: <DescriptionIcon />,
       children: [
-        { segment: 'service-management', title: 'Service Management', icon: <CategoryIcon /> },
-        { segment: 'profile-management', title: 'VP Submission Rules', icon: <SchemaIcon /> },
+        { segment: 'service-management', title: 'Service Management', icon: <CategoryIcon /> },        
         { segment: 'filter-management', title: 'Filter Management', icon: <FilterListIcon /> },
         { segment: 'process-management', title: 'Process Management', icon: <ProcessIcon /> },
+        { segment: 'profile-management', title: 'Profile Management', icon: <SchemaIcon /> },
         { segment: 'policy-management', title: 'Policy Management', icon: <RuleIcon /> },
       ],
     },

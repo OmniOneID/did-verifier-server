@@ -54,8 +54,8 @@
             <column name="display_claims" value='["testId.aa"]'/>
             <column name="value" value="VerifiableProfile"/>
             <column name="present_all" value="false"/>
-            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="created_at" valueDate="now()"/>
+            <column name="updated_at" valueDate="now()"/>
         </insert>
 
         <insert tableName="vp_filter">
@@ -67,8 +67,8 @@
             <column name="display_claims" value='["testId.aa"]'/>
             <column name="value" value="VerifiableProfile"/>
             <column name="present_all" value="false"/>
-            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="created_at" valueDate="now()"/>
+            <column name="updated_at" valueDate="now()"/>
         </insert>
     </changeSet>
 

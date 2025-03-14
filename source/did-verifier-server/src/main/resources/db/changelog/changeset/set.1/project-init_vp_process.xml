@@ -46,8 +46,8 @@
             <column name="curve" value="Secp256r1"/>
             <column name="cipher" value="AES-256-CBC"/>
             <column name="padding" value="PKCS5"/>
-            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="created_at" valueDate="now()"/>
+            <column name="updated_at" valueDate="now()"/>
         </insert>
 
         <insert tableName="vp_process">
@@ -57,8 +57,8 @@
             <column name="curve" value="Secp256r1"/>
             <column name="cipher" value="AES-256-CBC"/>
             <column name="padding" value="PKCS5"/>
-            <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-            <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+            <column name="created_at" valueDate="now()"/>
+            <column name="updated_at" valueDate="now()"/>
         </insert>
 
     </changeSet>

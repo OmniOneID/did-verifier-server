@@ -29,5 +29,7 @@ public class Policy extends BaseEntity implements Serializable {
     private String payloadId;
     @Column(name = "profile_id", nullable = false, length = 40)
     private String profileId;
+    @Column(name = "policy_title", nullable = false, length = 255)
+    private String policyTitle;
 
 }

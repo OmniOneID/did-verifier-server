@@ -6,32 +6,34 @@
 
   <changeSet id="init-policy" author="jhkim6557">
     <createTable tableName="policy">
-      <!-- 정책 ID (PK) -->
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false" />
       </column>
 
-      <!-- 정책(policy) ID (UUID) -->
       <column name="policy_id" type="varchar(40)">
         <constraints nullable="false" unique="true"/>
       </column>
 
-      <!-- 서비스(payload) ID (하나의 서비스는 하나의 정책에만 등록 가능) -->
       <column name="payload_id" type="varchar(40)">
         <constraints nullable="false" unique="true"/>
       </column>
 
-      <!-- 프로필 ID -->
+      <column name="payload_service" type="varchar(40)">
+        <constraints nullable="false" />
+      </column>
+
       <column name="profile_id" type="varchar(40)">
         <constraints nullable="false"/>
       </column>
 
-      <!-- 생성일시 -->
+      <column name="policy_title" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+
       <column name="created_at" type="timestamp">
         <constraints nullable="false"/>
       </column>
 
-      <!-- 업데이트 일시 -->
       <column name="updated_at" type="timestamp">
         <constraints nullable="true"/>
       </column>
@@ -42,29 +44,35 @@
             baseTableName="policy" baseColumnNames="payload_id"
             referencedTableName="payload" referencedColumnNames="payload_id"
             constraintName="fk_policy_payload"
-            onDelete="CASCADE" onUpdate="CASCADE"/>
+            onDelete="CASCADE"/>
 
     <!-- 프로필 ID 외래 키 설정 -->
     <addForeignKeyConstraint
             baseTableName="policy" baseColumnNames="profile_id"
-            referencedTableName="vp_policy_profile" referencedColumnNames="policy_profile_id"
+            referencedTableName="policy_profile" referencedColumnNames="policy_profile_id"
             constraintName="fk_policy_profile"
-            onDelete="CASCADE" onUpdate="CASCADE"/>
+            onDelete="CASCADE" />
 
+    <!-- Sample Data 1 -->
     <insert tableName="policy">
-      <column name="policy_id" value="1a04cd9d-7487-44cd-ae55-0d509e53c48d"/>
-      <column name="payload_id" value="489b0326-0b48-4112-a0c3-23a4c45c0d71"/>
-      <column name="profile_id" value="c500950c-bf19-46d2-ba1d-255aa76d8b64"/>
-      <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-      <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+      <column name="policy_id" value="a1b2c3d4-e5f6-7890-1234-56789abcdef0"/>
+      <column name="payload_id" value="123e4567-e89b-12d3-a456-426614174000"/>
+      <column name="payload_service" value="service-1"/>
+      <column name="profile_id" value="a1b2c3d4-5678-90ab-cdef-123456789abc"/>
+      <column name="policy_title" value="Sample Policy Title 1"/>
+      <column name="created_at" valueDate="now()"/>
+      <column name="updated_at" valueDate="now()"/>
     </insert>
 
+    <!-- Sample Data 2 -->
     <insert tableName="policy">
-      <column name="policy_id" value="39d5c94e-9e22-4de7-b7ce-e70e26140ec3"/>
-      <column name="payload_id" value="c4b4972a-6afb-42c6-8782-0352c7cebc82"/>
-      <column name="profile_id" value="d3b95a02-06af-407b-b958-00d7141cf7f8"/>
-      <column name="created_at" valueDate="2025-02-18 00:00:00"/>
-      <column name="updated_at" valueDate="2025-02-18 00:00:00"/>
+      <column name="policy_id" value="f1a2b3c4-d5e6-7890-1234-56789abcdef0"/>
+      <column name="payload_id" value="987e6543-e89b-12d3-a456-426614174111"/>
+      <column name="payload_service" value="service-2"/>
+      <column name="profile_id" value="b1c2d3e4-5678-90ab-cdef-987654321abc"/>
+      <column name="policy_title" value="Sample Policy Title 2"/>
+      <column name="created_at" valueDate="now()"/>
+      <column name="updated_at" valueDate="now()"/>
     </insert>
 
   </changeSet>

@@ -17,12 +17,9 @@
 package org.omnione.did.verifier.v1.agent.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +74,6 @@ import org.omnione.did.verifier.v1.agent.dto.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.ECPrivateKey;
@@ -111,7 +107,7 @@ public class VerifierServiceImpl implements VerifierService {
 
     private final PolicyRepository policyRepository;
     private final PayloadRepository payloadRepository;
-    private final VpPolicyProfileRepository vpPolicyProfileRepository;
+    private final PolicyProfileRepository policyProfileRepository;
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
 
@@ -695,7 +691,7 @@ public class VerifierServiceImpl implements VerifierService {
         String profileId = policy.getProfileId();
 
         // 2. Profile을 Policy Profile 테이블에서 가져옵니다.
-        VpPolicyProfile policyProfile = vpPolicyProfileRepository.findByPolicyProfileId(profileId)
+        PolicyProfile policyProfile = policyProfileRepository.findByPolicyProfileId(profileId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
 
         // 3. Profile을 JSON 문자열로 변환하고 VerifyProfile 객체로 변환합니다.

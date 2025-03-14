@@ -3,15 +3,15 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
-import org.hibernate.annotations.Type;
 import org.omnione.did.base.datamodel.enums.EccCurveType;
 import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
 import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
+import org.omnione.did.base.db.converter.EccCurveTypeConverter;
 import org.omnione.did.base.db.converter.StringListConverter;
+import org.omnione.did.base.db.converter.SymmetricCipherTypeConverter;
+import org.omnione.did.base.db.converter.SymmetricPaddingTypeConverter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -34,11 +34,14 @@ public class VpProcess extends BaseEntity implements Serializable {
     private List<String> endpoints;
     @Column(name = "auth_type")
     private int authType;
-    @Column(name = "curve", nullable = false, length = 40)
+    @Convert(converter = EccCurveTypeConverter.class)
+    @Column(name = "curve", nullable = false, length = 15)
     private EccCurveType curve;
-    @Column(name = "cipher", nullable = false, length = 40)
+    @Convert(converter = SymmetricCipherTypeConverter.class)
+    @Column(name = "cipher", nullable = false, length = 15)
     private SymmetricCipherType cipher;
-    @Column(name = "padding", nullable = false, length = 40)
+    @Convert(converter = SymmetricPaddingTypeConverter.class)
+    @Column(name = "padding", nullable = false, length = 15)
     private SymmetricPaddingType padding;
 
 }

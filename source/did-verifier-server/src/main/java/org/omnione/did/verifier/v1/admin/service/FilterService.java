@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.VpFilter;
+import org.omnione.did.base.db.domain.VpProcess;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
@@ -13,10 +14,14 @@ import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -84,5 +89,24 @@ public class FilterService {
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_FILTER_NOT_FOUND));
 
         vpFilterRepository.delete(vpFilter);
+    }
+
+
+    public List<FilterDTO> getFilterList(String title) {
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+
+        List<VpFilter> vpFilterList;
+        if(Objects.equals(title, "all")){
+            vpFilterList = vpFilterRepository.findAll(sort);
+        } else if (title != null && !title.isEmpty()) {
+            vpFilterList = vpFilterRepository.findByTitle(title, sort);
+        } else {
+            vpFilterList = vpFilterRepository.findAll(sort);
+        }
+
+
+        return vpFilterList.stream()
+                .map(filter -> modelMapper.map(filter, FilterDTO.class))
+                .collect(Collectors.toList());
     }
 }

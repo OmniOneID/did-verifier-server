@@ -22,6 +22,15 @@ import ServiceEditPage from './pages/vp-policy-management/service-management/Ser
 import FilterEditPage from './pages/vp-policy-management/filter-management/FilterEditPage';
 import FilterDetailPage from './pages/vp-policy-management/filter-management/FilterDetailPage';
 import FilterRegistrationPage from './pages/vp-policy-management/filter-management/FilterRegistrationPage';
+import ProcessEditPage from './pages/vp-policy-management/process-management/ProcessEditPage';
+import ProcessDetailPage from './pages/vp-policy-management/process-management/ProcessDetailPage';
+import ProcessRegistrationPage from './pages/vp-policy-management/process-management/ProcessRegistrationPage';
+import ProfileDetailPage from './pages/vp-policy-management/profile-management/ProfileDetailPage';
+import ProfileEditPage from './pages/vp-policy-management/profile-management/ProfileEditPage';
+import ProfileRegistrationPage from './pages/vp-policy-management/profile-management/ProfileRegistrationPage';
+import PolicyDetailPage from './pages/vp-policy-management/policy-management/PolicyDetailPage';
+import PolicyEditPage from './pages/vp-policy-management/policy-management/PolicyEditPage';
+import PolicyRegistrationPage from './pages/vp-policy-management/policy-management/PolicyRegistrationPage';
 
 
 const router = createBrowserRouter([
@@ -61,6 +70,18 @@ const router = createBrowserRouter([
             Component: ProfileManagementPage,
           },
           {
+            path: '/vp-policy-management/profile-management/profile-edit/:id',
+            Component: ProfileEditPage,
+          },
+          {
+            path: '/vp-policy-management/profile-management/profile-registration',
+            Component: ProfileRegistrationPage,
+          },
+          {
+            path: '/vp-policy-management/profile-management/:id',
+            Component: ProfileDetailPage,
+          },
+          {
             path: '/vp-policy-management/filter-management',
             Component: FilterManagementPage,
           },
@@ -81,8 +102,32 @@ const router = createBrowserRouter([
             Component: ProcessManagementPage,
           },
           {
+            path: '/vp-policy-management/process-management/process-edit/:id',
+            Component: ProcessEditPage,
+          },
+          {
+            path: '/vp-policy-management/process-management/process-registration',
+            Component: ProcessRegistrationPage,
+          },
+          {
+            path: '/vp-policy-management/process-management/:id',
+            Component: ProcessDetailPage,
+          },
+          {
             path: '/vp-policy-management/policy-management',
             Component: PolicyManagementPage,
+          },
+          {
+            path: '/vp-policy-management/policy-management/policy-edit/:id',
+            Component: PolicyEditPage,
+          },
+          {
+            path: '/vp-policy-management/policy-management/policy-registration',
+            Component: PolicyRegistrationPage,
+          },
+          {
+            path: '/vp-policy-management/policy-management/:id',
+            Component: PolicyDetailPage,
           },
           {
             path: '/vp-policy-management',
