@@ -3,7 +3,7 @@ import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { fetchServices, deleteService } from "../../../apis/payload-api";
+import { fetchServices, deleteService } from "../../../apis/vp-payload-api";
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';

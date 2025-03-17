@@ -17,7 +17,6 @@
 package org.omnione.did.verifier.v1.agent.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.omnione.did.base.datamodel.enums.PresentMode;
@@ -61,9 +60,9 @@ public class RequestOfferReqDto {
     /**
      * Service id.
      */
-    @Schema(example = "c4b4972a-6afb-42c6-8782-0352c7cebc82")
-    @NotNull(message = "payload id cannot be null")
-    private String payloadId;
+    @Schema(example = "f1a2b3c4-d5e6-7890-1234-56789abcdef0")
+    @NotNull(message = "policy id cannot be null")
+    private String policyId;
 
 
 

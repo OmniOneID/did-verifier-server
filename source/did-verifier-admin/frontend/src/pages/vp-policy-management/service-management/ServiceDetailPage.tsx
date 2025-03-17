@@ -2,7 +2,7 @@ import { useDialogs } from '@toolpad/core';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router';
 import CustomDialog from '../../../components/dialog/CustomDialog';
-import { getService } from '../../../apis/payload-api';
+import { getService } from '../../../apis/vp-payload-api';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from '@mui/material';
 

@@ -1,13 +1,13 @@
 import { useDialogs } from '@toolpad/core';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router';
-import { getService } from '../../../apis/payload-api';
+import { getService } from '../../../apis/vp-payload-api';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import { urlRegex, ipRegex } from '../../../utils/regex';
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
-import { putService } from "../../../apis/payload-api";
+import { putService } from "../../../apis/vp-payload-api";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 

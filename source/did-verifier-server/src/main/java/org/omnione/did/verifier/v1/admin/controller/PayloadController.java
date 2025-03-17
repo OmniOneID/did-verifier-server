@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * The AdminController class provides methods for saving and getting verifier information.
@@ -60,6 +62,12 @@ public class PayloadController {
         PayloadDTO updatedPayloadDto = payloadService.updatePayload(reqPayloadDto);
 
         return ResponseEntity.ok(updatedPayloadDto);
+    }
+
+    @Operation(summary = "Get Payload List", description = "Get a list of payloads by service (optional).")
+    @GetMapping(UrlConstant.Verifier.GET_POPUP_PAYLOAD_LIST)
+    public List<PayloadDTO> getPayloadList(@PathVariable String searchValue) {
+        return payloadService.getPayloadList(searchValue);
     }
 
 }

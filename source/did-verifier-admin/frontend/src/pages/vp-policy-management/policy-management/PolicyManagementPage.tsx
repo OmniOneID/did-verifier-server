@@ -127,7 +127,7 @@ const PolicyManagementPage = (props: Props) => {
             navigate(`/vp-policy-management/policy-edit/${selectedRowData.id}`);
           }
         }}
-        onRegister={() => navigate('/vp-policy-management/policy-registration')}
+        onRegister={() => navigate('/vp-policy-management/policy-management/policy-registration')}
         onDelete={handleDelete}
         additionalButtons={[
           

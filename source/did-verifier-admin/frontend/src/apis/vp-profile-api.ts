@@ -31,3 +31,7 @@ export const putProfile = async (data: any) => {
 export const deleteProfile = async (id: number) => {    
     return deleteData(API_BASE_URL, `profiles/${id}`);
 }
+
+export const searchProfileList = async (searchValue: string | '') => {    
+    return getData(API_BASE_URL, `profiles/popups/${searchValue}`);
+}

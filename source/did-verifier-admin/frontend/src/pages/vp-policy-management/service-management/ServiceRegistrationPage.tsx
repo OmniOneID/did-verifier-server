@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import { urlRegex, ipRegex } from '../../../utils/regex';
-import { postService } from "../../../apis/payload-api";
+import { postService } from "../../../apis/vp-payload-api";
 import CustomDialog from '../../../components/dialog/CustomDialog';
 
 type Props = {}

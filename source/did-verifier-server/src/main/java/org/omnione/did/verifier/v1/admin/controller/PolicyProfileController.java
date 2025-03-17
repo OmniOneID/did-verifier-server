@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * The AdminController class provides methods for saving and getting verifier information.
@@ -55,6 +57,11 @@ public Page<PolicyProfileDTO> searchPolicyProfileList(String searchKey, String s
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         policyProfileService.deleteProfile(id);
         return ResponseEntity.noContent().build();
+    }
+    @Operation(summary = "Search Profile List", description = "Search a list of profiles by name (optional).")
+    @GetMapping(UrlConstant.Verifier.GET_POPUP_PROFILE_LIST)
+    public List<PolicyProfileDTO> getProfileList(@PathVariable String searchValue) {
+        return policyProfileService.getProfileList(searchValue);
     }
 
 }

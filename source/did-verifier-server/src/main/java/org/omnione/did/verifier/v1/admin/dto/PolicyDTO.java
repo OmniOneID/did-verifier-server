@@ -5,6 +5,9 @@ import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.Policy;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * The PolicyDTO class is a data transfer object that is used to transfer policy data between the client and the server.
@@ -21,14 +24,22 @@ public class PolicyDTO {
     private String policyId;
     private String payloadId;
     private String payloadService;
-    private String profileId;
+    private String policyProfileId;
     private String profileTitle;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private String createdAt;
 
 
     public static PolicyDTO toDTO(Policy policy) {
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(policy, PolicyDTO.class);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return PolicyDTO.builder()
+                .id(policy.getId())
+                .policyId(policy.getPolicyId())
+                .payloadId(policy.getPayloadId())
+                .policyProfileId(policy.getPolicyProfileId())
+                .policyTitle(policy.getPolicyTitle())
+                .build();
     }
+
+
+
 }

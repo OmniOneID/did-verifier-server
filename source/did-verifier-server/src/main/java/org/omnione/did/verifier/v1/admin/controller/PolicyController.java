@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
-import org.omnione.did.verifier.v1.admin.service.VpPolicyService;
+import org.omnione.did.verifier.v1.admin.service.PolicyService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -23,24 +23,24 @@ import java.util.List;
 @RequestMapping(value = UrlConstant.Verifier.ADMIN)
 public class PolicyController {
 
-    private final VpPolicyService vpPolicyService;
+    private final PolicyService policyService;
 
     @Operation(summary = "Get Policy List", description = "Get a list of policies by title (optional).")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_LIST)
     public List<PolicyDTO> getPolicyList() {
-        return vpPolicyService.getPolicyList();
+        return policyService.getPolicyList();
     }
 
     @Operation(summary = "Get Policy Info", description = "Get a single policy's information.")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_INFO)
-    public PolicyDTO getPolicyInfo(@PathVariable String policyId) {
-        return vpPolicyService.getPolicyInfo(policyId);
+    public PolicyDTO getPolicyInfo(@PathVariable Long id) {
+        return policyService.getPolicyInfo(id);
     }
 
     @Operation(summary = "Save Policy", description = "Save a new policy.")
     @PostMapping(UrlConstant.Verifier.SAVE_POLICY_INFO)
     public ResponseEntity<Void> savePolicy(@RequestBody PolicyDTO policyDTO) {
-        vpPolicyService.savePolicy(policyDTO);
+        policyService.savePolicy(policyDTO);
         return ResponseEntity.noContent().build();
     }
 
@@ -48,14 +48,14 @@ public class PolicyController {
     @PutMapping(UrlConstant.Verifier.UPDATE_POLICY_INFO)
     public ResponseEntity<PolicyDTO> updatePolicy(@RequestBody PolicyDTO policyDTO) {
         log.info("Updating Policy: {}", policyDTO);
-        PolicyDTO updatedPolicyDTO = vpPolicyService.updatePolicy(policyDTO);
+        PolicyDTO updatedPolicyDTO = policyService.updatePolicy(policyDTO);
         return ResponseEntity.ok(updatedPolicyDTO);
     }
 
     @Operation(summary = "Delete Policy", description = "Delete a policy by ID.")
     @DeleteMapping(UrlConstant.Verifier.DELETE_POLICY_INFO)
-    public ResponseEntity<Void> deletePolicy(@PathVariable String policyId) {
-        vpPolicyService.deletePolicy(policyId);
+    public ResponseEntity<Void> deletePolicy(@PathVariable Long id) {
+        policyService.deletePolicy(id);
         return ResponseEntity.noContent().build();
     }
 

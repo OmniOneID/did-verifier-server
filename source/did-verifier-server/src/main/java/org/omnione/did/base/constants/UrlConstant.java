@@ -39,6 +39,7 @@ public class UrlConstant {
         public static final String GET_PAYLOAD_LIST = "/payloads";
         public static final String DELETE_PAYLOAD_INFO = "/payloads/{id}";
         public static final String UPDATE_PAYLOAD_INFO = "/payloads/{id}";
+        public static final String GET_POPUP_PAYLOAD_LIST = "/payloads/popups/{searchValue}";
 
         // Filter Manage
         public static final String SAVE_FILTER_INFO = "/filters";
@@ -62,6 +63,7 @@ public class UrlConstant {
         public static final String GET_PROFILE_LIST = "/profiles";
         public static final String DELETE_PROFILE_INFO = "/profiles/{id}";
         public static final String UPDATE_PROFILE_INFO = "/profiles/{id}";
+        public static final String GET_POPUP_PROFILE_LIST = "/profiles/popups/{searchValue}";
 
         // Policy Manage
         public static final String SAVE_POLICY_INFO = "/policies";

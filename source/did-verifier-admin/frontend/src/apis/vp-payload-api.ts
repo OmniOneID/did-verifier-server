@@ -31,3 +31,7 @@ export const putService = async (data: any) => {
 export const deleteService = async (id: number) => {    
     return deleteData(API_BASE_URL, `payloads/${id}`);
 }
+
+export const searchServiceList = async (searchValue: string | '') => {    
+    return getData(API_BASE_URL, `payloads/popups/${searchValue}`);
+}

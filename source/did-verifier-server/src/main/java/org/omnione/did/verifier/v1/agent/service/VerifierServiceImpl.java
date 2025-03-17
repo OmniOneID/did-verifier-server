@@ -442,16 +442,16 @@ public class VerifierServiceImpl implements VerifierService {
      */
     private VerifyOfferResult getPolicyAndValidate(RequestOfferReqDto requestOfferReqDto) throws JsonProcessingException {
 
-        Optional<Policy> policy = policyRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
+        Optional<Policy> policy = policyRepository.findByPolicyId(requestOfferReqDto.getPolicyId());
         if (policy.isEmpty()) {
-            log.error("Policy not found for payloadId: {}", requestOfferReqDto.getPayloadId());
+            log.error("Policy not found for payloadId: {}", requestOfferReqDto.getPolicyId());
             throw new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND);
         }
         String policyId = policy.get().getPolicyId();
 
-        Optional<Payload> payload = payloadRepository.findByPayloadId(requestOfferReqDto.getPayloadId());
+        Optional<Payload> payload = payloadRepository.findByPayloadId(requestOfferReqDto.getPolicyId());
         if (payload.isEmpty()) {
-            log.error("Payload not found for payloadId: {}", requestOfferReqDto.getPayloadId());
+            log.error("Payload not found for payloadId: {}", requestOfferReqDto.getPolicyId());
             throw new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND);
         }
         VerifyOfferPayload verifyOfferPayload = policyToVerifyOfferPayload(payload);
@@ -688,10 +688,10 @@ public class VerifierServiceImpl implements VerifierService {
         Policy policy = policyRepository.findByPolicyId(policyId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND));
 
-        String profileId = policy.getProfileId();
+        String policyProfileId = policy.getPolicyProfileId();
 
         // 2. Profile을 Policy Profile 테이블에서 가져옵니다.
-        PolicyProfile policyProfile = policyProfileRepository.findByPolicyProfileId(profileId)
+        PolicyProfile policyProfile = policyProfileRepository.findByPolicyProfileId(policyProfileId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
 
         // 3. Profile을 JSON 문자열로 변환하고 VerifyProfile 객체로 변환합니다.

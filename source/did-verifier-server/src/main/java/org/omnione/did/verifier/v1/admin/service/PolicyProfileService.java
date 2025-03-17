@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,10 +38,12 @@ public class PolicyProfileService {
     public List<PolicyProfileDTO> getProfileList(String title) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
 
-        List<PolicyProfile> policyProfileList =
-                (title != null && !title.isEmpty())
-                        ? profileRepository.findByTitle(title, sort)
-                        : profileRepository.findAll(sort);
+        List<PolicyProfile> policyProfileList;
+        if(Objects.equals(title, "all")) {
+            policyProfileList = profileRepository.findAll(sort);
+        } else {
+            policyProfileList = profileRepository.findByTitle(title, sort);
+        }
 
         return policyProfileList.stream()
                 .map(this::convertToProfileDTO)

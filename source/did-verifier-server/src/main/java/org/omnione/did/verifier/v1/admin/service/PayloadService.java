@@ -10,9 +10,13 @@ import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PayloadDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The AdminServiceImpl class provides methods for saving and getting verifier information.
@@ -23,6 +27,19 @@ public class PayloadService {
     private final PayloadRepository payloadRepository;
     private final ModelMapper modelMapper;
     private final PayloadQueryService payloadQueryService;
+
+    public List<PayloadDTO> getPayloadList(String service) {
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+        List<Payload> payloadList;
+        if(Objects.equals("all", service)) {
+            payloadList = payloadRepository.findAll(sort);
+        } else {
+            payloadList = payloadRepository.findByService(service, sort);
+        }
+        return payloadList.stream()
+            .map(payload -> modelMapper.map(payload, PayloadDTO.class))
+            .collect(Collectors.toList());
+    }
 
     @Transactional
     public void savePayload(PayloadDTO payloadDTO) {

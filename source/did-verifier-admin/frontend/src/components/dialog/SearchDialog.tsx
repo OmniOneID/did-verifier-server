@@ -23,7 +23,10 @@ import SearchIcon from '@mui/icons-material/Search';
 interface SearchItem {
     id?: number;
     filterId?: number;
+    payloadId?: number;
+    policyProfileId?: number;
     title: string;
+    service: string;
     [key: string]: any; // For additional properties
 }
 
@@ -33,6 +36,7 @@ interface SearchDialogProps {
     onSelect: (item: SearchItem) => void;
     onSearch?: (searchTerm: string) => void; 
     title: string;
+    service: string;
     items: SearchItem[];
     loading?: boolean;
     idField?: string; 
@@ -44,6 +48,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
     onSelect,
     onSearch,
     title,
+    service,
     items,
     loading = false,
     idField = 'id' 
