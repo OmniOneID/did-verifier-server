@@ -1,14 +1,13 @@
+import { Box, Button, FormControlLabel, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, styled, useTheme } from '@mui/material';
 import { useDialogs } from '@toolpad/core';
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { searchFilterList } from '../../../apis/vp-filter-api';
+import { searchProcessList } from '../../../apis/vp-process-api';
+import { getProfile, putProfile } from '../../../apis/vp-profile-api';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import SearchDialog from '../../../components/dialog/SearchDialog';
-import { getProfile, putProfile } from '../../../apis/vp-profile-api';
-import { getVerifierInfo } from '../../../apis/verifier-api';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { searchProcessList } from '../../../apis/vp-process-api';
-import { searchFilterList } from '../../../apis/vp-filter-api';
-import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Radio, RadioGroup, FormControlLabel, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme, FormHelperText } from '@mui/material';
 
 type Props = {}
 
@@ -581,9 +580,31 @@ const ProfileEdit = (props: Props) => {
         }
     };
 
+    const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+        width: 800,
+        margin: 'auto',
+        marginTop: theme.spacing(1),
+        padding: theme.spacing(3),
+        border: 'none',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: '#ffffff',
+        boxShadow: '0px 4px 8px 0px #0000001A',
+    })), []);
+    
+    const StyledTitle = useMemo(() => styled(Typography)({
+        textAlign: 'left',
+        fontSize: '24px',
+        fontWeight: 700,
+    }), []);
+    
+    const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
+        marginTop: theme.spacing(2),
+    })), []);
+
     return (
         <>
             <FullscreenLoader open={isLoading} />
+            <Typography variant="h4">Profile Management</Typography>
             
             {/* Process Search Dialog */}
             <SearchDialog
@@ -606,9 +627,9 @@ const ProfileEdit = (props: Props) => {
               items={filterList}
               loading={filterLoading}
             />
-            <Box sx={{ p: 3 }}>
-                <Typography variant="h4">Edit Profile</Typography>
-                <Box sx={{ maxWidth: 800, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
+            <StyledContainer>
+                <StyledTitle>Profile Update</StyledTitle>
+                <StyledInputArea>
                     <TextField
                         fullWidth
                         required
@@ -880,10 +901,11 @@ const ProfileEdit = (props: Props) => {
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
                         <Button 
                             variant="contained" 
-                            color="secondary" 
-                            onClick={handleCancel}
+                            color="primary" 
+                            onClick={handleSubmit}
+                            disabled={isButtonDisabled}
                         >
-                            Cancel
+                            Update
                         </Button>
                         <Button 
                             variant="contained" 
@@ -893,16 +915,15 @@ const ProfileEdit = (props: Props) => {
                             Reset
                         </Button>
                         <Button 
-                            variant="contained" 
-                            color="primary" 
-                            onClick={handleSubmit}
-                            disabled={isButtonDisabled}
+                            variant="outlined" 
+                            color="secondary" 
+                            onClick={handleCancel}
                         >
-                            Save
+                            Cancel
                         </Button>
                     </Box>
-                </Box>
-            </Box>
+                </StyledInputArea>
+            </StyledContainer>
         </>
     );
 };

@@ -1,13 +1,13 @@
-import { Link } from '@mui/material';
+import { Box, Link, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import FullscreenLoader from "../../../components/loading/FullscreenLoader";
+import { deleteProcess, fetchProcesses } from '../../../apis/vp-process-api';
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
-import { deleteProcess, fetchProcesses } from '../../../apis/vp-process-api';
+import FullscreenLoader from "../../../components/loading/FullscreenLoader";
 
 type Props = {}
 
@@ -98,69 +98,87 @@ const ProcessManagementPage = (props: Props) => {
       .finally(() => setLoading(false));
   }, [paginationModel]);
 
+  const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+    margin: 'auto',
+    marginTop: theme.spacing(1),
+    padding: theme.spacing(3),
+    border: 'none',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: '#ffffff',
+    boxShadow: '0px 4px 8px 0px #0000001A',
+  })), []);
+
+  const StyledSubTitle = useMemo(() => styled(Typography)({
+      textAlign: 'left',
+      fontSize: '24px',
+      fontWeight: 700,
+  }), []);
 
   return (
     <>
       <FullscreenLoader open={loading} />
-      <CustomDataGrid 
-        rows={rows} 
-        columns={[
-          { 
-            field: 'title', 
-            headerName: "Title", 
-            width: 150,
-            renderCell: (params) => (
-              <Link 
-                component="button"
-                variant='body2'
-                onClick={() => navigate(`/vp-policy-management/process-management/${params.row.id}`)}
-                sx={{ cursor: 'pointer', color: 'primary.main' }}
-              >
-                {params.value}
-              </Link>),
-          },
-          { 
-            field: 'authType', 
-            headerName: "Auth Type", 
-            width: 100,
-            renderCell: (params) => modeMapping[params.value] || params.value,
-          },
-          { 
-            field: 'reqE2e.curve', 
-            headerName: "Curve", 
-            width: 120,
-            renderCell: (params) => params.row.reqE2e?.curve || '',
-          },
-          { 
-            field: 'reqE2e.cipher', 
-            headerName: "Cipher", 
-            width: 120,
-            renderCell: (params) => params.row.reqE2e?.cipher || '',
-          },
-          { 
-            field: 'reqE2e.padding', 
-            headerName: "Padding", 
-            width: 120,
-            renderCell: (params) => params.row.reqE2e?.padding || '',
-          },
-        ]} 
-        selectedRow={selectedRow} 
-        setSelectedRow={setSelectedRow}
-        onEdit={() => {
-          if (selectedRowData) {
-            navigate(`/vp-policy-management/process-management/process-edit/${selectedRowData.id}`);
-          }
-        }}
-        onRegister={() => navigate('/vp-policy-management/process-management/process-registration')}
-        onDelete={handleDelete}
-        additionalButtons={[
-        
-        ]}
-        paginationMode="server" 
-        totalRows={totalRows} 
-        paginationModel={paginationModel} 
-        setPaginationModel={setPaginationModel} 
-      />
+      <StyledContainer>
+        <StyledSubTitle>Process Management</StyledSubTitle>
+        <CustomDataGrid 
+          rows={rows} 
+          columns={[
+            { 
+              field: 'title', 
+              headerName: "Title", 
+              width: 150,
+              renderCell: (params) => (
+                <Link 
+                  component="button"
+                  variant='body2'
+                  onClick={() => navigate(`/vp-policy-management/process-management/${params.row.id}`)}
+                  sx={{ cursor: 'pointer', color: 'primary.main' }}
+                >
+                  {params.value}
+                </Link>),
+            },
+            { 
+              field: 'authType', 
+              headerName: "Auth Type", 
+              width: 100,
+              renderCell: (params) => modeMapping[params.value] || params.value,
+            },
+            { 
+              field: 'reqE2e.curve', 
+              headerName: "Curve", 
+              width: 120,
+              renderCell: (params) => params.row.reqE2e?.curve || '',
+            },
+            { 
+              field: 'reqE2e.cipher', 
+              headerName: "Cipher", 
+              width: 120,
+              renderCell: (params) => params.row.reqE2e?.cipher || '',
+            },
+            { 
+              field: 'reqE2e.padding', 
+              headerName: "Padding", 
+              width: 120,
+              renderCell: (params) => params.row.reqE2e?.padding || '',
+            },
+          ]} 
+          selectedRow={selectedRow} 
+          setSelectedRow={setSelectedRow}
+          onEdit={() => {
+            if (selectedRowData) {
+              navigate(`/vp-policy-management/process-management/process-edit/${selectedRowData.id}`);
+            }
+          }}
+          onRegister={() => navigate('/vp-policy-management/process-management/process-registration')}
+          onDelete={handleDelete}
+          additionalButtons={[
+          
+          ]}
+          paginationMode="server" 
+          totalRows={totalRows} 
+          paginationModel={paginationModel} 
+          setPaginationModel={setPaginationModel} 
+        />
+      </StyledContainer>
     </>
   )
 }

@@ -1,15 +1,14 @@
-import { useDialogs } from '@toolpad/core';
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router';
-import { getService } from '../../../apis/vp-payload-api';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { urlRegex, ipRegex } from '../../../utils/regex';
-import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
-import { putService } from "../../../apis/vp-payload-api";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Button, FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, styled, useTheme } from '@mui/material';
+import { useDialogs } from '@toolpad/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { getService, putService } from '../../../apis/vp-payload-api';
+import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
+import CustomDialog from '../../../components/dialog/CustomDialog';
+import FullscreenLoader from '../../../components/loading/FullscreenLoader';
+import { ipRegex, urlRegex } from '../../../utils/regex';
 
 type Props = {}
 
@@ -34,6 +33,7 @@ const ServiceEditPage = (props: Props) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const dialogs = useDialogs();
+    const theme = useTheme();
 
     const numericServiceId = id ? parseInt(id, 10) : null;
 
@@ -88,13 +88,29 @@ const ServiceEditPage = (props: Props) => {
           tempErrors.mode = validateMode(formData.mode);
           if (formData.endpoints.length === 0) {
             tempErrors.errorEndpointsMessage = "At least one endpoint is required.";
-        } else {
-            tempErrors.endpoints = formData.endpoints.map(validateItem).map(err => err.endpoint).filter(Boolean) as string[];
-            if (tempErrors.endpoints.length === 0) tempErrors.endpoints = undefined;
-        }
-  
-          setErrors(tempErrors);
-          return Object.values(tempErrors).every((error) => !error);
+          } else {
+            const seen = new Set<string>();
+            const duplicateIndices: number[] = [];
+    
+            formData.endpoints.forEach((value, index) => {
+                if (seen.has(value) && value.trim() !== "") {
+                    duplicateIndices.push(index);
+                }
+                seen.add(value);
+            });
+    
+            const endpointErrors = formData.endpoints.map((item, index) => {
+                if (!item.trim()) return "Endpoint is required.";
+                if (duplicateIndices.includes(index)) return "Duplicate endpoint is not allowed.";
+                if (!urlRegex.test(item) && !ipRegex.test(item)) return "Invalid endpoint format.";
+                return "";
+            });
+    
+            tempErrors.endpoints = endpointErrors.every(err => err === "") ? undefined : endpointErrors;
+          }
+    
+        setErrors(tempErrors);
+        return Object.values(tempErrors).every((error) => !error);
     };
     
     const validateService = (serivce?: string): string | undefined => {
@@ -216,110 +232,130 @@ const ServiceEditPage = (props: Props) => {
       setIsButtonDisabled(!isModified);
    }, [formData, initialData]);
 
+   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+        width: 500,
+        margin: 'auto',
+        marginTop: theme.spacing(1),
+        padding: theme.spacing(3),
+        border: 'none',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: '#ffffff',
+        boxShadow: '0px 4px 8px 0px #0000001A',
+    })), []);
+
+    const StyledTitle = useMemo(() => styled(Typography)({
+    textAlign: 'left',
+    fontSize: '24px',
+    fontWeight: 700,
+    }), []);
+
+    const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    })), []);
+
     return (
       <>
         <FullscreenLoader open={isLoading} />
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h4">Edit Service</Typography>
+        <Typography variant="h4">Server Management</Typography>
+        <StyledContainer>
+            <StyledTitle>Service Update</StyledTitle>
 
-          <Box sx={{ maxWidth: 500, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
-            <TextField 
-                fullWidth
-                label="Service" 
-                variant="outlined"
-                margin="normal" 
-                size="small"
-                value={formData.service} 
-                onChange={handleChange('service')} 
-                error={!!errors.service} 
-                helperText={errors.service} 
-                sx={{ maxLength: 50 }}
-            />
+            <StyledInputArea>
+                <TextField 
+                    fullWidth
+                    label="Service" 
+                    variant="outlined"
+                    margin="normal" 
+                    size="small"
+                    value={formData.service} 
+                    onChange={handleChange('service')} 
+                    error={!!errors.service} 
+                    helperText={errors.service} 
+                    sx={{ maxLength: 50 }}
+                />
 
-            <FormControl fullWidth margin="normal" error={!!errors.locked}>
-                <InputLabel>Lock Status</InputLabel>
-                <Select 
-                    value={formData.locked === undefined ? "" : String(formData.locked)}
-                    onChange={(event) => setFormData((prev) => ({
-                        ...prev, 
-                        locked: event.target.value === "true"
-                    }))}  
-                    label="Lock Status"
-                >
-                    <MenuItem value={"true"}>Locked</MenuItem>
-                    <MenuItem value={"false"}>Unlocked</MenuItem>
-                </Select>
-                {errors.locked && <FormHelperText>{errors.locked}</FormHelperText>}
-            </FormControl>
+                <FormControl fullWidth margin="normal" error={!!errors.locked}>
+                    <InputLabel>Lock Status</InputLabel>
+                    <Select 
+                        value={formData.locked === undefined ? "" : String(formData.locked)}
+                        onChange={(event) => setFormData((prev) => ({
+                            ...prev, 
+                            locked: event.target.value === "true"
+                        }))}  
+                        label="Lock Status"
+                    >
+                        <MenuItem value={"true"}>Locked</MenuItem>
+                        <MenuItem value={"false"}>Unlocked</MenuItem>
+                    </Select>
+                    {errors.locked && <FormHelperText>{errors.locked}</FormHelperText>}
+                </FormControl>
 
-            <TextField 
-                fullWidth
-                label="Device" 
-                variant="outlined"
-                margin="normal" 
-                size="small"
-                value={formData.device} 
-                onChange={handleChange('device')} 
-                error={!!errors.device} 
-                helperText={errors.device} 
-                sx={{ maxLength: 50 }}
-            />
+                <TextField 
+                    fullWidth
+                    label="Device" 
+                    variant="outlined"
+                    margin="normal" 
+                    size="small"
+                    value={formData.device} 
+                    onChange={handleChange('device')} 
+                    error={!!errors.device} 
+                    helperText={errors.device} 
+                    sx={{ maxLength: 50 }}
+                />
 
-            <FormControl fullWidth margin="normal" error={!!errors.mode}>
-                <InputLabel>Submittion Mode</InputLabel>
-                <Select 
-                    value={formData.mode} 
-                    onChange={handleChange('mode')}
-                    label="Submittion Mode"
-                >
-                    <MenuItem value="Direct">Direct</MenuItem>
-                    <MenuItem value="Indirect">inDirect</MenuItem>
-                    <MenuItem value="Proxy">Proxy</MenuItem>
-                </Select>
-                {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
-            </FormControl>
+                <FormControl fullWidth margin="normal" error={!!errors.mode}>
+                    <InputLabel>Submittion Mode</InputLabel>
+                    <Select 
+                        value={formData.mode} 
+                        onChange={handleChange('mode')}
+                        label="Submittion Mode"
+                    >
+                        <MenuItem value="Direct">Direct</MenuItem>
+                        <MenuItem value="Indirect">inDirect</MenuItem>
+                        <MenuItem value="Proxy">Proxy</MenuItem>
+                    </Select>
+                    {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
+                </FormControl>
 
-            <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
-            {errors.errorEndpointsMessage && (
-                <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>{errors.errorEndpointsMessage}</Typography>
-            )}
-            <Button variant="contained" startIcon={<AddCircleOutlineIcon />} sx={{ mt: 2, mb: 2 }} onClick={handleAddEndpoint}>
-                Add Endpoint
-            </Button>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>API Address</TableCell>
-                            <TableCell>Delete</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {formData.endpoints.map((endpoint, index) => (
-                            <TableRow key={index}>
-                                <TableCell>
-                                    <TextField fullWidth size="small" value={endpoint} onChange={(event) => handleEndpointChange(index, event)} error={!!errors.endpoints?.[index]} helperText={errors.endpoints?.[index]} />
-                                </TableCell>
-                                <TableCell>
-                                    <IconButton onClick={() => handleRemoveEndpoint(index)} color="error">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-                <Button variant="contained" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>
-                  Back
+                <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
+                {errors.errorEndpointsMessage && (
+                    <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>{errors.errorEndpointsMessage}</Typography>
+                )}
+                <Button variant="contained" startIcon={<AddCircleOutlineIcon />} sx={{ mt: 2, mb: 2 }} onClick={handleAddEndpoint}>
+                    Add Endpoint
                 </Button>
-                <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Update</Button>
-            </Box>
-          </Box>
-        </Box>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{ backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.paper : "#f5f5f5" }}>
+                                <TableCell sx={{ width: '80%' }}>API Address</TableCell>
+                                <TableCell>Delete</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {formData.endpoints.map((endpoint, index) => (
+                                <TableRow key={index}>
+                                    <TableCell sx={{ verticalAlign: 'top', width: '80%' }}>
+                                        <TextField fullWidth size="small" value={endpoint} onChange={(event) => handleEndpointChange(index, event)} error={!!errors.endpoints?.[index]} helperText={errors.endpoints?.[index]} />
+                                    </TableCell>
+                                    <TableCell sx={{ verticalAlign: 'top', width: '20%', textAlign: 'center' }}>
+                                        <IconButton onClick={() => handleRemoveEndpoint(index)} sx={{ color: '#FF8400' }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+                    <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Update</Button>
+                    <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
+                    <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>Cancel</Button>
+                </Box>
+          </StyledInputArea>
+        </StyledContainer>
       </>
     )
 }

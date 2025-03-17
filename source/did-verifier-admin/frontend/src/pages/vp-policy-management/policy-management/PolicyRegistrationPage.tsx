@@ -1,13 +1,13 @@
+import { Box, Button, TextField, Typography, styled, useTheme } from '@mui/material';
 import { useDialogs } from '@toolpad/core';
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import SearchDialog from '../../../components/dialog/SearchDialog';
+import { searchServiceList } from '../../../apis/vp-payload-api';
 import { postPolicy } from '../../../apis/vp-policy-api';
 import { searchProfileList } from '../../../apis/vp-profile-api';
-import { searchServiceList } from '../../../apis/vp-payload-api';
+import CustomDialog from '../../../components/dialog/CustomDialog';
+import SearchDialog from '../../../components/dialog/SearchDialog';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { Box, Button, Paper, TextField, Typography, useTheme } from '@mui/material';
 
 type Props = {}
 
@@ -302,9 +302,31 @@ const PolicyRegistration = (props: Props) => {
         }
     };
 
+    const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+        width: 800,
+        margin: 'auto',
+        marginTop: theme.spacing(1),
+        padding: theme.spacing(3),
+        border: 'none',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: '#ffffff',
+        boxShadow: '0px 4px 8px 0px #0000001A',
+    })), []);
+    
+    const StyledTitle = useMemo(() => styled(Typography)({
+        textAlign: 'left',
+        fontSize: '24px',
+        fontWeight: 700,
+    }), []);
+    
+    const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
+        marginTop: theme.spacing(2),
+    })), []);
+
     return (
         <>
             <FullscreenLoader open={isLoading} />
+            <Typography variant="h4">Policy Management</Typography>
             
             {/* Profile Search Dialog */}
             <SearchDialog
@@ -329,9 +351,9 @@ const PolicyRegistration = (props: Props) => {
                 loading={payloadLoading}
                 idField="id"  
             />
-            <Box sx={{ p: 3 }}>
-                <Typography variant="h4">Create New Policy</Typography>
-                <Box sx={{ maxWidth: 800, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
+            <StyledContainer>
+                <StyledTitle>Policy Registration</StyledTitle>
+                <StyledInputArea>
                     <TextField
                         fullWidth
                         required
@@ -396,10 +418,11 @@ const PolicyRegistration = (props: Props) => {
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
                         <Button 
                             variant="contained" 
-                            color="secondary" 
-                            onClick={() => navigate('/vp-policy-management/policy-management')}
+                            color="primary" 
+                            onClick={handleSubmit}
+                            disabled={isButtonDisabled}
                         >
-                            Cancel
+                            Register
                         </Button>
                         <Button 
                             variant="contained" 
@@ -409,16 +432,15 @@ const PolicyRegistration = (props: Props) => {
                             Reset
                         </Button>
                         <Button 
-                            variant="contained" 
-                            color="primary" 
-                            onClick={handleSubmit}
-                            disabled={isButtonDisabled}
+                            variant="outlined" 
+                            color="secondary" 
+                            onClick={() => navigate('/vp-policy-management/policy-management')}
                         >
-                            Save
+                            Cancel
                         </Button>
                     </Box>
-                </Box>
-            </Box>
+                </StyledInputArea>
+            </StyledContainer>
         </>
     );
 };

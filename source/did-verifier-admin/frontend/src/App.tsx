@@ -1,3 +1,4 @@
+import { CssBaseline, GlobalStyles } from '@mui/material';
 import type { Navigation, Session } from '@toolpad/core/AppProvider';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { DialogsProvider } from '@toolpad/core/useDialogs';
@@ -8,6 +9,7 @@ import LoadingOverlay from './components/loading/LoadingOverlay';
 import { getNavigationByStatus } from './config/navigationConfig';
 import { ServerStatusProvider, useServerStatus } from './context/ServerStatusContext';
 import { SessionContext } from './context/SessionContext';
+import customTheme from './theme';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -88,7 +90,9 @@ function AppContent() {
           navigation={navigation}
           session={session}
           authentication={{ signIn, signOut }}
+          theme={customTheme}
         >
+          <CssBaseline />
           <Outlet />
         </ReactRouterAppProvider>
       </DialogsProvider>
@@ -99,6 +103,7 @@ function AppContent() {
 export default function App() {
   return (
     <ServerStatusProvider>
+      <GlobalStyles styles={{ body: { padding: "10px" } }} />
       <AppContent />
     </ServerStatusProvider>
   );

@@ -1,13 +1,13 @@
-import { useDialogs } from '@toolpad/core';
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router';
-import { getFilter, putFilter } from '../../../apis/vp-filter-api';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Checkbox, FormControlLabel } from '@mui/material';
-import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Button, FormControl, FormHelperText, IconButton, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, styled } from '@mui/material';
+import { useDialogs } from '@toolpad/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { getFilter, putFilter } from '../../../apis/vp-filter-api';
+import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
+import CustomDialog from '../../../components/dialog/CustomDialog';
+import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 
 type Props = {}
 
@@ -228,13 +228,34 @@ const FilterEditPage = (props: Props) => {
       setIsButtonDisabled(!isModified);
     }, [formData, initialData]);
 
+    const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+        width: 600,
+        margin: 'auto',
+        marginTop: theme.spacing(1),
+        padding: theme.spacing(3),
+        border: 'none',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: '#ffffff',
+        boxShadow: '0px 4px 8px 0px #0000001A',
+    })), []);
+    
+    const StyledTitle = useMemo(() => styled(Typography)({
+        textAlign: 'left',
+        fontSize: '24px',
+        fontWeight: 700,
+    }), []);
+    
+    const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
+        marginTop: theme.spacing(2),
+    })), []);
+
     return (
       <>
         <FullscreenLoader open={isLoading} />
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h4">Edit Filter</Typography>
-
-          <Box sx={{ maxWidth: 600, margin: 'auto', mt: 2, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
+        <Typography variant="h4">Filter Management</Typography>
+        <StyledContainer>
+          <StyledTitle>Filter Update</StyledTitle>
+          <StyledInputArea>
             <TextField 
                 fullWidth
                 label="Title" 
@@ -310,7 +331,7 @@ const FilterEditPage = (props: Props) => {
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
-                        <TableRow>
+                        <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                             <TableCell>Required Claim</TableCell>
                             <TableCell>Action</TableCell>
                         </TableRow>
@@ -352,7 +373,7 @@ const FilterEditPage = (props: Props) => {
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
-                        <TableRow>
+                        <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                             <TableCell>Display Claim</TableCell>
                             <TableCell>Action</TableCell>
                         </TableRow>
@@ -398,7 +419,7 @@ const FilterEditPage = (props: Props) => {
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
-                        <TableRow>
+                        <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                             <TableCell>Allowed Issuer</TableCell>
                             <TableCell>Action</TableCell>
                         </TableRow>
@@ -433,14 +454,14 @@ const FilterEditPage = (props: Props) => {
                 {errors.presentAll && <FormHelperText>{errors.presentAll}</FormHelperText>}
             </FormControl>
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-                <Button variant="contained" color="secondary" onClick={() => navigate('/vp-policy-management/filter-management')}>
-                  Back
-                </Button>
-                <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
                 <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Update</Button>
+                <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
+                <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/filter-management')}>
+                  Cancel
+                </Button>
             </Box>
-          </Box>
-        </Box>
+          </StyledInputArea>
+        </StyledContainer>
       </>
     )
 }
