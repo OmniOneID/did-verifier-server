@@ -48,7 +48,7 @@ server:
   port: 8092
 
 tas:
-  url: 
+  url:
 
 verifier:
   domain: "http://127.0.0.1:8092"
@@ -61,7 +61,7 @@ verifier:
 
 wallet:
   file-path:
-  password: 12345
+  password: omnioneopendid12!@
 
 
 springdoc:
