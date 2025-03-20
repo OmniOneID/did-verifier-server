@@ -23,6 +23,7 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.enums.did.ProofPurpose;
+import org.omnione.did.verifier.v1.common.service.StorageService;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Executors;

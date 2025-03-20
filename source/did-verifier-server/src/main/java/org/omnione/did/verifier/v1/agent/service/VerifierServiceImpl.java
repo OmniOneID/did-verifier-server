@@ -71,6 +71,7 @@ import org.omnione.did.data.model.vp.VerifiablePresentation;
 import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.agent.dto.*;
 
+import org.omnione.did.verifier.v1.common.service.StorageService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -97,7 +98,6 @@ public class VerifierServiceImpl implements VerifierService {
     private final TransactionService transactionService;
     private final E2EQueryService e2EQueryService;
     private final VpOfferQueryService vpOfferQueryService;
-//    private final FileLoaderService fileLoaderService;
     private final VpProfileRepository vpProfileRepository;
     private final VpSubmitRepository vpSubmitRepository;
     private final FileWalletService walletService;

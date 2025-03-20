@@ -28,8 +28,8 @@ import org.omnione.did.verifier.v1.admin.dto.GetVerifierInfoReqDto;
 import org.omnione.did.verifier.v1.admin.dto.SendCertificateVcReqDto;
 import org.omnione.did.verifier.v1.admin.dto.SendEntityInfoReqDto;
 import org.omnione.did.verifier.v1.agent.service.CertificateVcQueryService;
-import org.omnione.did.verifier.v1.agent.service.StorageService;
 import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
+import org.omnione.did.verifier.v1.common.service.StorageService;
 import org.springframework.stereotype.Service;
 
 @Slf4j

@@ -10,6 +10,7 @@ spring:
           - logging
           - spring-docs
           - verifier
+          - blockchain
         sample:
           - databases-sample
           - wallet
