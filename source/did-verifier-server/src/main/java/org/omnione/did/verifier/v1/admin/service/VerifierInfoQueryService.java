@@ -42,4 +42,9 @@ public class VerifierInfoQueryService {
     public VerifierInfo getVerifierInfoOrNull() {
         return verifierInfoRepository.findFirstBy().orElse(null);
     }
+
+    public void save(VerifierInfo verifierInfo) {
+        VerifierInfo savedVerifierInfo = verifierInfoRepository.save(verifierInfo);
+        this.verifierInfo = savedVerifierInfo;
+    }
 }
