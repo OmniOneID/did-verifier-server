@@ -26,9 +26,9 @@ spring:
     enabled: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/postgres
-    username: postgres
-    password:
+    url: jdbc:postgresql://127.0.0.1:5430/verifier
+    username: omn
+    password: omn
   jpa:
     open-in-view: true
     show-sql: true
@@ -48,7 +48,7 @@ server:
   port: 8092
 
 tas:
-  url: http://127.0.0.1:8090/tas
+  url: 
 
 verifier:
   domain: "http://127.0.0.1:8092"
@@ -60,7 +60,7 @@ verifier:
   tas-url: ""
 
 wallet:
-  file-path: source/did-verifier-server/verifier.wallet
+  file-path:
   password: 12345
 
 
