@@ -40,14 +40,14 @@
             baseTableName="policy" baseColumnNames="payload_id"
             referencedTableName="payload" referencedColumnNames="payload_id"
             constraintName="fk_policy_payload"
-            onDelete="CASCADE"/>
+            />
 
     <!-- 프로필 ID 외래 키 설정 -->
     <addForeignKeyConstraint
             baseTableName="policy" baseColumnNames="policy_profile_id"
             referencedTableName="policy_profile" referencedColumnNames="policy_profile_id"
             constraintName="fk_policy_profile"
-            onDelete="CASCADE" />
+             />
 
     <!-- Sample Data 1 -->
     <insert tableName="policy">

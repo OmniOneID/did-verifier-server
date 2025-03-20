@@ -11,6 +11,17 @@ import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 
 type Props = {}
 
+// Define a SearchItem type to match the SearchDialog component's expected type
+interface SearchItem {
+  id?: number;
+  filterId?: number;
+  payloadId?: number;
+  policyProfileId?: number;
+  title: string;
+  service: string;
+  [key: string]: any;
+}
+
 interface LogoImage {
   format: string;
   link?: string;
@@ -71,15 +82,16 @@ const ProfileEdit = (props: Props) => {
     // States for search dialogs
     const [processSearchOpen, setProcessSearchOpen] = useState(false);
     const [filterSearchOpen, setFilterSearchOpen] = useState(false);
-    const [processList, setProcessList] = useState<{id: number, title: string}[]>([]);
-    const [filterList, setFilterList] = useState<{id: number, title: string}[]>([]);
+    const [processList, setProcessList] = useState<SearchItem[]>([]);
+    const [filterList, setFilterList] = useState<SearchItem[]>([]);
     const [processLoading, setProcessLoading] = useState(false);
     const [filterLoading, setFilterLoading] = useState(false);
 
-    const transformFilterList = (data: any[]): {id: number, title: string}[] => {        
+    const transformFilterList = (data: any[]): SearchItem[] => {        
       return data.map(item => ({
         id: item.filterId || item.id || 0, 
-        title: item.title || item.name || `Filter ${item.filterId || item.id || 'Unknown'}`          
+        title: item.title || item.name || `Filter ${item.filterId || item.id || 'Unknown'}`,
+        service: ''        
       }));
     };
     
@@ -299,7 +311,7 @@ const ProfileEdit = (props: Props) => {
     }, [profileData, showLogo, logoType, originalData]);
     
     // API response processing helper
-    const processApiResponse = (data: any): {id: number, title: string}[] => {
+    const processApiResponse = (data: any): SearchItem[] => {
       if (!data) return [];
       
       // Check if data is an array
@@ -308,24 +320,27 @@ const ProfileEdit = (props: Props) => {
               id: item.id || 0,
               title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
               filterId: item.filterId || 0,
+              service: '',
           }));
       }
       
       // Check if data has a data property that's an array
       if (data.data && Array.isArray(data.data)) {
-          return data.data.map(item => ({
+          return data.data.map((item: { id: any; title: any; name: any; filterId: any; }) => ({
               id: item.id || 0,
               title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
               filterId: item.filterId || 0,
+              service: '',
           }));
       }
       
       // Check if data is an object with items array
       if (data.items && Array.isArray(data.items)) {
-          return data.items.map(item => ({
+          return data.items.map((item: { id: any; title: any; name: any; filterId: any; }) => ({
               id: item.id || 0,
               title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
               filterId: item.filterId || 0,
+              service: '',
           }));
       }
       
@@ -381,18 +396,18 @@ const ProfileEdit = (props: Props) => {
       }
     };
     
-    const handleProcessSelect = (selectedProcess: { id: number, title: string }) => {
+    const handleProcessSelect = (selectedProcess: SearchItem) => {
         setProfileData(prev => ({
             ...prev,
-            processId: selectedProcess.id,
+            processId: Number(selectedProcess.id),
             processTitle: selectedProcess.title
         }));
     };
     
-    const handleFilterSelect = (selectedFilter: { id: number, title: string }) => {
+    const handleFilterSelect = (selectedFilter: SearchItem) => {
         setProfileData(prev => ({
             ...prev,
-            filterId: selectedFilter.id,
+            filterId: Number(selectedFilter.id),
             filterTitle: selectedFilter.title
         }));
     };
@@ -541,6 +556,7 @@ const ProfileEdit = (props: Props) => {
             
             // Prepare data for submission
             const dataToSubmit = { ...profileData };
+            console.log('Data to submit:', dataToSubmit);            
             
             // Remove logo if not shown
             if (!showLogo) {
@@ -613,6 +629,7 @@ const ProfileEdit = (props: Props) => {
               onSelect={handleProcessSelect}
               onSearch={handleProcessSearch}
               title="Process Search"
+              service=""
               items={processList}
               loading={processLoading}
             />
@@ -624,6 +641,7 @@ const ProfileEdit = (props: Props) => {
               onSelect={handleFilterSelect}
               onSearch={handleFilterSearch}
               title="Filter Search"
+              service=""
               items={filterList}
               loading={filterLoading}
             />
@@ -873,30 +891,29 @@ const ProfileEdit = (props: Props) => {
                             Search
                         </Button>
                     </Box>
-                    
                     <Typography variant="h6" sx={{ mt: 3 }}>Filter Information</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                        {/* Hidden input for filterId */}
-                        <input type="hidden" value={profileData?.filterId || ''} />
-                        
-                        <TextField
-                            sx={{ flex: 1 }}
-                            label="Filter Title"
-                            value={profileData?.filterTitle || ''}
-                            variant="outlined" 
-                            size="small"
-                            InputProps={{ readOnly: true }}
-                            error={!!errors.filterId}
-                            helperText={errors.filterId}
-                        />
-                        <Button 
-                            variant="contained" 
-                            size="small"
-                            onClick={() => handleFilterSearch()}
-                        >
-                            Search
-                        </Button>
-                    </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+                            {/* Hidden input for filterId */}
+                            <input type="hidden" value={profileData?.filterId || ''} />
+                            
+                            <TextField
+                                sx={{ flex: 1 }}
+                                label="Filter Title"
+                                value={profileData?.filterTitle || ''}
+                                variant="outlined" 
+                                size="small"
+                                InputProps={{ readOnly: true }}
+                                error={!!errors.filterId}
+                                helperText={errors.filterId}
+                            />
+                            <Button 
+                                variant="contained" 
+                                size="small"
+                                onClick={() => handleFilterSearch()}
+                            >
+                                Search
+                            </Button>
+                        </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
                         <Button 

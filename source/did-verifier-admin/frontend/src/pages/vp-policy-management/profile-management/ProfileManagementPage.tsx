@@ -8,6 +8,7 @@ import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
+import { formatErrorMessage } from '../../../utils/error-handler';
 
 type Props = {}
 
@@ -62,7 +63,11 @@ const ProfileManagementPage = (props: Props) => {
           })
           .catch((error) => {
             console.error("Failed to delete Profile. ", error);
-            navigate('/error', { state: { message: `Failed to delete Profile: ${error}` } });
+            const result = dialogs.open(CustomConfirmDialog, {
+              title: 'Confirmation',
+              message: formatErrorMessage(error, "Failed to delete Profile!! "),
+              isModal: true,
+            });        
           })
           .finally(() => setLoading(false));
       }

@@ -82,42 +82,6 @@ const PolicyDetailPage = (props: Props) => {
     }
   };
   
-  const handleDelete = async () => {
-    if (!policyData) return;
-    
-    const confirmResult = await dialogs.open(CustomConfirmDialog, {
-      title: 'Confirm Delete',
-      message: 'Are you sure you want to delete this policy? This action cannot be undone.',
-      isModal: true
-    });
-    
-    if (confirmResult) {
-      try {
-        setIsLoading(true);
-        await deletePolicy(policyData.id);
-        setIsLoading(false);
-        
-        // Show success dialog
-        await dialogs.open(CustomDialog, { 
-          title: 'Success', 
-          message: 'Policy has been deleted successfully.', 
-          isModal: true 
-        }, {
-          onClose: async () => navigate('/vp-policy-management', { replace: true }),
-        });
-      } catch (err) {
-        console.error('Failed to delete policy:', err);
-        setIsLoading(false);
-        
-        await dialogs.open(CustomDialog, { 
-          title: 'Error', 
-          message: `Failed to delete policy: ${err}`, 
-          isModal: true 
-        });
-      }
-    }
-  };
-  
   const handleBack = () => {
     navigate('/vp-policy-management');
   };
@@ -206,14 +170,7 @@ const PolicyDetailPage = (props: Props) => {
                 onClick={handleEdit}
               >
                 Go to Edit
-              </Button>
-              <Button 
-                variant="contained" 
-                color="error" 
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
+              </Button>              
             </Box>
           </StyledInputArea>
         )}

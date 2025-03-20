@@ -72,9 +72,11 @@ public class UrlConstant {
         public static final String DELETE_POLICY_INFO = "/policies/{id}";
         public static final String UPDATE_POLICY_INFO = "/policies/{id}";
 
-
         //Verifier Manage
         public static final String GET_VERIFIER_INFO = "/verifier/info";
+
+        //Verifier Manage
+        public static final String GET_VP_SUBMIT_LIST = "/vpSubmitList";
 
         //Session
         public static final String LOGIN = "/login";

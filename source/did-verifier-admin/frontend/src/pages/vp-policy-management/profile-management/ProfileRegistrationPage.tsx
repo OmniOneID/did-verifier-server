@@ -532,12 +532,13 @@ const ProfileRegistration = (props: Props) => {
                 <StyledTitle>Profile Registration</StyledTitle>
                 <StyledInputArea>
                     <TextField
-                        fullWidth
+                        fullWidth                        
                         required
                         label="Title"
                         name="title"
                         value={profileData?.title || ''}
                         variant="outlined" 
+                        size='small'
                         margin="normal" 
                         onChange={handleInputChange}
                         error={!!errors.title}
@@ -551,6 +552,7 @@ const ProfileRegistration = (props: Props) => {
                         name="type"
                         value={profileData?.type || ''}
                         variant="outlined" 
+                        size='small'
                         margin="normal" 
                         onChange={handleInputChange}
                         error={!!errors.type}
@@ -558,11 +560,12 @@ const ProfileRegistration = (props: Props) => {
                     />
                     
                     <TextField
-                        fullWidth
+                        fullWidth                        
                         label="Description"
                         name="description"
                         value={profileData?.description || ''}
                         variant="outlined" 
+                        size='small'
                         margin="normal" 
                         onChange={handleInputChange}
                         multiline
@@ -578,6 +581,7 @@ const ProfileRegistration = (props: Props) => {
                         name="encoding"
                         value={profileData?.encoding || ''}
                         variant="outlined" 
+                        size='small'
                         margin="normal" 
                         onChange={handleInputChange}
                         error={!!errors.encoding}
@@ -591,6 +595,7 @@ const ProfileRegistration = (props: Props) => {
                         name="language"
                         value={profileData?.language || ''}
                         variant="outlined" 
+                        size='small'
                         margin="normal" 
                         onChange={handleInputChange}
                         error={!!errors.language}

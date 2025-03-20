@@ -3,9 +3,11 @@ package org.omnione.did.verifier.v1.admin.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.VpFilter;
 import org.omnione.did.base.db.domain.VpProcess;
+import org.omnione.did.base.db.repository.PolicyRepository;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.VpProcessRepository;
@@ -31,9 +33,11 @@ public class PolicyProfileService {
     private final PolicyProfileRepository profileRepository;
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
-    private final VerifierProperty verifierConfig; // Verifier 설정 주입
+    private final VerifierProperty verifierConfig;
     private final ModelMapper modelMapper;
     private final PolicyProfileQueryService policyProfileQueryService;
+    private final PolicyRepository policyRepository;
+
 
     public List<PolicyProfileDTO> getProfileList(String title) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
@@ -75,6 +79,11 @@ public class PolicyProfileService {
         existingProfile.setProcessId(policyProfileDTO.getProcessId());
         existingProfile.setFilterId(policyProfileDTO.getFilterId());
         existingProfile.setType(policyProfileDTO.getType());
+        if (policyProfileDTO.getLogo() != null) {
+            existingProfile.setFormat(policyProfileDTO.getLogo().getFormat());
+            existingProfile.setLink(policyProfileDTO.getLogo().getLink());
+            existingProfile.setValue(policyProfileDTO.getLogo().getValue());
+        }
 
         return modelMapper.map(profileRepository.save(existingProfile), PolicyProfileDTO.class);
     }
@@ -83,6 +92,13 @@ public class PolicyProfileService {
     public void deleteProfile(long profileId) {
         PolicyProfile policyProfile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PROFILE_NOT_FOUND));
+
+        // Check if profile is referenced in any policy
+        List<Policy> referencingPolicies = policyRepository.findByPolicyProfileId(policyProfile.getPolicyProfileId());
+        if (!referencingPolicies.isEmpty()) {
+            throw new OpenDidException(ErrorCode.VP_POLICY_PROFILE_IN_USE);
+        }
+
         profileRepository.delete(policyProfile);
     }
 
@@ -92,10 +108,10 @@ public class PolicyProfileService {
     private PolicyProfileDTO convertToProfileDTO(PolicyProfile profile) {
         String filterTitle = vpFilterRepository.findByFilterId(profile.getFilterId())
                 .map(VpFilter::getTitle)
-                .orElse("Unknown Filter");
+                .orElse("Empty Filter");
         String processTitle = vpProcessRepository.findById(profile.getProcessId())
                 .map(VpProcess::getTitle)
-                .orElse("Unknown Process");
+                .orElse("Empty Process");
 
         PolicyProfileDTO.Verifier verifier = new PolicyProfileDTO.Verifier();
         verifier.setDid(verifierConfig.getDid());

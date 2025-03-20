@@ -67,7 +67,7 @@ public class PolicyService {
 
 
     public PolicyDTO updatePolicy(PolicyDTO policyDTO) {
-        Policy findPolicy = policyRepository.findByPolicyId(policyDTO.getPolicyId())
+        Policy findPolicy = policyRepository.findById(policyDTO.getId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
 
             findPolicy.setPayloadId(policyDTO.getPayloadId());

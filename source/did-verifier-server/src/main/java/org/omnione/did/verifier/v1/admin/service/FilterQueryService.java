@@ -19,12 +19,12 @@ public class FilterQueryService {
     private final VpFilterRepository filterRepository;
 
     public Page<FilterDTO> searchFilterList(String searchKey, String searchValue, Pageable pageable) {
-        Page<VpFilter> payloadPage = filterRepository.searchVpFilterList(searchKey, searchValue, pageable);
+        Page<VpFilter> vpFilters = filterRepository.searchVpFilterList(searchKey, searchValue, pageable);
 
-        List<FilterDTO> filterDtos = payloadPage.getContent().stream()
+        List<FilterDTO> filterDtos = vpFilters.getContent().stream()
                 .map(FilterDTO::fromVpFilter)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(filterDtos, pageable, payloadPage.getTotalElements());
+        return new PageImpl<>(filterDtos, pageable, vpFilters.getTotalElements());
 
     }}

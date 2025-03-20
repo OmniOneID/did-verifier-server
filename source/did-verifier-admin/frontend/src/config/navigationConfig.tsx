@@ -27,16 +27,12 @@ export const getNavigationByStatus = (serverStatus: string | null): Navigation=>
     },
     {
       segment: 'vp-submission-management',
-      title: 'VP Submission Management', 
+      title: 'VP History Page', 
     },
     {
       segment: 'admin-management',
       title: 'Admin Management', 
-    },
-    {
-      segment: 'server-management',
-      title: 'Server Management', 
-    },
+    },    
     {kind: 'divider',},
   ];
 };

@@ -107,8 +107,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
         <Dialog 
             open={open} 
             onClose={onClose}
-            maxWidth="md"
-            fullWidth
+            maxWidth="sm"            
         >
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>

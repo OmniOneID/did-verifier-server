@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layout/Layout';
 import AdminManagementPage from './pages/admins/AdminManagementPage';
+import AdminDetailPage from './pages/admins/AdminDetailPage';
+import AdminRegisterPage from './pages/admins/AdminRegisterPage';
 import SignInPage from './pages/auth/SignIn';
 import ErrorPage from './pages/ErrorPage';
 import ServerManagementPage from './pages/servers/ServerManagementPage';
@@ -15,7 +17,7 @@ import ProcessManagementPage from './pages/vp-policy-management/process-manageme
 import ProfileManagementPage from './pages/vp-policy-management/profile-management/ProfileManagementPage';
 import ServiceManagementPage from './pages/vp-policy-management/service-management/ServiceManagementPage';
 import VpPolicyManagementPage from './pages/vp-policy-management/VpPolicyManagementPage';
-import VpSubmissionManagementPage from './pages/vp-submission-management/VpSubmissionManagementPage';
+import VpHistoryPage from './pages/vp-submission-management/VpHistoryPage';
 import ServiceRegistrationPage from './pages/vp-policy-management/service-management/ServiceRegistrationPage';
 import ServiceDetailPage from './pages/vp-policy-management/service-management/ServiceDetailPage';
 import ServiceEditPage from './pages/vp-policy-management/service-management/ServiceEditPage';
@@ -135,10 +137,18 @@ const router = createBrowserRouter([
           },
           {
             path: '/vp-submission-management',
-            Component: VpSubmissionManagementPage,
+            Component: VpHistoryPage,
           },
           {
-            path: '/admin-management',
+            path: 'admin-management/admin-registration',
+            Component: AdminRegisterPage,
+          },
+          {
+            path: 'admin-management/:id',
+            Component: AdminDetailPage,
+          },
+          {
+            path: 'admin-management',
             Component: AdminManagementPage,
           },
           {

@@ -284,7 +284,7 @@ const FilterRegistrationPage = (props: Props) => {
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Required Claim</TableCell>
-                                    <TableCell>Action</TableCell>
+                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -292,7 +292,7 @@ const FilterRegistrationPage = (props: Props) => {
                                     <TableRow key={index}>
                                         <TableCell>{claim}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => handleRemoveRequiredClaim(index)} color="error">
+                                            <IconButton onClick={() => handleRemoveRequiredClaim(index)} sx={{ color: '#FF8400' }}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
@@ -326,7 +326,7 @@ const FilterRegistrationPage = (props: Props) => {
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Display Claim</TableCell>
-                                    <TableCell>Action</TableCell>
+                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -334,7 +334,7 @@ const FilterRegistrationPage = (props: Props) => {
                                     <TableRow key={index}>
                                         <TableCell>{claim}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => handleRemoveDisplayClaim(index)} color="error">
+                                            <IconButton onClick={() => handleRemoveDisplayClaim(index)} sx={{ color: '#FF8400' }}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
@@ -373,7 +373,7 @@ const FilterRegistrationPage = (props: Props) => {
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Allowed Issuer</TableCell>
-                                    <TableCell>Action</TableCell>
+                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -381,7 +381,7 @@ const FilterRegistrationPage = (props: Props) => {
                                     <TableRow key={index}>
                                         <TableCell>{issuer}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => handleRemoveAllowedIssuer(index)} color="error">
+                                            <IconButton onClick={() => handleRemoveAllowedIssuer(index)} sx={{ color: '#FF8400' }}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

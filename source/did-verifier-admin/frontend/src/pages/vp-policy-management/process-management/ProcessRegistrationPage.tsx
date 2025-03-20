@@ -108,9 +108,9 @@ const ProcessRegistrationPage = (props: Props) => {
             id: 0,
             title: '',
             reqE2e: {
-                curve: '',
-                cipher: '',
-                padding: '',            
+                curve: 'Secp256r1',
+                cipher: 'AES-128-CBC',
+                padding: 'PKCS5',           
             },
             authType: 0,
             endpoints: [],
@@ -342,7 +342,7 @@ const ProcessRegistrationPage = (props: Props) => {
                             <TableHead>
                                 <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                                     <TableCell>Endpoint</TableCell>
-                                    <TableCell>Action</TableCell>
+                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -350,7 +350,7 @@ const ProcessRegistrationPage = (props: Props) => {
                                     <TableRow key={index}>
                                         <TableCell>{endpoint}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => handleRemoveEndpoint(index)} color="error">
+                                            <IconButton onClick={() => handleRemoveEndpoint(index)} sx={{ color: '#FF8400' }}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

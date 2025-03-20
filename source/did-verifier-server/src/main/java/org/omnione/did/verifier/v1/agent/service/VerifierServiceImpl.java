@@ -449,7 +449,7 @@ public class VerifierServiceImpl implements VerifierService {
         }
         String policyId = policy.get().getPolicyId();
 
-        Optional<Payload> payload = payloadRepository.findByPayloadId(requestOfferReqDto.getPolicyId());
+        Optional<Payload> payload = payloadRepository.findByPayloadId(policy.get().getPayloadId());
         if (payload.isEmpty()) {
             log.error("Payload not found for payloadId: {}", requestOfferReqDto.getPolicyId());
             throw new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND);

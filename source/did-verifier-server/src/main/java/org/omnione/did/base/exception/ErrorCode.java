@@ -48,6 +48,8 @@ public enum ErrorCode {
     VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
     VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
     VP_POLICY_UPDATE_FAILED("SSRVVRF00211", "Failed to update VP policy.", 500),
+    VP_PAYLOAD_IN_USE("SSRVVRF00212", "PAYLOAD is in use by one or more policies",400 ),
+    VP_POLICY_PROFILE_IN_USE("SSRVVRF00213", "POLICY_PROFILE is in use by one or more policies",400 ),
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),
@@ -102,7 +104,10 @@ public enum ErrorCode {
 
     // Admin Errors (1100~1199)
     ADMIN_INFO_NOT_FOUND("SSRVVRF01100", "Failed to find admin: admin is not registered.", 400),
-    ;
+    ADMIN_ALREADY_EXISTS("SSRVVRF01101", "Failed to register admin: admin is already registered.", 400);
+
+
+
 
 
 

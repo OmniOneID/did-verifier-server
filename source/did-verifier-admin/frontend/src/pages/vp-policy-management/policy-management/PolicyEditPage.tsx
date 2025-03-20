@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Typography, styled, useTheme } from '@mui/material';
 import { useDialogs } from '@toolpad/core';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { searchServiceList } from '../../../apis/vp-payload-api';
 import { getPolicy, putPolicy } from '../../../apis/vp-policy-api';
@@ -10,6 +10,17 @@ import SearchDialog from '../../../components/dialog/SearchDialog';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 
 type Props = {}
+
+// Define a SearchItem type to match the SearchDialog component's expected type
+interface SearchItem {
+  id?: number;
+  filterId?: number;
+  payloadId?: number;
+  policyProfileId?: number;
+  title: string;
+  service: string;
+  [key: string]: any;
+}
 
 interface PolicyFormData {
   id: number;
@@ -41,8 +52,8 @@ const PolicyEditPage = (props: Props) => {
   // States for search dialogs
   const [profileSearchOpen, setProfileSearchOpen] = useState(false);
   const [payloadSearchOpen, setPayloadSearchOpen] = useState(false);
-  const [profileList, setProfileList] = useState<{id: string, title: string}[]>([]);
-  const [payloadList, setPayloadList] = useState<{id: string, title: string}[]>([]);
+  const [profileList, setProfileList] = useState<SearchItem[]>([]);
+  const [payloadList, setPayloadList] = useState<SearchItem[]>([]);
   const [profileLoading, setProfileLoading] = useState(false);
   const [payloadLoading, setPayloadLoading] = useState(false);
   
@@ -54,6 +65,28 @@ const PolicyEditPage = (props: Props) => {
     policyProfileId: '',
     profileTitle: ''
   });
+  
+  // Styled components
+  const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
+    width: 800,
+    margin: 'auto',
+    marginTop: theme.spacing(1),
+    padding: theme.spacing(3),
+    border: 'none',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: '#ffffff',
+    boxShadow: '0px 4px 8px 0px #0000001A',
+  })), []);
+  
+  const StyledTitle = useMemo(() => styled(Typography)({
+    textAlign: 'left',
+    fontSize: '24px',
+    fontWeight: 700,
+  }), []);
+  
+  const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+  })), []);
   
   useEffect(() => {
     const fetchPolicyData = async () => {
@@ -162,8 +195,10 @@ const PolicyEditPage = (props: Props) => {
       const processed = processApiResponse(response);
       
       const mappedProfiles = processed.map(item => ({
-        id: item.policyProfileId || '',
-        title: item.title || '[No Title]'
+        policyProfileId: item.policyProfileId || undefined,
+        id: item.id || undefined,
+        title: item.title || '[No Title]',
+        service: '' // Added to satisfy the interface
       }));
       
       setProfileList(mappedProfiles);
@@ -190,8 +225,10 @@ const PolicyEditPage = (props: Props) => {
       const response = await searchServiceList(searchTerm || 'all');        
       const processed = processApiResponse(response);        
       const mappedPayloads = processed.map(item => ({
-        id: item.payloadId || '',
-        title: item.service || '[No Service Name]'
+        payloadId: item.payloadId || undefined,
+        id: item.id || undefined,
+        title: item.title || '[No Title]',
+        service: item.service || '' // Should already exist, but we ensure it's there
       }));
       
       setPayloadList(mappedPayloads);
@@ -208,21 +245,19 @@ const PolicyEditPage = (props: Props) => {
     }
   };
   
-  const handleProfileSelect = (selectedProfile: { id: string, title: string }) => {
-    console.log('Selected profile:', selectedProfile);
+  const handleProfileSelect = (selectedProfile: SearchItem) => {  
     setPolicyData(prev => ({
       ...prev,
-      policyProfileId: selectedProfile.id,
+      policyProfileId: String(selectedProfile.policyProfileId || selectedProfile.id || ''),
       profileTitle: selectedProfile.title
     }));
   };
   
-  const handlePayloadSelect = (selectedPayload: { id: string, title: string }) => {
-    console.log('Selected payload:', selectedPayload);
+  const handlePayloadSelect = (selectedPayload: SearchItem) => {    
     setPolicyData(prev => ({
       ...prev,
-      payloadId: selectedPayload.id,
-      payloadService: selectedPayload.title
+      payloadId: String(selectedPayload.payloadId || selectedPayload.id || ''),
+      payloadService: selectedPayload.service || selectedPayload.title
     }));
   };
   
@@ -264,7 +299,7 @@ const PolicyEditPage = (props: Props) => {
   };
   
   const handleCancel = () => {
-    navigate(`/vp-policy-management/policy/${policyId}`);
+    navigate('/vp-policy-management/policy-management');
   };
   
   const handleSubmit = async () => {
@@ -282,6 +317,7 @@ const PolicyEditPage = (props: Props) => {
       
       // Prepare data for submission
       const dataToSubmit = { ...policyData };
+      console.log('Submitting data:', dataToSubmit);
       
       // Call API
       await putPolicy(dataToSubmit);
@@ -294,7 +330,7 @@ const PolicyEditPage = (props: Props) => {
         message: 'Policy has been updated successfully.', 
         isModal: true 
       }, {
-        onClose: async () => navigate(`/vp-policy-management/policy/${policyId}`, { replace: true }),
+        onClose: async () => navigate(`/vp-policy-management/policy-managetment/${policyId}`, { replace: true }),
       });
     } catch (err) {
       console.error('Failed to update policy:', err);
@@ -318,8 +354,10 @@ const PolicyEditPage = (props: Props) => {
         const profileData = await searchProfileList('all');
         const profileConverted = processApiResponse(profileData);
         const profileMapped = profileConverted.map(item => ({
-          id: item.policyProfileId || '',
-          title: item.title || '[No Title]'
+          policyProfileId: item.policyProfileId || undefined,
+          id: item.id || undefined,
+          title: item.title || '[No Title]',
+          service: '' // Added to satisfy the interface
         }));
         setProfileList(profileMapped);
         setProfileLoading(false);
@@ -329,8 +367,10 @@ const PolicyEditPage = (props: Props) => {
         const payloadData = await searchServiceList('all');                
         const processed = processApiResponse(payloadData);        
         const mappedPayloads = processed.map(item => ({
-          id: item.payloadId || '',      
-          title: item.service || '[No Service Name]',
+          payloadId: item.payloadId || undefined,
+          id: item.id || undefined,
+          title: item.service || '[No Title]',
+          service: item.service || '' // Should already exist, but we ensure it's there
         }));
         
         setPayloadList(mappedPayloads);
@@ -351,32 +391,11 @@ const PolicyEditPage = (props: Props) => {
     loadInitialData();
   }, [dialogs]);
 
-  const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
-    width: 800,
-    margin: 'auto',
-    marginTop: theme.spacing(1),
-    padding: theme.spacing(3),
-    border: 'none',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: '#ffffff',
-    boxShadow: '0px 4px 8px 0px #0000001A',
-  })), []);
-
-  const StyledTitle = useMemo(() => styled(Typography)({
-      textAlign: 'left',
-      fontSize: '24px',
-      fontWeight: 700,
-  }), []);
-
-  const StyledInputArea = useMemo(() => styled(Box)(({ theme }) => ({
-      marginTop: theme.spacing(2),
-  })), []);
-
   return (
     <>
       <FullscreenLoader open={isLoading} />
       <Typography variant="h4">Policy Management</Typography>
-      
+        
       {/* Profile Search Dialog */}
       <SearchDialog
         open={profileSearchOpen}
@@ -386,7 +405,7 @@ const PolicyEditPage = (props: Props) => {
         title="Profile Search"
         items={profileList}
         loading={profileLoading}
-        idField="id"  
+        idField="policyProfileId"  
       />
 
       {/* Payload Search Dialog */}
@@ -398,13 +417,12 @@ const PolicyEditPage = (props: Props) => {
         title="Payload Search"
         items={payloadList}
         loading={payloadLoading}
-        idField="id"  
+        idField="payloadId"  
       />
       
-      <StyledContainer>
-        <StyledTitle>Policy Update</StyledTitle>
-        
-        {policyData && (
+      {policyData && (
+        <StyledContainer>
+          <StyledTitle>Policy Edit</StyledTitle>
           <StyledInputArea>
             <TextField
               fullWidth
@@ -468,13 +486,13 @@ const PolicyEditPage = (props: Props) => {
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
-            <Button 
+              <Button 
                 variant="contained" 
                 color="primary" 
                 onClick={handleSubmit}
                 disabled={isButtonDisabled}
               >
-                Update
+                Save
               </Button>
               <Button 
                 variant="contained" 
@@ -492,8 +510,8 @@ const PolicyEditPage = (props: Props) => {
               </Button>
             </Box>
           </StyledInputArea>
-        )}
-      </StyledContainer>
+        </StyledContainer>
+      )}
     </>
   );
 };

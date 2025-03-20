@@ -15,4 +15,8 @@ import java.util.Optional;
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
     Optional<Policy> findByPolicyId(String policyId);
+
+    List<Policy> findByPayloadId(String payloadId);
+
+    List<Policy> findByPolicyProfileId(String policyProfileId);
 }

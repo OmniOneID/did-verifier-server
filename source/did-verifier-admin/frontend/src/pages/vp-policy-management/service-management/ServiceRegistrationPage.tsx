@@ -51,7 +51,7 @@ const ServiceRegistrationPage = (props: Props) => {
             setFormData((prev) => ({ ...prev, [field]: newValue }));
     };
 
-    const handleEndpointChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleEndpointChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newEndpoints = [...formData.endpoints];
         newEndpoints[index] = event.target.value;
         setFormData((prev) => ({ ...prev, endpoints: newEndpoints }));

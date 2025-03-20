@@ -392,7 +392,7 @@ const ProcessEditPage = (props: Props) => {
                             <TableRow key={index}>
                                 <TableCell>{endpoint}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => handleRemoveEndpoint(index)} color="error">
+                                    <IconButton onClick={() => handleRemoveEndpoint(index)} sx={{ color: '#FF8400' }}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>

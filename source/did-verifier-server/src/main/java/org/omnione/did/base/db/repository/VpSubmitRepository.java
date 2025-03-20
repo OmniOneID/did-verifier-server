@@ -18,6 +18,7 @@ package org.omnione.did.base.db.repository;
 
 import org.omnione.did.base.db.domain.VpSubmit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ import java.util.Optional;
  * Provides CRUD operations for VpSubmit entities and custom query methods.
  *
  */
-public interface VpSubmitRepository extends JpaRepository<VpSubmit, Long> {
+public interface VpSubmitRepository extends JpaRepository<VpSubmit, Long>, QuerydslPredicateExecutor<VpSubmit>, VpSubmitRepositoryAdmin {
 
     /**
      * Finds a VpSubmit entity by its associated transaction ID.

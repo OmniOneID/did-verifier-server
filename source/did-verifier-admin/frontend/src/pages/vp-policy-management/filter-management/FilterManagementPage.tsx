@@ -28,7 +28,7 @@ const FilterManagementPage = (props: Props) => {
   const dialogs = useDialogs();
   const [loading, setLoading] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [selectedRow, setSelectedRow] = useState<string | number | null>(null);  
   const [rows, setRows] = useState<FilterRow[]>([]);
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -140,7 +140,7 @@ const FilterManagementPage = (props: Props) => {
             },
           ]} 
           selectedRow={selectedRow} 
-          setSelectedRow={(id: number | null) => setSelectedRow(id)}
+          setSelectedRow={setSelectedRow}
           onEdit={() => {
             if (selectedRowData) {
               navigate(`/vp-policy-management/filter-management/filter-edit/${selectedRowData.filterId}`);
@@ -152,8 +152,7 @@ const FilterManagementPage = (props: Props) => {
           paginationMode="server" 
           totalRows={totalRows} 
           paginationModel={paginationModel} 
-          setPaginationModel={setPaginationModel} 
-          getRowId={(row: { filterId: number; }) => row.filterId} 
+          setPaginationModel={setPaginationModel}           
         />
       </StyledContainer>
     </>

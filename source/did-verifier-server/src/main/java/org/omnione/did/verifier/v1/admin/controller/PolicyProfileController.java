@@ -47,7 +47,6 @@ public Page<PolicyProfileDTO> searchPolicyProfileList(String searchKey, String s
     @Operation(summary = "Update Profile", description = "Update an existing profile.")
     @PutMapping(UrlConstant.Verifier.UPDATE_PROFILE_INFO)
     public ResponseEntity<PolicyProfileDTO> updateProfile(@RequestBody PolicyProfileDTO policyProfileDTO) {
-        log.info("Updating Profile: {}", policyProfileDTO);
         PolicyProfileDTO updatedPolicyProfileDTO = policyProfileService.updateProfile(policyProfileDTO);
         return ResponseEntity.ok(updatedPolicyProfileDTO);
     }

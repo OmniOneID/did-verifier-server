@@ -142,7 +142,7 @@ const PolicyManagementPage = (props: Props) => {
           setSelectedRow={setSelectedRow}
           onEdit={() => {
             if (selectedRowData) {
-              navigate(`/vp-policy-management/policy-edit/${selectedRowData.id}`);
+              navigate(`/vp-policy-management/policy-management/policy-edit/${selectedRowData.id}`);
             }
           }}
           onRegister={() => navigate('/vp-policy-management/policy-management/policy-registration')}

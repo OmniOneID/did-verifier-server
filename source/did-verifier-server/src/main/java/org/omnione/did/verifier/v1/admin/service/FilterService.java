@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.VpFilter;
-import org.omnione.did.base.db.domain.VpProcess;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;

@@ -47,7 +47,6 @@ public class PolicyController {
     @Operation(summary = "Update Policy", description = "Update an existing policy.")
     @PutMapping(UrlConstant.Verifier.UPDATE_POLICY_INFO)
     public ResponseEntity<PolicyDTO> updatePolicy(@RequestBody PolicyDTO policyDTO) {
-        log.info("Updating Policy: {}", policyDTO);
         PolicyDTO updatedPolicyDTO = policyService.updatePolicy(policyDTO);
         return ResponseEntity.ok(updatedPolicyDTO);
     }

@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.Payload;
+import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.repository.PayloadRepository;
+import org.omnione.did.base.db.repository.PolicyRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PayloadDTO;
@@ -27,6 +29,7 @@ public class PayloadService {
     private final PayloadRepository payloadRepository;
     private final ModelMapper modelMapper;
     private final PayloadQueryService payloadQueryService;
+    private final PolicyRepository policyRepository;
 
     public List<PayloadDTO> getPayloadList(String service) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
@@ -83,6 +86,12 @@ public class PayloadService {
     public void deletePayload(long id) {
         Payload payload = payloadRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND));
+
+        // Check if payload is referenced in any policy
+        List<Policy> referencingPolicies = policyRepository.findByPayloadId(payload.getPayloadId());
+        if (!referencingPolicies.isEmpty()) {
+            throw new OpenDidException(ErrorCode.VP_PAYLOAD_IN_USE);
+        }
 
         payloadRepository.delete(payload);
     }

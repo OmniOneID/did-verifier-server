@@ -73,6 +73,11 @@ public class PolicyProfileDTO {
         profile.setLanguage(this.language);
         profile.setProcessId(this.processId);
         profile.setFilterId(this.filterId);
+        if (this.logo != null) {
+            profile.setFormat(this.logo.getFormat());
+            profile.setLink(this.logo.getLink());
+            profile.setValue(this.logo.getValue());
+        }
         return profile;
     }
 

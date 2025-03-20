@@ -8,6 +8,8 @@ import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
+import { formatErrorMessage } from '../../../utils/error-handler';
+
 
 type Props = {}
 
@@ -76,8 +78,8 @@ const ProcessManagementPage = (props: Props) => {
             });
           })
           .catch((error) => {
-            console.error("Failed to delete Process. ", error);
-            navigate('/error', { state: { message: `Failed to delete Process: ${error}` } });
+            console.error("Failed to delete Process. ", error);            
+            navigate('/error', { state: { message: formatErrorMessage(error, "Failed to delete Process") } });
           })
           .finally(() => setLoading(false));
       }
