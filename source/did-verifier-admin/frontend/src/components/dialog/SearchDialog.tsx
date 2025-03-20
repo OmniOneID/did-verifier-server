@@ -48,7 +48,6 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
     onSelect,
     onSearch,
     title,
-    service,
     items,
     loading = false,
     idField = 'id' 
@@ -170,7 +169,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
                                                 onChange={() => handleRadioChange(item)}
                                             />
                                         </TableCell>
-                                        <TableCell>{item.title}</TableCell>
+                                        <TableCell>{item.title}</TableCell>                                        
                                     </TableRow>
                                 ))
                             )}

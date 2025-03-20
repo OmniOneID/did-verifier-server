@@ -354,33 +354,33 @@ const ProfileEdit = (props: Props) => {
     const handleProcessSearch = async (searchTerm?: string) => {
       setProcessSearchOpen(true);
       
-      if (searchTerm !== undefined) {
-        try {
-          setProcessLoading(true);
-          const processData = await searchProcessList(searchTerm);
-          setProcessList(processApiResponse(processData));
-          setProcessLoading(false);
-        } catch (err) {
-          console.error('Failed to search processes:', err);
-          setProcessLoading(false);
-          
-          dialogs.open(CustomDialog, { 
-            title: 'Error', 
-            message: 'Failed to search processes. Please try again.', 
-            isModal: true 
-          });
-        }
-      }
+      
+    try {
+        setProcessLoading(true);
+        const processData = await searchProcessList(searchTerm || 'all');
+        setProcessList(processApiResponse(processData));
+        setProcessLoading(false);
+    } catch (err) {
+        console.error('Failed to search processes:', err);
+        setProcessLoading(false);
+        
+        dialogs.open(CustomDialog, { 
+        title: 'Error', 
+        message: 'Failed to search processes. Please try again.', 
+        isModal: true 
+        });
+    }
+      
     };
     
     // Filter search handler
     const handleFilterSearch = async (searchTerm?: string) => {
       setFilterSearchOpen(true);
       
-      if (searchTerm !== undefined) {
+      
         try {
           setFilterLoading(true);
-          const filterData = await searchFilterList(searchTerm);
+          const filterData = await searchFilterList(searchTerm || 'all');
           setFilterList(transformFilterList(processApiResponse(filterData)));           
           setFilterLoading(false);          
         } catch (err) {
@@ -393,7 +393,7 @@ const ProfileEdit = (props: Props) => {
             isModal: true 
           });
         }
-      }
+      
     };
     
     const handleProcessSelect = (selectedProcess: SearchItem) => {

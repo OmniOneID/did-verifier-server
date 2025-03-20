@@ -11,6 +11,7 @@ type Props = {}
 
 interface PolicyData {
   id: number;
+  policyId: string;
   policyTitle: string;
   payloadId: string;
   payloadService: string;
@@ -49,6 +50,7 @@ const PolicyDetailPage = (props: Props) => {
         
         setPolicyData({
           id: data.id,
+          policyId: data.policyId || '',
           policyTitle: data.policyTitle || '',
           payloadId: data.payloadId || '',
           payloadService: data.payloadService || '',
@@ -116,6 +118,19 @@ const PolicyDetailPage = (props: Props) => {
         
         {policyData && (
           <StyledInputArea>
+            <TextField
+              fullWidth
+              label="Policy ID"
+              name="policyId"
+              value={policyData?.policyId || ''}
+              variant="outlined" 
+              margin="normal"
+              InputProps={{ readOnly: true }}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+              The policy ID is automatically assigned.
+            </Typography>
+            
             <TextField
               fullWidth
               label="Policy Title"

@@ -32,6 +32,6 @@ export const deleteFilter = async (id: number) => {
     return deleteData(API_BASE_URL, `filters/${id}`);
 }
 
-export const searchFilterList = async (searchValue: string|'') => {    
+export const searchFilterList = async (searchValue: string | '') => {    
     return getData(API_BASE_URL, `filters/popups/${searchValue}`);
 }

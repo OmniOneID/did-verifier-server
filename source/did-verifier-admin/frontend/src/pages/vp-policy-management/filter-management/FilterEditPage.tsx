@@ -74,9 +74,6 @@ const FilterEditPage = (props: Props) => {
         setFormData((prev) => ({ ...prev, [field]: newValue }));
     };
 
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prev) => ({ ...prev, presentAll: event.target.checked }));
-    };
 
     const handleReset = () => {
       if (initialData) {
@@ -139,9 +136,7 @@ const FilterEditPage = (props: Props) => {
 
       if (!formData.id.trim()) tempErrors.id = "ID is required.";
       
-      if (!formData.type.trim()) tempErrors.type = "Type is required.";
-      
-      if (!formData.value.trim()) tempErrors.value = "Value is required.";
+      if (!formData.type.trim()) tempErrors.type = "Type is required.";            
 
       // Array validations
       if (formData.requiredClaims.length === 0) {
@@ -254,34 +249,36 @@ const FilterEditPage = (props: Props) => {
         <FullscreenLoader open={isLoading} />
         <Typography variant="h4">Filter Management</Typography>
         <StyledContainer>
-          <StyledTitle>Filter Update</StyledTitle>
-          <StyledInputArea>
-            <TextField 
-                fullWidth
-                label="Title" 
-                variant="outlined"
-                margin="normal" 
-                size="small"
-                value={formData.title} 
-                onChange={handleChange('title')} 
-                error={!!errors.title} 
-                helperText={errors.title} 
-            />
+            <StyledTitle>Filter Registration</StyledTitle>
+            <StyledInputArea>
+                <TextField 
+                    fullWidth
+                    label="Title" 
+                    required
+                    variant="outlined"
+                    margin="normal" 
+                    size="small"
+                    value={formData.title} 
+                    onChange={handleChange('title')} 
+                    error={!!errors.title} 
+                    helperText={errors.title} 
+                />
 
-            <TextField 
-                fullWidth
-                label="ID" 
-                variant="outlined"
-                margin="normal" 
-                size="small"
-                value={formData.id} 
-                onChange={handleChange('id')} 
-                error={!!errors.id} 
-                helperText={errors.id} 
-            />
+                <TextField 
+                    fullWidth
+                    label="ID" 
+                    required
+                    variant="outlined"
+                    margin="normal" 
+                    size="small"
+                    value={formData.id} 
+                    onChange={handleChange('id')} 
+                    error={!!errors.id} 
+                    helperText={errors.id} 
+                />
 
-            <FormControl fullWidth margin="normal" error={!!errors.type}>
-                <InputLabel>Type</InputLabel>
+                <FormControl fullWidth margin="normal" error={!!errors.type}>
+                    <InputLabel>Type *</InputLabel>
                 <Select 
                     value={formData.type} 
                     onChange={handleChange('type')}
@@ -292,17 +289,7 @@ const FilterEditPage = (props: Props) => {
                 {errors.type && <FormHelperText>{errors.type}</FormHelperText>}
             </FormControl>
 
-            <TextField 
-                fullWidth
-                label="Value" 
-                variant="outlined"
-                margin="normal" 
-                size="small"
-                value={formData.value} 
-                onChange={handleChange('value')} 
-                error={!!errors.value} 
-                helperText={errors.value} 
-            />
+
 
             {/* Required Claims Section */}
             <Typography variant="h6" sx={{ mt: 3 }}>Required Claims</Typography>

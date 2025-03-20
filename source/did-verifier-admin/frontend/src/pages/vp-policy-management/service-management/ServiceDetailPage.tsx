@@ -13,6 +13,7 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
+    validSeconds: number;
     endpoints: string[];
 }
 
@@ -24,11 +25,12 @@ const ServiceDetailPage = (props: Props) => {
 
     const numericServiceId = id ? parseInt(id, 10) : null;
     const [isLoading, setIsLoading] = useState<boolean>(true); 
-    const [serviceData, serServiceData] = useState<ServiceFormData>({
+    const [serviceData, setServiceData] = useState<ServiceFormData>({
         service: '',
         locked: undefined,
         device: '',
         mode: '',
+        validSeconds: 180,
         endpoints: [],
     });
     
@@ -49,16 +51,17 @@ const ServiceDetailPage = (props: Props) => {
 
             try {
                 const { data } = await getService(numericServiceId);
-                serServiceData({
+                setServiceData({
                     service: data.service,
                     locked: data.locked,
                     device: data.device,
-                    mode : data.mode,
-                    endpoints : JSON.parse(data.endpoints),
+                    mode: data.mode,
+                    validSeconds: data.validSecond || 180,
+                    endpoints: JSON.parse(data.endpoints),
                 });
                 setIsLoading(false);
             } catch (err) {
-                  console.error('Failed to fetch Serivce information:', err);
+                  console.error('Failed to fetch Service information:', err);
                   setIsLoading(false);
                   navigate('/error', { state: { message: `Failed to namespace information: ${err}` } });
             }
@@ -133,10 +136,10 @@ const ServiceDetailPage = (props: Props) => {
                     />
 
                     <FormControl fullWidth margin="normal" variant='standard'>
-                        <InputLabel>Submittion Mode</InputLabel>
+                        <InputLabel>Submission Mode</InputLabel>
                         <Select 
                             value={serviceData?.mode || ''} 
-                            label="Submittion Mode"
+                            label="Submission Mode"
                             slotProps={{ input: { readOnly: true } }} 
                         >
                             <MenuItem value="Direct">Direct</MenuItem>
@@ -144,6 +147,15 @@ const ServiceDetailPage = (props: Props) => {
                             <MenuItem value="Proxy">Proxy</MenuItem>
                         </Select>
                     </FormControl>
+
+                    <TextField
+                        fullWidth
+                        label="Valid Seconds"
+                        value={serviceData?.validSeconds || 180}
+                        variant="standard" 
+                        margin="normal" 
+                        slotProps={{ input: { readOnly: true } }} 
+                    />
 
                     <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
                     <TableContainer component={Paper}>
@@ -157,10 +169,20 @@ const ServiceDetailPage = (props: Props) => {
                                 {serviceData.endpoints?.map((endpoint, index) => (
                                     <TableRow key={index}>
                                         <TableCell>
-                                            <TextField fullWidth size="small" value={endpoint} />
+                                            <TextField 
+                                                fullWidth 
+                                                size="small" 
+                                                value={endpoint}
+                                                InputProps={{ readOnly: true }}
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {(serviceData.endpoints?.length === 0 || !serviceData.endpoints) && (
+                                    <TableRow>
+                                        <TableCell align="center">No endpoints available</TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>

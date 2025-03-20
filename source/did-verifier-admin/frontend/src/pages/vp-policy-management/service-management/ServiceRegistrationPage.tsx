@@ -17,6 +17,7 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
+    validSeconds: number;
     endpoints: string[];
 }
 
@@ -25,6 +26,7 @@ interface ErrorState {
     locked?: string;
     device?: string;
     mode?: string;
+    validSeconds?: string;
     endpoints?: string[];
     errorEndpointsMessage?: string;
 }
@@ -39,6 +41,7 @@ const ServiceRegistrationPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
+        validSeconds: 180,
         endpoints: [],
     });
     const [errors, setErrors] = useState<ErrorState>({});
@@ -49,6 +52,17 @@ const ServiceRegistrationPage = (props: Props) => {
         (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             setFormData((prev) => ({ ...prev, [field]: newValue }));
+    };
+
+    const handleValidSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        // Only allow numeric input for validSeconds
+        if (value === "" || /^\d+$/.test(value)) {
+            setFormData((prev) => ({ 
+                ...prev, 
+                validSeconds: value === "" ? 0 : parseInt(value, 10) 
+            }));
+        }
     };
 
     const handleEndpointChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -70,7 +84,14 @@ const ServiceRegistrationPage = (props: Props) => {
     const handleReset = () => {
         setErrors({});
         setIsButtonDisabled(true);
-        setFormData({ service: '', locked: undefined, device: '', mode: '', endpoints: [] });
+        setFormData({ 
+            service: '', 
+            locked: undefined, 
+            device: '', 
+            mode: '', 
+            validSeconds: 180, 
+            endpoints: [] 
+        });
     };
 
     const handleSubmit = async () => {
@@ -91,7 +112,7 @@ const ServiceRegistrationPage = (props: Props) => {
                 device: formData.device,
                 mode: formData.mode,
                 endpoints: JSON.stringify(formData.endpoints),
-                validSecond: 180
+                validSecond: formData.validSeconds
             }
 
             await postService(requestObject).then((response) => {
@@ -122,6 +143,7 @@ const ServiceRegistrationPage = (props: Props) => {
         tempErrors.locked = validateLocked(formData.locked);
         tempErrors.device = validateDevice(formData.device);
         tempErrors.mode = validateMode(formData.mode);
+        tempErrors.validSeconds = validateValidSeconds(formData.validSeconds);
 
         if (formData.endpoints.length === 0) {
             tempErrors.errorEndpointsMessage = "At least one endpoint is required.";
@@ -171,6 +193,13 @@ const ServiceRegistrationPage = (props: Props) => {
         if (!mode) return 'Please select a submission mode.';
         return undefined;
     }; 
+
+    const validateValidSeconds = (validSeconds?: number): string | undefined => {
+        if (validSeconds === undefined || validSeconds === null) return 'Please enter valid seconds.';
+        if (validSeconds <= 0) return 'Valid seconds must be greater than 0.';
+        if (validSeconds > 86400) return 'Valid seconds must be less than or equal to 86400 (24 hours).';
+        return undefined;
+    };
 
     const validateItem = (item: string): { endpoint?: string } => {
         let itemErrors: { endpoint?: string } = {};
@@ -271,6 +300,21 @@ const ServiceRegistrationPage = (props: Props) => {
                         </Select>
                         {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
                     </FormControl>
+
+                    <TextField 
+                        fullWidth
+                        required
+                        label="Valid Seconds" 
+                        variant="outlined"
+                        margin="normal" 
+                        size="small"
+                        type="number"
+                        value={formData.validSeconds} 
+                        onChange={handleValidSecondsChange} 
+                        error={!!errors.validSeconds} 
+                        helperText={errors.validSeconds}
+                        inputProps={{ min: 1, max: 86400 }} 
+                    />
                     
                     <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
                     {errors.errorEndpointsMessage && (
@@ -307,7 +351,7 @@ const ServiceRegistrationPage = (props: Props) => {
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
                         <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isButtonDisabled}>Register</Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>Back</Button>                        
+                        <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>Cancel</Button>                        
                     </Box>
                 </StyledInputArea>
             </StyledContainer>

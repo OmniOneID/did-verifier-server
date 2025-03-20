@@ -93,7 +93,7 @@ const PolicyRegistration = (props: Props) => {
           const processed = processApiResponse(payloadData);        
           const mappedPayloads = processed.map(item => ({
               id: item.payloadId || '',      
-              title: item.service || '[No Service Name]',
+              title: item.service || '[No Service Name]'              
           }));
           console.log('Payload mapped:', mappedPayloads);
           setPayloadList(mappedPayloads);
@@ -146,7 +146,7 @@ const PolicyRegistration = (props: Props) => {
     // Profile search function
     const handleProfileSearch = async (searchTerm?: string) => {
         setProfileSearchOpen(true);
-        
+        console.log('handleProfileSearch term:', searchTerm);
         try {
             setProfileLoading(true);
             // If no search term provided, search for 'all' to get all profiles
@@ -201,7 +201,7 @@ const PolicyRegistration = (props: Props) => {
     };
 
     const handleProfileSelect = (selectedProfile: { id: string, title: string }) => {
-        console.log('Selected profile:', selectedProfile);
+        
         setPolicyData(prev => ({
             ...prev,
             policyProfileId: selectedProfile.id,
@@ -210,7 +210,7 @@ const PolicyRegistration = (props: Props) => {
     };
 
     const handlePayloadSelect = (selectedPayload: { id: string, title: string }) => {
-        console.log('Selected payload:', selectedPayload);
+        
         setPolicyData(prev => ({
             ...prev,
             payloadId: selectedPayload.id,

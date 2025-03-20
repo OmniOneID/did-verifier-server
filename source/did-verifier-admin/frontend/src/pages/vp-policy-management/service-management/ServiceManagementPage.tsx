@@ -141,7 +141,7 @@ const ServiceManagementPage = (props: Props) => {
               { field: 'locked', headerName: "Lock Status", width: 100,
                 renderCell: (params) => lockedMapping[params.value],
               },
-              { field: 'mode', headerName: "Submissin Mode", width: 200,
+              { field: 'mode', headerName: "Submission Mode", width: 200,
                 renderCell: (params) => modeMapping[params.value],
               },
             ]} 

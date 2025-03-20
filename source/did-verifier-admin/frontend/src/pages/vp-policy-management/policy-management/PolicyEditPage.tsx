@@ -53,7 +53,7 @@ const PolicyEditPage = (props: Props) => {
   const [profileSearchOpen, setProfileSearchOpen] = useState(false);
   const [payloadSearchOpen, setPayloadSearchOpen] = useState(false);
   const [profileList, setProfileList] = useState<SearchItem[]>([]);
-  const [payloadList, setPayloadList] = useState<SearchItem[]>([]);
+  const [payloadList, setPayloadList] = useState<{id: string, title: string}[]>([]);
   const [profileLoading, setProfileLoading] = useState(false);
   const [payloadLoading, setPayloadLoading] = useState(false);
   
@@ -227,8 +227,7 @@ const PolicyEditPage = (props: Props) => {
       const mappedPayloads = processed.map(item => ({
         payloadId: item.payloadId || undefined,
         id: item.id || undefined,
-        title: item.title || '[No Title]',
-        service: item.service || '' // Should already exist, but we ensure it's there
+        title: item.service || '[No Title]'        
       }));
       
       setPayloadList(mappedPayloads);

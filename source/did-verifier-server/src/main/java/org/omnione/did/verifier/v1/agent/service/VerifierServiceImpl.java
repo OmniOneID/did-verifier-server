@@ -684,17 +684,14 @@ public class VerifierServiceImpl implements VerifierService {
      * @throws OpenDidException If the policy is not found or cannot be parsed
      */
     private VerifyProfile getVerifyProfileFromPolicy(String policyId) throws IOException {
-        // 1. Policy 테이블에서 Profile 아이디를 가져옵니다.
         Policy policy = policyRepository.findByPolicyId(policyId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND));
 
         String policyProfileId = policy.getPolicyProfileId();
 
-        // 2. Profile을 Policy Profile 테이블에서 가져옵니다.
         PolicyProfile policyProfile = policyProfileRepository.findByPolicyProfileId(policyProfileId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
 
-        // 3. Profile을 JSON 문자열로 변환하고 VerifyProfile 객체로 변환합니다.
         String jsonProfile = objectMapper.writeValueAsString(policyProfile);
         VerifyProfile verifyProfile = objectMapper.readValue(jsonProfile, VerifyProfile.class);
 

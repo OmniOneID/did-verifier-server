@@ -1,4 +1,4 @@
-import { Box, Typography, styled } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
 import { useEffect, useMemo, useState } from "react";
@@ -19,11 +19,13 @@ type VpSubmitRow = {
   createdAt: string;
 };
 
+type TransactionStatusType = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELED';
+
 const transactionStatusMapping: { [key: string]: string } = {
   COMPLETED: "Completed",
   PENDING: "Pending",
   FAILED: "Failed",
-  EXPIRED: "Expired"
+  CANCELED: "Canceled",
 };
 
 const VpHistoryPage = (props: Props) => {
@@ -33,6 +35,7 @@ const VpHistoryPage = (props: Props) => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [selectedRow, setSelectedRow] = useState<string | number | null>(null);
   const [rows, setRows] = useState<VpSubmitRow[]>([]);
+  const [statusFilter, setStatusFilter] = useState<TransactionStatusType>('ALL');
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -43,74 +46,34 @@ const VpHistoryPage = (props: Props) => {
     return rows.find(row => row.id === selectedRow) || null;
   }, [rows, selectedRow]);
   
-  useEffect(() => {
+  const fetchData = async () => {
     setLoading(true);
-    // 실제 API 호출 부분
-    fetchSubmits(paginationModel.page, paginationModel.pageSize, null, null)
-      .then((response) => {
-        setRows(response.data.content);
-        setTotalRows(response.data.totalElements);
-      })
-      .catch((error) => {
-        console.error("Failed to retrieve VP Submits. ", error);
-        navigate('/error', { state: { message: `Failed to retrieve VP Submits: ${error}` } });
-      })
-      .finally(() => setLoading(false));
-      
-    /*
-    setTimeout(() => {
-      const mockData = {
-        content: [
-          {
-            id: 1,
-            vp: '{"@context":["https://www.w3.org/2018/credentials/v1"],"holder":"did:omnione:12345abcde","type":["VerifiablePresentation"]}',
-            holderDID: 'did:omnione:12345abcde',
-            transactionId: 101,
-            transactionStatus: 'COMPLETED',
-            createdAt: '2025-03-15 09:30:22'
-          },
-          {
-            id: 2,
-            vp: '{"@context":["https://www.w3.org/2018/credentials/v1"],"holder":"did:omnione:67890fghij","type":["VerifiablePresentation"]}',
-            holderDID: 'did:omnione:67890fghij',
-            transactionId: 102,
-            transactionStatus: 'PENDING',
-            createdAt: '2025-03-16 14:25:41'
-          },
-          {
-            id: 3,
-            vp: '{"@context":["https://www.w3.org/2018/credentials/v1"],"holder":"did:omnione:klmno12345","type":["VerifiablePresentation"]}',
-            holderDID: 'did:omnione:klmno12345',
-            transactionId: 103,
-            transactionStatus: 'FAILED',
-            createdAt: '2025-03-17 11:12:05'
-          },
-          {
-            id: 4,
-            vp: '{"@context":["https://www.w3.org/2018/credentials/v1"],"holder":"did:omnione:pqrst67890","type":["VerifiablePresentation"]}',
-            holderDID: 'did:omnione:pqrst67890',
-            transactionId: 104,
-            transactionStatus: 'COMPLETED',
-            createdAt: '2025-03-17 16:05:33'
-          },
-          {
-            id: 5,
-            vp: '{"@context":["https://www.w3.org/2018/credentials/v1"],"holder":"did:omnione:uvwxy12345","type":["VerifiablePresentation"]}',
-            holderDID: 'did:omnione:uvwxy12345',
-            transactionId: 105,
-            transactionStatus: 'EXPIRED',
-            createdAt: '2025-03-18 08:42:17'
-          }
-        ],
-        totalElements: 5
-      };
-      
-      setRows(mockData.content);
-      setTotalRows(mockData.totalElements);
+    try {
+      // Pass the status filter to the API if it's not 'ALL'
+      const statusParam = statusFilter !== 'ALL' ? statusFilter : null;
+      const response = await fetchSubmits(paginationModel.page, paginationModel.pageSize, statusParam, null);
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+    } catch (error) {
+      console.error("Failed to retrieve VP Submits. ", error);
+      navigate('/error', { state: { message: `Failed to retrieve VP Submits: ${error}` } });
+    } finally {
       setLoading(false);
-    }, 1000);
-    */
-  }, [paginationModel]);
+    }
+  };
+  
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel, statusFilter]);
+
+  const handleStatusFilterChange = (event: any) => {
+    setStatusFilter(event.target.value as TransactionStatusType);
+    // Reset to first page when filter changes
+    setPaginationModel(prev => ({
+      ...prev,
+      page: 0
+    }));
+  };
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     margin: 'auto',
@@ -132,7 +95,25 @@ const VpHistoryPage = (props: Props) => {
     <>
       <FullscreenLoader open={loading} />
       <StyledContainer>
-        <StyledSubTitle>VP Submit List</StyledSubTitle>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <StyledSubTitle>VP Submit List</StyledSubTitle>
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel id="transaction-status-filter-label">Transaction Status</InputLabel>
+            <Select
+              labelId="transaction-status-filter-label"
+              id="transaction-status-filter"
+              value={statusFilter}
+              label="Transaction Status"
+              onChange={handleStatusFilterChange}
+              size="small"
+            >
+              <MenuItem value="ALL">All Status</MenuItem>
+              {Object.entries(transactionStatusMapping).map(([value, label]) => (
+                <MenuItem key={value} value={value}>{label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
         <CustomDataGrid 
             rows={rows} 
             columns={[
@@ -148,12 +129,12 @@ const VpHistoryPage = (props: Props) => {
                       params.value === 'COMPLETED' ? '#e8f5e9' : 
                       params.value === 'PENDING' ? '#fff8e1' : 
                       params.value === 'FAILED' ? '#ffebee' : 
-                      params.value === 'EXPIRED' ? '#eceff1' : '#f5f5f5',
+                      params.value === 'CANCELED' ? '#eceff1' : '#f5f5f5',
                     color: 
                       params.value === 'COMPLETED' ? '#2e7d32' : 
                       params.value === 'PENDING' ? '#f57c00' : 
                       params.value === 'FAILED' ? '#c62828' : 
-                      params.value === 'EXPIRED' ? '#546e7a' : '#212121',
+                      params.value === 'CANCELED' ? '#546e7a' : '#212121',
                   }}>
                     {transactionStatusMapping[params.value] || params.value}
                   </Box>

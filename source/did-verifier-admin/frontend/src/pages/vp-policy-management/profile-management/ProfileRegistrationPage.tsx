@@ -246,7 +246,7 @@ const ProfileRegistration = (props: Props) => {
       if (searchTerm !== undefined) {
         try {
           setProcessLoading(true);
-          const processData = await searchProcessList(searchTerm);
+          const processData = await searchProcessList(searchTerm || 'all');
           setProcessList(processApiResponse(processData));
           setProcessLoading(false);
         } catch (err) {
@@ -264,25 +264,25 @@ const ProfileRegistration = (props: Props) => {
     
     // Filter 검색 함수
     const handleFilterSearch = async (searchTerm?: string) => {
-      setFilterSearchOpen(true);
+      setFilterSearchOpen(true);      
       
-      if (searchTerm !== undefined) {
         try {
-          setFilterLoading(true);
-          const filterData = await searchFilterList(searchTerm);
-          setFilterList(processApiResponse(filterData));           
-          setFilterLoading(false);          
+            console.log('searchTerm', searchTerm);
+            setFilterLoading(true);
+            const filterData = await searchFilterList(searchTerm || 'all');
+            setFilterList(processApiResponse(filterData));           
+            setFilterLoading(false);          
         } catch (err) {
-          console.error('Failed to search filters:', err);
-          setFilterLoading(false);
-          
-          dialogs.open(CustomDialog, { 
+            console.error('Failed to search filters:', err);
+            setFilterLoading(false);
+            
+            dialogs.open(CustomDialog, { 
             title: 'Error', 
             message: 'Failed to search filters. Please try again.', 
             isModal: true 
-          });
+            });
         }
-      }
+      
     };
     
     const handleProcessSelect = (selectedProcess: { id: number, title: string }) => {
@@ -560,7 +560,7 @@ const ProfileRegistration = (props: Props) => {
                     />
                     
                     <TextField
-                        fullWidth                        
+                        fullWidth                                                
                         label="Description"
                         name="description"
                         value={profileData?.description || ''}

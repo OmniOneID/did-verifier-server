@@ -17,6 +17,7 @@ interface ServiceFormData {
   locked?: boolean;
   device: string;
   mode: string;
+  validSeconds: number;
   endpoints: string[];
 }
 
@@ -25,6 +26,7 @@ interface ErrorState {
   locked?: string;
   device?: string;
   mode?: string;
+  validSeconds?: string;
   endpoints?: string[];
   errorEndpointsMessage?: string;
 }
@@ -42,6 +44,7 @@ const ServiceEditPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
+        validSeconds: 180,
         endpoints: [],
     });
 
@@ -56,6 +59,17 @@ const ServiceEditPage = (props: Props) => {
         setFormData((prev) => ({ ...prev, [field]: newValue }));
     };
 
+    const handleValidSecondsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        // Only allow numeric input for validSeconds
+        if (value === "" || /^\d+$/.test(value)) {
+            setFormData((prev) => ({ 
+                ...prev, 
+                validSeconds: value === "" ? 0 : parseInt(value, 10) 
+            }));
+        }
+    };
+
     const handleEndpointChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newEndpoints = [...formData.endpoints];
         newEndpoints[index] = event.target.value;
@@ -66,6 +80,7 @@ const ServiceEditPage = (props: Props) => {
       if (initialData) {
         setFormData(initialData);
         setIsButtonDisabled(true);
+        setErrors({});
       }
     };
 
@@ -86,6 +101,8 @@ const ServiceEditPage = (props: Props) => {
           tempErrors.locked = validateLocked(formData.locked);
           tempErrors.device = validateDevice(formData.device);
           tempErrors.mode = validateMode(formData.mode);
+          tempErrors.validSeconds = validateValidSeconds(formData.validSeconds);
+
           if (formData.endpoints.length === 0) {
             tempErrors.errorEndpointsMessage = "At least one endpoint is required.";
           } else {
@@ -134,6 +151,13 @@ const ServiceEditPage = (props: Props) => {
         if (!mode) return 'Please select a submission mode.';
         return undefined;
     };
+
+    const validateValidSeconds = (validSeconds?: number): string | undefined => {
+        if (validSeconds === undefined || validSeconds === null) return 'Please enter valid seconds.';
+        if (validSeconds <= 0) return 'Valid seconds must be greater than 0.';
+        if (validSeconds > 86400) return 'Valid seconds must be less than or equal to 86400 (24 hours).';
+        return undefined;
+    };
     
     const validateItem = (item: string): { endpoint?: string } => {
           let itemErrors: { endpoint?: string } = {};
@@ -163,7 +187,7 @@ const ServiceEditPage = (props: Props) => {
           device: formData.device,
           mode: formData.mode,
           endpoints: JSON.stringify(formData.endpoints),
-          validSecond: 180
+          validSecond: formData.validSeconds
         }
 
         await putService(requestObject).then((response) => {
@@ -209,8 +233,9 @@ const ServiceEditPage = (props: Props) => {
                 service: data.service,
                 locked: data.locked,
                 device: data.device,
-                mode : data.mode,
-                endpoints : JSON.parse(data.endpoints),
+                mode: data.mode,
+                validSeconds: data.validSecond || 180, // Use validSecond from API or default to 180
+                endpoints: JSON.parse(data.endpoints),
               }
               setFormData(serviceData);
               setInitialData(serviceData);
@@ -304,11 +329,11 @@ const ServiceEditPage = (props: Props) => {
                 />
 
                 <FormControl fullWidth margin="normal" error={!!errors.mode}>
-                    <InputLabel>Submittion Mode</InputLabel>
+                    <InputLabel>Submission Mode</InputLabel>
                     <Select 
                         value={formData.mode} 
                         onChange={handleChange('mode')}
-                        label="Submittion Mode"
+                        label="Submission Mode"
                     >
                         <MenuItem value="Direct">Direct</MenuItem>
                         <MenuItem value="Indirect">inDirect</MenuItem>
@@ -316,6 +341,21 @@ const ServiceEditPage = (props: Props) => {
                     </Select>
                     {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
                 </FormControl>
+
+                <TextField 
+                    fullWidth
+                    required
+                    label="Valid Seconds" 
+                    variant="outlined"
+                    margin="normal" 
+                    size="small"
+                    type="number"
+                    value={formData.validSeconds} 
+                    onChange={handleValidSecondsChange} 
+                    error={!!errors.validSeconds} 
+                    helperText={errors.validSeconds}
+                    inputProps={{ min: 1, max: 86400 }} 
+                />
 
                 <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
                 {errors.errorEndpointsMessage && (

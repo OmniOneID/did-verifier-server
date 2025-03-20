@@ -56,7 +56,7 @@ interface ErrorState {
     reqE2eCurve?: string;
     reqE2eCipher?: string;
     reqE2ePadding?: string;
-    errorEndpointsMessage?: string;
+    endpoints?: string;
 }
 
 const ProcessEditPage = (props: Props) => {
@@ -109,6 +109,7 @@ const ProcessEditPage = (props: Props) => {
       if (initialData) {
         setFormData(initialData);
         setIsButtonDisabled(true);
+        setErrors({});
       }
     };
 
@@ -119,12 +120,22 @@ const ProcessEditPage = (props: Props) => {
         endpoints: [...prev.endpoints, newEndpoint] 
       }));
       setNewEndpoint('');
+      
+      // Clear the endpoints error when adding an endpoint
+      if (errors.endpoints) {
+        setErrors(prev => ({ ...prev, endpoints: undefined }));
+      }
     };
 
     const handleRemoveEndpoint = (index: number) => {
       const newEndpoints = [...formData.endpoints];
       newEndpoints.splice(index, 1);
       setFormData((prev) => ({ ...prev, endpoints: newEndpoints }));
+      
+      // Re-validate endpoints after removal
+      if (newEndpoints.length === 0) {
+        setErrors(prev => ({ ...prev, endpoints: "Endpoints is required." }));
+      }
     };
 
     const validate = () => {
@@ -140,6 +151,9 @@ const ProcessEditPage = (props: Props) => {
       if (!formData.reqE2e.curve.trim()) tempErrors.reqE2eCurve = "Curve is required.";
       if (!formData.reqE2e.cipher.trim()) tempErrors.reqE2eCipher = "Cipher is required.";
       if (!formData.reqE2e.padding.trim()) tempErrors.reqE2ePadding = "Padding is required.";
+      
+      // Endpoints validation
+      if (formData.endpoints.length === 0) tempErrors.endpoints = "Endpoints is required.";
 
       setErrors(tempErrors);
       return Object.keys(tempErrors).length === 0;
@@ -357,9 +371,9 @@ const ProcessEditPage = (props: Props) => {
 
             {/* Endpoints Section */}
             <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
-            {errors.errorEndpointsMessage && (
+            {errors.endpoints && (
                 <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
-                    {errors.errorEndpointsMessage}
+                    {errors.endpoints}
                 </Typography>
             )}
             <Box sx={{ display: 'flex', mb: 2 }}>
@@ -369,6 +383,7 @@ const ProcessEditPage = (props: Props) => {
                     value={newEndpoint}
                     onChange={(e) => setNewEndpoint(e.target.value)}
                     placeholder="Enter endpoint" 
+                    error={!!errors.endpoints}
                 />
                 <Button 
                     variant="contained" 
@@ -379,7 +394,12 @@ const ProcessEditPage = (props: Props) => {
                     Add
                 </Button>
             </Box>
-            <TableContainer component={Paper}>
+            <TableContainer 
+                component={Paper}
+                sx={{ 
+                    border: errors.endpoints ? '1px solid #d32f2f' : 'inherit'
+                }}
+            >
                 <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "#f5f5f5" }}>

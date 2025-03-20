@@ -222,6 +222,7 @@ const FilterRegistrationPage = (props: Props) => {
                     <TextField 
                         fullWidth
                         label="Title" 
+                        required
                         variant="outlined"
                         margin="normal" 
                         size="small"
@@ -234,6 +235,7 @@ const FilterRegistrationPage = (props: Props) => {
                     <TextField 
                         fullWidth
                         label="ID" 
+                        required
                         variant="outlined"
                         margin="normal" 
                         size="small"
@@ -244,11 +246,12 @@ const FilterRegistrationPage = (props: Props) => {
                     />
 
                     <FormControl fullWidth margin="normal" error={!!errors.type}>
-                        <InputLabel>Type</InputLabel>
+                        <InputLabel>Type *</InputLabel>
                         <Select 
                             value={formData.type} 
                             onChange={handleChange('type')}
                             label="Type"
+                            required
                         >
                             <MenuItem value="OsdSchemaCredential">OsdSchemaCredential</MenuItem>                    
                         </Select>
@@ -411,7 +414,7 @@ const FilterRegistrationPage = (props: Props) => {
                         <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Register</Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
                         <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/filter-management')}>
-                            Back
+                            Cancel
                         </Button> 
                     </Box>
                 </StyledInputArea>
