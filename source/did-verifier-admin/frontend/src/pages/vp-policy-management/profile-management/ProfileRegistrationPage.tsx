@@ -75,7 +75,7 @@ const ProfileRegistration = (props: Props) => {
 
     const transformFilterList = (data: any[]): {id: number, title: string}[] => {        
      
-        return data.map(item => ({
+        return data.map((item: ApiResponseItem) => ({
           id: item.filterId || item.id || 0, 
           title: item.title || item.name || `Filter ${item.filterId || item.id || 'Unknown'}`          
         }));
@@ -173,13 +173,22 @@ const ProfileRegistration = (props: Props) => {
         setIsButtonDisabled(!isModified);
     }, [profileData, showLogo, logoType]);
 
+    // Define interface for API response items
+    interface ApiResponseItem {
+        id?: number;
+        filterId?: number;
+        title?: string;
+        name?: string;
+        [key: string]: any; // Allow other unknown properties
+    }
+
     // Handle API responses with proper error checking
     const processApiResponse = (data: any): {id: number, title: string}[] => {
         if (!data) return [];
         
         // Check if data is an array
         if (Array.isArray(data)) {
-            return data.map(item => ({
+            return data.map((item: ApiResponseItem) => ({
                 id: item.id || 0,
                 title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
                 filterId: item.filterId || 0,
@@ -188,7 +197,7 @@ const ProfileRegistration = (props: Props) => {
         
         // Check if data has a data property that's an array
         if (data.data && Array.isArray(data.data)) {
-            return data.data.map(item => ({
+            return data.data.map((item: ApiResponseItem) => ({
                 id: item.id || 0,
                 title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
                 filterId: item.filterId || 0,
@@ -197,7 +206,7 @@ const ProfileRegistration = (props: Props) => {
         
         // Check if data is an object with items array
         if (data.items && Array.isArray(data.items)) {
-            return data.items.map(item => ({
+            return data.items.map((item: ApiResponseItem) => ({
                 id: item.id || 0,
                 title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
                 filterId: item.filterId || 0,
@@ -285,18 +294,30 @@ const ProfileRegistration = (props: Props) => {
       
     };
     
-    const handleProcessSelect = (selectedProcess: { id: number, title: string }) => {
+    const handleProcessSelect = (selectedProcess: { id?: string | number, title: string }) => {
+        const processId = typeof selectedProcess.id === 'number' 
+            ? selectedProcess.id 
+            : typeof selectedProcess.id === 'string' 
+                ? parseInt(selectedProcess.id, 10) 
+                : 0;
+                
         setProfileData(prev => ({
             ...prev,
-            processId: selectedProcess.id,
+            processId: processId,
             processTitle: selectedProcess.title
         }));
     };
     
-    const handleFilterSelect = (selectedFilter: { id: number, title: string }) => {                
+    const handleFilterSelect = (selectedFilter: { id?: string | number, title: string }) => {                
+        const filterId = typeof selectedFilter.id === 'number' 
+            ? selectedFilter.id 
+            : typeof selectedFilter.id === 'string' 
+                ? parseInt(selectedFilter.id, 10) 
+                : 0;
+                
         setProfileData(prev => ({
             ...prev,
-            filterId: selectedFilter.id,
+            filterId: filterId,
             filterTitle: selectedFilter.title
         }));
     };

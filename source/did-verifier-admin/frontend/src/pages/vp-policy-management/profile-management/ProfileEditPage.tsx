@@ -396,7 +396,7 @@ const ProfileEdit = (props: Props) => {
       
     };
     
-    const handleProcessSelect = (selectedProcess: SearchItem) => {
+    const handleProcessSelect = (selectedProcess: any) => {
         setProfileData(prev => ({
             ...prev,
             processId: Number(selectedProcess.id),
@@ -404,7 +404,7 @@ const ProfileEdit = (props: Props) => {
         }));
     };
     
-    const handleFilterSelect = (selectedFilter: SearchItem) => {
+    const handleFilterSelect = (selectedFilter: any) => {
         setProfileData(prev => ({
             ...prev,
             filterId: Number(selectedFilter.id),

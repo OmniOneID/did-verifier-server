@@ -21,12 +21,12 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 
 interface SearchItem {
-    id?: number;
+    id?: number | string;
     filterId?: number;
     payloadId?: number;
     policyProfileId?: number;
     title: string;
-    service: string;
+    service?: string;
     [key: string]: any; // For additional properties
 }
 
@@ -36,7 +36,7 @@ interface SearchDialogProps {
     onSelect: (item: SearchItem) => void;
     onSearch?: (searchTerm: string) => void; 
     title: string;
-    service: string;
+    service?: string;
     items: SearchItem[];
     loading?: boolean;
     idField?: string; 

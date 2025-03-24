@@ -145,8 +145,7 @@ const PolicyRegistration = (props: Props) => {
 
     // Profile search function
     const handleProfileSearch = async (searchTerm?: string) => {
-        setProfileSearchOpen(true);
-        console.log('handleProfileSearch term:', searchTerm);
+        setProfileSearchOpen(true);        
         try {
             setProfileLoading(true);
             // If no search term provided, search for 'all' to get all profiles
@@ -200,21 +199,21 @@ const PolicyRegistration = (props: Props) => {
         }
     };
 
-    const handleProfileSelect = (selectedProfile: { id: string, title: string }) => {
+    const handleProfileSelect = (selectedProfile: any) => {
         
         setPolicyData(prev => ({
             ...prev,
-            policyProfileId: selectedProfile.id,
-            profileTitle: selectedProfile.title
+            policyProfileId: selectedProfile.id?.toString() || '',
+            profileTitle: selectedProfile.title || ''
         }));
     };
 
-    const handlePayloadSelect = (selectedPayload: { id: string, title: string }) => {
+    const handlePayloadSelect = (selectedPayload: any) => {
         
         setPolicyData(prev => ({
             ...prev,
-            payloadId: selectedPayload.id,
-            payloadService: selectedPayload.title
+            payloadId: selectedPayload.id?.toString() || '',
+            payloadService: selectedPayload.title || ''
         }));
     };
 
@@ -337,10 +336,10 @@ const PolicyRegistration = (props: Props) => {
                 title="Profile Search"
                 items={profileList}
                 loading={profileLoading}
-                idField="id"  
+                idField="id"
+                service=""
             />
 
-            {/* Payload Search Dialog */}
             <SearchDialog
                 open={payloadSearchOpen}
                 onClose={() => setPayloadSearchOpen(false)}
@@ -349,8 +348,10 @@ const PolicyRegistration = (props: Props) => {
                 title="Payload Search"
                 items={payloadList}
                 loading={payloadLoading}
-                idField="id"  
+                idField="id"
+                service=""
             />
+            
             <StyledContainer>
                 <StyledTitle>Policy Registration</StyledTitle>
                 <StyledInputArea>

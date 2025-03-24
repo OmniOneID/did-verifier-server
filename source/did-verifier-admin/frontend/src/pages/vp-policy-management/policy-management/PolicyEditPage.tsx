@@ -244,7 +244,7 @@ const PolicyEditPage = (props: Props) => {
     }
   };
   
-  const handleProfileSelect = (selectedProfile: SearchItem) => {  
+  const handleProfileSelect = (selectedProfile: any) => {  
     setPolicyData(prev => ({
       ...prev,
       policyProfileId: String(selectedProfile.policyProfileId || selectedProfile.id || ''),
@@ -252,7 +252,7 @@ const PolicyEditPage = (props: Props) => {
     }));
   };
   
-  const handlePayloadSelect = (selectedPayload: SearchItem) => {    
+  const handlePayloadSelect = (selectedPayload: any) => {    
     setPolicyData(prev => ({
       ...prev,
       payloadId: String(selectedPayload.payloadId || selectedPayload.id || ''),

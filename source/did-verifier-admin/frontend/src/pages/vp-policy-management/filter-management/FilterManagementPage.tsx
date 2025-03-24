@@ -76,7 +76,7 @@ const FilterManagementPage = (props: Props) => {
     setLoading(true);
     fetchFilters(paginationModel.page, paginationModel.pageSize, null, null)
       .then((response) => {        
-        const transformedRows = response.data.content.map(row => ({
+        const transformedRows = response.data.content.map((row: { filterId: any; }) => ({
           ...row,          
           id: row.filterId
         }));

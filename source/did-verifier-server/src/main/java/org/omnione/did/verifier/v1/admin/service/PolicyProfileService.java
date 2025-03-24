@@ -3,10 +3,7 @@ package org.omnione.did.verifier.v1.admin.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.omnione.did.base.db.domain.Policy;
-import org.omnione.did.base.db.domain.PolicyProfile;
-import org.omnione.did.base.db.domain.VpFilter;
-import org.omnione.did.base.db.domain.VpProcess;
+import org.omnione.did.base.db.domain.*;
 import org.omnione.did.base.db.repository.PolicyRepository;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.db.repository.PolicyProfileRepository;
@@ -33,10 +30,11 @@ public class PolicyProfileService {
     private final PolicyProfileRepository profileRepository;
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
-    private final VerifierProperty verifierConfig;
     private final ModelMapper modelMapper;
     private final PolicyProfileQueryService policyProfileQueryService;
     private final PolicyRepository policyRepository;
+    private final VerifierInfoQueryService verifierInfoQueryService;
+
 
 
     public List<PolicyProfileDTO> getProfileList(String title) {
@@ -114,10 +112,11 @@ public class PolicyProfileService {
                 .orElse("Empty Process");
 
         PolicyProfileDTO.Verifier verifier = new PolicyProfileDTO.Verifier();
-        verifier.setDid(verifierConfig.getDid());
-        verifier.setCertVcRef(verifierConfig.getCertVcRef());
-        verifier.setName(verifierConfig.getName());
-        verifier.setRef(verifierConfig.getRef());
+        VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+        verifier.setDid(verifierInfo.getDid());
+        verifier.setCertVcRef(verifierInfo.getCertificateUrl());
+        verifier.setName(verifierInfo.getName());
+        verifier.setRef(verifierInfo.getServerUrl());
 
         PolicyProfileDTO.LogoImage logoImage = null;
         if (profile.getFormat() != null) {
