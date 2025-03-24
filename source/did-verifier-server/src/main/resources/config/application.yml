@@ -50,15 +50,6 @@ server:
 tas:
   url:
 
-verifier:
-  domain: "http://127.0.0.1:8092"
-  did: did:omn:verifier
-  cert-vc-ref: "${verifier.domain}/verifier/api/v1/certificate-vc"
-  ref: "${verifier.domain}/swagger-ui/index.html#/"
-  name : "Verifier"
-  verifier-end-points: "${verifier.domain}/verifier/api/v1/request-verify"
-  tas-url: ""
-
 wallet:
   file-path:
   password: omnioneopendid12!@
