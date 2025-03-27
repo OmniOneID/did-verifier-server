@@ -35,7 +35,6 @@ import org.omnione.did.base.db.domain.*;
 import org.omnione.did.base.db.repository.*;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.property.VerifierProperty;
 import org.omnione.did.base.util.BaseCoreDidUtil;
 import org.omnione.did.base.util.BaseCryptoUtil;
 import org.omnione.did.base.util.BaseDigestUtil;
@@ -69,6 +68,7 @@ import org.omnione.did.data.model.vc.CredentialSchema;
 import org.omnione.did.data.model.vc.VerifiableCredential;
 import org.omnione.did.data.model.vp.VerifiablePresentation;
 import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
+import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.dto.*;
 
 import org.omnione.did.verifier.v1.common.service.StorageService;
@@ -103,8 +103,7 @@ public class VerifierServiceImpl implements VerifierService {
     private final FileWalletService walletService;
     private final StorageService storageService;
     private final DidDocService didDocService;
-    private final VerifierProperty verifierProperty;
-
+    private final VerifierInfoQueryService verifierInfoQueryService;
     private final PolicyRepository policyRepository;
     private final PayloadRepository payloadRepository;
     private final PolicyProfileRepository policyProfileRepository;
@@ -124,6 +123,7 @@ public class VerifierServiceImpl implements VerifierService {
      */
     @Override
     public RequestOfferResDto requestVpOfferbyQR(RequestOfferReqDto requestOfferReqDto) {
+
         log.debug("=== Starting Requesting VpOfferbyQR ===");
         try{
             log.debug("\t validate requestOfferReqDto and get VpPayload and VpPolicyId");
@@ -187,18 +187,14 @@ public class VerifierServiceImpl implements VerifierService {
             generateReqE2e(reqE2e, generateNonce, keyPair);
             process.setReqE2e(reqE2e);
             process.setVerifierNonce(generateNonce);
-            //log.debug("verifyProfile: {}", verifyProfile.toJson());
             String encodedSessionKey = encodedSessionKey((ECPrivateKey) keyPair.getPrivateKey());
             log.debug("\t --> Retrieving verifier DID Document");
-            //DidDocument verifierDidDoc = didDocService.getDidDocument(verifierProperty.getDid());
+            VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+            DidDocument verifierDidDoc = didDocService.getDidDocument(verifierInfo.getDid());
 
             log.debug("\t --> Generating Verify Profile Proof");
-            //verifyProfile.setProof(generatePreProof(verifierDidDoc));
-            //##TEST를 위한 임시 코드 시작
-            verifyProfile.setProof(generatePreProof2());
-            //##TEST를 위한 임시 코드 끝
+            verifyProfile.setProof(generatePreProof(verifierDidDoc));
             verifyProfile.setProof(generateProof(verifyProfile));
-            log.debug("verifyProfile: {}", verifyProfile.toJson());
 
             log.debug("\t --> Saving VP Profile and E2E information");
             VpProfileSave(verifyProfile, transaction.getId());
@@ -240,10 +236,11 @@ public class VerifierServiceImpl implements VerifierService {
     private void setVerifierProviderDetail(VerifyProfile verifyProfile) {
         InnerVerifyProfile profile = new InnerVerifyProfile();
         ProviderDetail providerDetail = new ProviderDetail();
-        providerDetail.setCertVcRef(verifierProperty.getCertVcRef());
-        providerDetail.setDid(verifierProperty.getDid());
-        providerDetail.setRef(verifierProperty.getRef());
-        providerDetail.setName(verifierProperty.getName());
+        VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+        providerDetail.setCertVcRef(verifierInfo.getCertificateUrl());
+        providerDetail.setDid(verifierInfo.getDid());
+        providerDetail.setRef(verifierInfo.getServerUrl());
+        providerDetail.setName(verifierInfo.getName());
         profile.setVerifier(providerDetail);
         verifyProfile.setProfile(profile);
 
@@ -827,16 +824,6 @@ public class VerifierServiceImpl implements VerifierService {
         proof.setVerificationMethod(verificationMethod);
         return proof;
     }
-    private Proof generatePreProof2() {
-        Proof proof = new Proof();
-        proof.setType(ProofType.SECP256R1_SIGNATURE_2018.getRawValue());
-        proof.setCreated(DateTimeUtil.getCurrentUTCTimeString());
-        proof.setProofPurpose(ProofPurpose.ASSERTION_METHOD.toString());
-        String verificationMethod = "testMethod";
-        proof.setVerificationMethod(verificationMethod);
-        return proof;
-    }
-
 
     /**
      * Generates a shared secret key using the AccE2e public key and the stored E2e session key.

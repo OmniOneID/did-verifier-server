@@ -49,9 +49,23 @@ const VpHistoryPage = (props: Props) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Pass the status filter to the API if it's not 'ALL'
-      const statusParam = statusFilter !== 'ALL' ? statusFilter : null;
-      const response = await fetchSubmits(paginationModel.page, paginationModel.pageSize, statusParam, null);
+      // Create search parameters for the API call
+      let searchKey = null;
+      let searchValue = null;
+      
+      // If statusFilter is not 'ALL', set searchKey to 'status' and searchValue to the selected status
+      if (statusFilter !== 'ALL') {
+        searchKey = 'status';
+        searchValue = statusFilter;
+      }
+      
+      const response = await fetchSubmits(
+        paginationModel.page, 
+        paginationModel.pageSize, 
+        searchKey, 
+        searchValue
+      );
+      
       setRows(response.data.content);
       setTotalRows(response.data.totalElements);
     } catch (error) {
