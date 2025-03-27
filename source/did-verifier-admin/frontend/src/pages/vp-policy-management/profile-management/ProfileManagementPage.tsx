@@ -61,10 +61,9 @@ const ProfileManagementPage = (props: Props) => {
               },
             });
           })
-          .catch((error) => {
-            console.error("Failed to delete Profile. ", error);
-            const result = dialogs.open(CustomConfirmDialog, {
-              title: 'Confirmation',
+          .catch((error) => {           
+            const result = dialogs.open(CustomDialog, {
+              title: 'Notification',
               message: formatErrorMessage(error, "Failed to delete Profile!! "),
               isModal: true,
             });        

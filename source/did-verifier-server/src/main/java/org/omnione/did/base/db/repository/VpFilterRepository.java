@@ -15,5 +15,5 @@ import java.util.Optional;
 public interface VpFilterRepository extends JpaRepository<VpFilter, Long>, QuerydslPredicateExecutor<VpFilter>, VpFilterRepositoryAdmin {
     Optional<VpFilter> findByFilterId(Long filterId);
 
-    List<VpFilter> findByTitle(String title, Sort sort);
+    List<VpFilter> findByTitleContainingIgnoreCase(String title, Sort sort);
 }

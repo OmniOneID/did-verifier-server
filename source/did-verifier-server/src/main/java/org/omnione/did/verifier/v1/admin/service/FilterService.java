@@ -98,7 +98,7 @@ public class FilterService {
         if(Objects.equals(title, "all")){
             vpFilterList = vpFilterRepository.findAll(sort);
         } else if (title != null && !title.isEmpty()) {
-            vpFilterList = vpFilterRepository.findByTitle(title, sort);
+            vpFilterList = vpFilterRepository.findByTitleContainingIgnoreCase(title, sort);
         } else {
             vpFilterList = vpFilterRepository.findAll(sort);
         }

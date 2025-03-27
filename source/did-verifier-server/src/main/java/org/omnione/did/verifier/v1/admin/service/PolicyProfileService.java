@@ -44,7 +44,7 @@ public class PolicyProfileService {
         if(Objects.equals(title, "all")) {
             policyProfileList = profileRepository.findAll(sort);
         } else {
-            policyProfileList = profileRepository.findByTitle(title, sort);
+            policyProfileList = profileRepository.findByTitleContainingIgnoreCase(title, sort);
         }
 
         return policyProfileList.stream()

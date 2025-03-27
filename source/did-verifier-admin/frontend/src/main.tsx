@@ -8,6 +8,7 @@ import AdminDetailPage from './pages/admins/AdminDetailPage';
 import AdminRegisterPage from './pages/admins/AdminRegisterPage';
 import SignInPage from './pages/auth/SignIn';
 import ErrorPage from './pages/ErrorPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
 import ServerManagementPage from './pages/servers/ServerManagementPage';
 import VerifierManagementPage from './pages/verifier/VerifierManagementPage';
 import VerifierRegisterPage from './pages/verifier/VerifierRegistrationPage';
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         path: '/',
         Component: Layout,
         children: [
+          {
+            path: '/',
+            Component: DashboardPage
+          },
           {
             path: '/verifier-registration',
             Component: VerifierRegisterPage,

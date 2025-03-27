@@ -17,5 +17,5 @@ public interface PayloadRepository extends JpaRepository<Payload, Long>, Queryds
 
     Optional<Payload> findByPayloadId(String payloadId);
 
-    List<Payload> findByService(String service, Sort sort);
+    List<Payload> findByServiceContainingIgnoreCase(String service, Sort sort);
 }

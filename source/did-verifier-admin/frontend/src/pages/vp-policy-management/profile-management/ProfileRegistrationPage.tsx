@@ -82,7 +82,7 @@ const ProfileRegistration = (props: Props) => {
       };
     
     const [profileData, setProfileData] = useState<ProfileFormData>({
-        type: '',
+        type: 'VerifyProfile',
         title: '',
         description: '',
         encoding: '',
@@ -431,7 +431,7 @@ const ProfileRegistration = (props: Props) => {
         setShowLogo(false);
         setLogoType('link');
         setProfileData({
-            type: '',
+            type: 'VerifyProfile',
             title: '',
             description: '',
             encoding: '',
@@ -578,6 +578,7 @@ const ProfileRegistration = (props: Props) => {
                         onChange={handleInputChange}
                         error={!!errors.type}
                         helperText={errors.type}
+                        disabled={true}
                     />
                     
                     <TextField
