@@ -32,9 +32,4 @@ public class VpSubmitController {
         return vpSubmitService.searchVpSubmitList(searchKey, searchValue, pageable);
     }
 
-    /*
-    public Page<PayloadDTO> searchPayloadList(String searchKey, String searchValue, Pageable pageable) {
-        return payloadService.searchPayloadList(searchKey, searchValue, pageable);
-    }
-     */
 }

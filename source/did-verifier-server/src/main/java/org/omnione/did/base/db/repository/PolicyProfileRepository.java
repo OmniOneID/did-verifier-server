@@ -14,6 +14,6 @@ import java.util.Optional;
  */
 public interface PolicyProfileRepository extends JpaRepository<PolicyProfile, Long>, QuerydslPredicateExecutor<VpProfile>, PolicyProfileRepositoryAdmin {
 
-    List<PolicyProfile> findByTitle(String title, Sort sort);
+    List<PolicyProfile> findByTitleContainingIgnoreCase(String title, Sort sort);
     Optional<PolicyProfile> findByPolicyProfileId(String policyProfileId);
 }

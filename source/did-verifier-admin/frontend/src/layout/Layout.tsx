@@ -23,7 +23,7 @@ export default function Layout() {
         alignItems="flex-start"
         spacing={2}
         sx={{ cursor: 'pointer'}}
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/verifier-management')}
       >
          <img src={logo} alt="OpenDID Logo" style={{ height: '20px', width: '140px' }} />
          <span

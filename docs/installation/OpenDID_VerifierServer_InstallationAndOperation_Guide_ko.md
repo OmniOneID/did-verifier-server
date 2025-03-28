@@ -31,6 +31,7 @@ Open DID Verifier Server Installation And Operation Guide
 - [2. 사전 준비 사항](#2-사전-준비-사항)
   - [2.1. Git 설치](#21-git-설치)
   - [2.2. PostgreSQL 설치](#22-postgresql-설치)
+  - [2.3. Node.js 설치](#23-nodejs-설치)
 - [3. GitHub에서 소스 코드 복제하기](#3-github에서-소스-코드-복제하기)
   - [3.1. 소스코드 복제](#31-소스코드-복제)
   - [3.2. 디렉토리 구조](#32-디렉토리-구조)
@@ -87,9 +88,10 @@ Open DID Verifier Server Installation And Operation Guide
 
 ## 1.1. 개요
 
-본 문서는 Verifier 서버의 설치 및 구동에 관한 가이드를 제공합니다. Verifier의 설치 과정, 설정 방법, 그리고 구동 절차를 단계별로 설명하여, 사용자가 이를 효율적으로 설치하고 운영할 수 있도록 안내합니다.
+본 문서는 Open DID Verifier 서버의 설치, 설정 및 구동 방법에 대한 가이드를 제공합니다. Verifier 서버는 Spring Boot 기반의 백엔드와 React 기반의 Admin console 프론트엔드로 구성되어 있으며, Gradle 빌드를 통해 통합 배포가 가능합니다. 설치 과정, 환경 설정, Docker 실행 방법, 프로파일 설정까지 단계별로 설명되어 있어, 사용자가 효율적으로 서버를 설치하고 실행할 수 있도록 안내합니다.
 
-OpenDID의 전체 설치에 대한 가이드는 [Open DID Installation Guide]를 참고해 주세요.
+- OpenDID의 전체 설치에 대한 가이드는 [Open DID Installation Guide]를 참고해 주세요.
+- Admin console에 대한 가이드는 [Open DID Admin Console Guide]를 참고해 주세요.
 
 <br/>
 
@@ -138,6 +140,27 @@ Verifier 서버를 구동하려면 데이터베이스 설치가 필요하며, Op
 - [8. Docker postgreSQL 설치하기](#8-docker-postgresql-설치하기)
 
 <br/>
+
+## 2.3. Node.js 설치
+React 기반의 Verifier Admin Console을 실행하려면 `Node.js`와 `npm`이 필요합니다.
+
+npm(Node Package Manager)은 프론트엔드 개발에 필요한 의존성들을 설치하고 관리하는 데 사용됩니다.
+
+설치가 완료되면 다음 명령어로 정상적으로 설치되었는지 확인할 수 있습니다:
+
+
+```bash
+node --version
+npm --version
+```
+
+
+> **참고 링크**  
+> - [Node.js 공식 다운로드 페이지](https://nodejs.org/)  
+> - LTS(Long Term Support) 버전 설치를 권장합니다.  
+
+> ✅ 설치 확인 팁  
+> `node -v`와 `npm -v` 명령어를 입력했을 때 버전 정보가 출력되면 정상적으로 설치된 것입니다.
 
 # 3. GitHub에서 소스 코드 복제하기
 
@@ -201,6 +224,7 @@ did-verifier-server
         └── src
         └── build.gradle
         └── README.md
+    └── did-verifier-admin 
 ```
 
 | Name                    | Description                              |
@@ -218,14 +242,14 @@ did-verifier-server
 | ┖ errorCode             | 오류 코드 및 문제 해결 가이드            |
 | ┖ installation          | 설치 및 설정 가이드                      |
 | ┖ db                    | 데이터베이스 ERD, 테이블 명세서          |
-| source                  | 소스 코드                                |
-| ┖ did-verifier-server        | Verifier 서버 소스 코드 및 빌드 파일          |
+| source/did-verifier-server| Verifier 서버 소스 코드 및 빌드 파일 |
 | ┖ gradle                | Gradle 빌드 설정 및 스크립트             |
 | ┖ libs                  | 외부 라이브러리 및 의존성                |
 | ┖ sample                | 샘플 파일                                |
 | ┖ src                   | 주요 소스 코드 디렉토리                  |
 | ┖ build.gradle          | Gradle 빌드 설정 파일                    |
 | ┖ README.md             | 소스 코드 개요 및 안내                   |
+| source/did-verifier-admin| Verifier Admin console 소스 코드 |
 
 <br/>
 
@@ -241,58 +265,91 @@ did-verifier-server
 
 3. **Docker로 빌드하는 방법**: 서버를 Docker 이미지로 빌드하고, Docker 컨테이너로 실행할 수 있습니다. 이 방법은 환경 간 일관성을 유지하며, 배포 및 스케일링이 용이한 장점이 있습니다.
 
-## 4.1. IntelliJ IDEA로 구동하기 (Gradle 지원)
+## 4.1. IDE로 구동하기 (Gradle 및 React 프로젝트 실행)
 
-IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으로, Gradle과 같은 빌드 도구를 지원하여 프로젝트 설정 및 의존성 관리가 매우 용이합니다. Open DID의 서버는 Gradle을 사용하여 빌드되므로, IntelliJ IDEA에서 쉽게 프로젝트를 설정하고 서버를 실행할 수 있습니다.
+Open DID 프로젝트는 백엔드(Spring Boot 기반)와 프론트엔드(React 기반)로 구성되어 있으며, 각각 IntelliJ IDEA와 VS Code에서 개발 및 실행할 수 있습니다.
 
-### 4.1.1. IntelliJ IDEA 설치 및 설정
+### 4.1.1. IntelliJ IDEA에서 백엔드(Spring Boot) 실행
 
-1. IntelliJ를 설치합니다. (설치 방법은 아래 링크를 참조)
+IntelliJ IDEA는 Java 개발에 널리 사용되는 IDE로, Gradle 기반 프로젝트와 잘 호환됩니다. Open DID 서버는 Gradle을 사용하므로, IntelliJ에서 쉽게 실행할 수 있습니다.
 
-> **참고 링크**
->
-> - [IntelliJ IDEA 다운로드](https://www.jetbrains.com/idea/download/)
+#### 1. IntelliJ IDEA 설치
 
-### 4.1.2. IntelliJ에서 프로젝트 열기
+- [IntelliJ IDEA 다운로드](https://www.jetbrains.com/idea/download/)
 
-- IntelliJ를 실행시키고 `File -> New -> Project from Existing Sources`를 선택합니다. 파일 선택 창이 나타나면 [3.1. 소스코드 복제](#31-소스코드-복제) 에서 복제한 리포지토리에서 'source/did-verifier-server' 폴더를 선택합니다.
-- 프로젝트를 열면 build.gradle 파일이 자동으로 인식됩니다.
-- Gradle이 자동으로 필요한 의존성 파일들을 다운로드하며, 이 과정이 완료될 때까지 기다립니다.
+#### 2. 프로젝트 열기
 
-### 4.1.3. Gradle 빌드
+- `File -> New -> Project from Existing Sources` 선택  
+- `source/did-verifier-server` 디렉토리 선택  
+- `build.gradle` 파일이 자동 인식되며, 필요한 의존성이 자동으로 다운로드됨
 
-- IntelliJ IDEA의 `Gradle` 탭에서 `Tasks -> build -> build`를 실행합니다.
-- 빌드가 성공적으로 완료되면, 프로젝트가 실행 가능한 상태로 준비됩니다.
+#### 3. Gradle 빌드
 
-### 4.1.4. 서버 구동
+- `Gradle` 탭에서 `Tasks -> build -> build` 실행
 
-- IntelliJ IDEA의 Gradle 탭에서 Tasks -> application -> bootRun을 선택하고 실행합니다.
-- Gradle이 자동으로 서버를 빌드하고 실행합니다.
-- 콘솔 로그에서 "Started [ApplicationName] in [time] seconds" 메시지를 확인하여 서버가 정상적으로 실행되었는지 확인합니다.
-- 서버가 정상적으로 구동되면, 브라우저에서 <http://localhost:8092/swagger-ui/index.html> 주소로 이동하여 Swagger UI를 통해 API 문서가 제대로 표시되는지 확인합니다.
+#### 4. 서버 실행
 
-### 4.1.5. 데이터베이스 설치
+- `Tasks -> application -> bootRun` 실행  
+- 콘솔에 `"Started [ApplicationName] in [time] seconds"` 메시지 출력 시 정상 구동
 
-Verifier 서버는 운영에 필요한 데이터를 데이터베이스에 저장하므로, 서버를 운영하려면 반드시 데이터베이스가 설치되어야 합니다. Open DID의 서버는 PostgreSQL 데이터베이스를 사용합니다. PostgreSQL 서버의 설치 방법은 여러가지가 있지만, Docker를 이용한 설치가 가장 간편하고 쉽습니다. PostgreSQL의 설치 방법은 [2.2. PostgreSQL 설치](#22-postgresql-설치) 장을 참고해 주세요.
+> ⚠️ 기본 `sample` 프로파일로 실행됨. 데이터베이스 없이 테스트용으로 구동됨  
+> 자세한 내용은 [6. 프로파일 설정 및 사용](#6-프로파일-설정-및-사용) 참고
+
+#### 5. 데이터베이스 설치
+
+- PostgreSQL 사용 (Docker 설치 권장)  
+- 자세한 설치 방법은 [2.2. PostgreSQL 설치](#22-postgresql-설치) 참고
+
+#### 6. 서버 설정
+
+- 설정 파일 위치: `src/main/resources/config`  
+- 예: DB 연결 정보, 포트, 이메일 설정 등  
+- 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 참고
+
+---
+
+### 4.1.2. VS Code에서 프론트엔드(React) 실행
+
+Verifier 어드민 콘솔은 React 기반이며, VS Code에서 별도로 실행할 수 있습니다. 프론트엔드 개발 또는 UI 확인 시 유용합니다.
+
+#### 1. VS Code 설치
+
+- [VS Code 다운로드](https://code.visualstudio.com/)
+
+#### 2. 프로젝트 열기
+
+- VS Code에서 `source/did-verifier-admin` 디렉토리 열기
+
+#### 3. 의존성 설치
+
+```bash
+npm install
+```
+
+#### 4. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+- 기본 접속 URL: [http://localhost:5173](http://localhost:5173)
+
+> 📌 **참고:**  
+> 백엔드(Spring Boot 서버)는 별도로 실행되어 있어야 하며,  
+> 프론트엔드에서 API 서버 주소는 `vite.config.ts` 파일 또는 설정 파일을 통해 지정할 수 있습니다.
+   
 
 <br/>
 
-### 4.1.6. 서버 설정
-
-- 서버는 배포 환경에 맞게 필요한 설정을 수정해야 하며, 이를 통해 서버가 안정적으로 작동할 수 있도록 해야 합니다. 예를 들어, 데이터베이스 연결 정보, 포트 번호, 이메일 연동 정보 등 각 환경에 맞는 구성 요소들을 조정해야 합니다.
-- 서버의 설정 파일은 `src/main/resource/config` 경로에 위치해 있습니다.
-- 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 를 참고해 주세요.
-
-<br/>
 
 ## 4.2. 콘솔 명령어로 구동하기
 
 콘솔 명령어를 사용하여 Open DID 서버를 구동하는 방법을 안내합니다. Gradle을 이용해 프로젝트를 빌드하고, 생성된 JAR 파일을 사용하여 서버를 구동하는 과정을 설명합니다.
+- Gradle 빌드시 프론트엔드(Admin Console)가 자동으로 함께 빌드되며, 정적 리소스로 포함됩니다.
 
 ### 4.2.1. Gradle 빌드 명령어
 
 - gradlew를 사용하여 소스를 빌드합니다.
-
   ```shell
     # 복제한 리포지토리로의 소스폴더로 이동
     cd source/did-verifier-server
@@ -303,35 +360,16 @@ Verifier 서버는 운영에 필요한 데이터를 데이터베이스에 저장
     # 프로젝트를 클린 빌드 (이전 빌드 파일을 삭제하고 새로 빌드)
     ./gradlew clean build
   ```
+  > 참고: 프론트엔드 빌드가 필요 없는 경우(예: 백엔드만 테스트하거나 프론트엔드 결과물을 이미 포함하고 있는 경우)는 다음과 같이 옵션을 추가하여 프론트엔드 빌드를 생략할 수 있습니다. 
+  > - `./gradlew clean build -DskipFrontendBuild=true`
 
-  > 참고
-  > - gradlew은 Gradle Wrapper의 줄임말로, 프로젝트에서 Gradle을 실행하는 데 사용되는 스크립트입니다. 로컬에 Gradle이 설치되어 있지 않더라도, 프로젝트에서 지정한 버전의 Gradle을 자동으로 다운로드하고 실행할 수 있도록 해줍니다. 따라서 개발자는 Gradle 설치 여부와 상관없이 동일한 환경에서 프로젝트를 빌드할 수 있게 됩니다.
 
 - 빌드된 폴더로 이동하여 JAR 파일이 생성된 것을 확인합니다.
-
     ```shell
       cd build/libs
       ls
     ```
-
 - 이 명령어는 `did-verifier-server-1.0.0.jar` 파일을 생성합니다.
-
-<br/>
-
-### 4.2.2. 서버 구동 방법
-
-빌드된 JAR 파일을 사용하여 서버를 구동합니다:
-
-```bash
-java -jar did-verifier-server-1.0.0.jar
-```
-
-- 서버가 정상적으로 구동되면, 브라우저에서 <http://localhost:8092/swagger-ui/index.html> 주소로 이동하여 Swagger UI를 통해 API 문서가 제대로 표시되는지 확인합니다.
-
-> **주의**
->
-> - Verifier 서버는 초기에 sample 프로파일로 설정되어 있습니다.
-> - sample 프로파일로 설정시, 필수 설정(예: 데이터베이스)을 무시하고 서버가 구동됩니다. 자세한 내용은 [6. 프로파일 설정 및 사용](#6-프로파일-설정-및-사용) 장을 참고해 주세요.
 
 <br/>
 
@@ -731,8 +769,8 @@ Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `samp
 반면, `dev` 프로파일은 실제 동작을 수행하도록 설계되었습니다. 이 프로파일을 사용하면 실데이터에 대한 테스트와 검증이 가능합니다. `dev` 프로파일을 활성화하면 실제 데이터베이스, 블록체인 등 외부 서비스와 연동되어, 실제 환경에서의 애플리케이션 동작을 테스트할 수 있습니다.
 
 ### 6.1.1. `sample` 프로파일
-
 `sample` 프로파일은 외부 서비스(DB, 블록체인 등)와의 연동 없이 서버를 독립적으로 구동할 수 있도록 설계되었습니다. 이 프로파일은 API 호출 테스트에 적합하며, 개발자가 애플리케이션의 기본 동작을 빠르게 확인할 수 있습니다. 모든 API 호출에 대해 고정된 응답 데이터를 반환하므로, 초기 개발 단계나 기능 테스트에 유용합니다. 외부 시스템과의 연동이 전혀 필요하지 않기 때문에, 단독으로 서버를 실행하고 테스트할 수 있는 환경을 제공합니다.
+> 참고: sample 프로파일을 사용 할 경우 Admin Console이 동작하지 않습니다.
 
 ### 6.1.2. `dev` 프로파일
 

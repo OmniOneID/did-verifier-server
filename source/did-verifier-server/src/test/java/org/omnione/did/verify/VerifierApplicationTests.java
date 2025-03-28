@@ -60,6 +60,7 @@ class VerifierControllerTest {
         reqDto.setDevice("WEB");
         reqDto.setMode(PresentMode.DIRECT);
         reqDto.setService("login");
+        reqDto.setPolicyId("f1a2b3c4-d5e6-7890-1234-56789abcdef0");
 
         //2. 컨트롤러 호출 및 응답 검증
         MvcResult result = mockMvc.perform(post(UrlConstant.Verifier.V1 + UrlConstant.Verifier.REQUEST_OFFER_QR)

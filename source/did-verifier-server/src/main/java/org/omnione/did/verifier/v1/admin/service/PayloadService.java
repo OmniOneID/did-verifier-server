@@ -37,7 +37,7 @@ public class PayloadService {
         if(Objects.equals("all", service)) {
             payloadList = payloadRepository.findAll(sort);
         } else {
-            payloadList = payloadRepository.findByService(service, sort);
+            payloadList = payloadRepository.findByServiceContainingIgnoreCase(service, sort);
         }
         return payloadList.stream()
             .map(payload -> modelMapper.map(payload, PayloadDTO.class))

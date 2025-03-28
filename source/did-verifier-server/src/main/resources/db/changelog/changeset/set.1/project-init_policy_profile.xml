@@ -54,7 +54,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liqu
   <changeSet id="insert-initial-data-policy_profile" author="jhkim6557">
     <insert tableName="policy_profile">
         <column name="policy_profile_id" value="c500950c-bf19-46d2-ba1d-255aa76d8b64"/>
-        <column name="type" value="VP"/>
+        <column name="type" value="VerifyProfile"/>
         <column name="title" value="VP Policy Profile"/>
         <column name="description" value="VP Policy Profile Description"/>
         <column name="encoding" value="UTF-8"/>
@@ -67,7 +67,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liqu
 
     <insert tableName="policy_profile">
         <column name="policy_profile_id" value="d3b95a02-06af-407b-b958-00d7141cf7f8"/>
-        <column name="type" value="VP"/>
+        <column name="type" value="VerifyProfile"/>
         <column name="title" value="VP Policy Profile 2"/>
         <column name="description" value="VP Policy Profile Description 2"/>
         <column name="encoding" value="UTF-8"/>

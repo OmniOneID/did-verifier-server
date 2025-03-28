@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public interface VpProcessRepository extends JpaRepository<VpProcess, Long>, QuerydslPredicateExecutor<VpProcess>, VpProcessRepositoryAdmin {
     @NotNull Optional<VpProcess> findById(@NotNull Long id);
-    List<VpProcess> findByTitle(String title);
+    List<VpProcess> findByTitleContainingIgnoreCase(String title);
 
 
 }

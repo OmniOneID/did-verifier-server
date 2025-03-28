@@ -73,7 +73,7 @@ public class ProcessService {
         if(Objects.equals(searchValue, "all")){
             vpProcessList = vpProcessRepository.findAll(sort);
         } else if (searchValue != null && !searchValue.isEmpty()) {
-            vpProcessList = vpProcessRepository.findByTitle(searchValue);
+            vpProcessList = vpProcessRepository.findByTitleContainingIgnoreCase(searchValue);
         } else {
             vpProcessList = vpProcessRepository.findAll(sort);
         }

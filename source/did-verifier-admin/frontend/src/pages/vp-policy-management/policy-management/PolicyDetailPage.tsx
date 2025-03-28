@@ -85,9 +85,9 @@ const PolicyDetailPage = (props: Props) => {
   };
   
   const handleBack = () => {
-    navigate('/vp-policy-management');
+    navigate('/vp-policy-management/policy-management');
   };
-
+  
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     width: 800,
     margin: 'auto',

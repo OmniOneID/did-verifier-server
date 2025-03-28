@@ -71,10 +71,9 @@ const ServiceManagementPage = (props: Props) => {
               },
             });
           })
-          .catch((error) => {
-            console.error("Failed to delete Service. ", error);
-            const result = dialogs.open(CustomConfirmDialog, {
-              title: 'Confirmation',
+          .catch((error) => {            
+            const result = dialogs.open(CustomDialog, {
+              title: 'Notification',
               message: formatErrorMessage(error, "Failed to delete Service!! "),
               isModal: true,
             });            

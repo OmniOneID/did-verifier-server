@@ -110,7 +110,10 @@ const ProcessEditPage = (props: Props) => {
         setFormData(initialData);
         setIsButtonDisabled(true);
         setErrors({});
-      }
+      }      
+    };
+    const handleCancel = () => {
+        navigate(`/vp-policy-management/process-management/${id}`);        
     };
 
     const handleAddEndpoint = () => {
@@ -430,9 +433,7 @@ const ProcessEditPage = (props: Props) => {
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
                 <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Update</Button>
                 <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/process-management')}>
-                  Cancel
-                </Button>
+                <Button variant="outlined" color="secondary" onClick={handleCancel}>Cancel</Button>
             </Box>
           </StyledInputArea>
         </StyledContainer>

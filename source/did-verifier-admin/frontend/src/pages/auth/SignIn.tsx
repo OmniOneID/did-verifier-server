@@ -53,7 +53,7 @@ export default function SignIn() {
         localStorage.removeItem('email');
       }
 
-      navigate(callbackUrl ?? '/ta-registration', { replace: true });
+      navigate(callbackUrl ?? '/verifier-registration', { replace: true });
       return {};
     } catch (error) {
       return { error: 'Invalid username or password.' };
@@ -74,7 +74,7 @@ export default function SignIn() {
       const session = { user: { name: loginData.email } };
       setSession(session);
       
-      navigate('/ta-management', { replace: true });
+      navigate('/verifier-management', { replace: true });
     } catch (error) {
       console.error('Failed to reset password:', error);
     } finally {
@@ -83,7 +83,7 @@ export default function SignIn() {
     }
   };
 
-  const Title = () => <p style={{ fontWeight: 700, fontSize: '32px', lineHeight: '150%', margin: 0 }}>Verifier Admin Console Login</p>;
+  const Title = () => <p style={{ fontWeight: 700, fontSize: '32px', lineHeight: '150%', margin: 0 }}>Verifier Admin Login</p>;
   const SubTitle = () => <p style={{ fontSize: '14px', marginBottom: 16, marginTop: 8 }}>Welcome, please sign in to continue</p>;
 
   return (
