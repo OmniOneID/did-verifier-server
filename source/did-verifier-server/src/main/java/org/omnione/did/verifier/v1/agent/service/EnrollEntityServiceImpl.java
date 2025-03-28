@@ -73,48 +73,45 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
      */
     @Override
     public EnrollEntityResDto enrollEntity() {
-        try {
-            log.debug("=== Starting Enroll Entity ===");
 
-            log.debug("\t--> 1. propose Enroll Entity");
-            ProposeEnrollEntityApiResDto proposeResponse = proposeEnrollEntity();
-            String txId = proposeResponse.getTxId();
-            String authNonce = proposeResponse.getAuthNonce();
+        log.debug("=== Starting Enroll Entity ===");
 
-            log.debug("\t--> 2. request ECDH");
-            EccCurveType eccCurveType = EccCurveType.SECP_256_R1;
-            log.debug("\t\t--> generate Tmp Keypair");
-            EcKeyPair ecKeyPair = (EcKeyPair) BaseCryptoUtil.generateKeyPair(eccCurveType);
-            log.debug("\t\t--> generate ReqEcdh");
-            String clientNonce = BaseMultibaseUtil.encode(BaseCryptoUtil.generateNonce(16));
-            EcdhReqData reqData = generateReqData(ecKeyPair, eccCurveType, clientNonce);
-            log.debug("\t\t--> request ECDH");
-            RequestEcdhApiResDto ecdhResponse = requestEcdh(txId, reqData);
+        log.debug("\t--> 1. propose Enroll Entity");
+        ProposeEnrollEntityApiResDto proposeResponse = proposeEnrollEntity();
+        String txId = proposeResponse.getTxId();
+        String authNonce = proposeResponse.getAuthNonce();
 
-            log.debug("\t--> 3. request Enroll Entity");
-            log.debug("\t\t--> generate DID Auth");
-            DidAuth didAuth = generateDidAuth(authNonce);
-            log.debug("\t\t--> request Enroll Entity");
-            RequestEnrollEntityApiResDto enrollEntityResponse = requestEnrollEntity(txId, didAuth);
-            log.debug("\t\t--> decrypt VC");
-            VerifiableCredential vc = decryptVc((ECPrivateKey) ecKeyPair.getPrivateKey(),
-                    ecdhResponse.getAccEcdh(), enrollEntityResponse, clientNonce);
+        log.debug("\t--> 2. request ECDH");
+        EccCurveType eccCurveType = EccCurveType.SECP_256_R1;
+        log.debug("\t\t--> generate Tmp Keypair");
+        EcKeyPair ecKeyPair = (EcKeyPair) BaseCryptoUtil.generateKeyPair(eccCurveType);
+        log.debug("\t\t--> generate ReqEcdh");
+        String clientNonce = BaseMultibaseUtil.encode(BaseCryptoUtil.generateNonce(16));
+        EcdhReqData reqData = generateReqData(ecKeyPair, eccCurveType, clientNonce);
+        log.debug("\t\t--> request ECDH");
+        RequestEcdhApiResDto ecdhResponse = requestEcdh(txId, reqData);
 
-            log.debug("\t--> 4. confirm Enroll Entity");
-            ConfirmEnrollEntityApiResDto confirmResponse = confirmEnrollEntity(txId, vc.getId());
+        log.debug("\t--> 3. request Enroll Entity");
+        log.debug("\t\t--> generate DID Auth");
+        DidAuth didAuth = generateDidAuth(authNonce);
+        log.debug("\t\t--> request Enroll Entity");
+        RequestEnrollEntityApiResDto enrollEntityResponse = requestEnrollEntity(txId, didAuth);
+        log.debug("\t\t--> decrypt VC");
+        VerifiableCredential vc = decryptVc((ECPrivateKey) ecKeyPair.getPrivateKey(),
+                ecdhResponse.getAccEcdh(), enrollEntityResponse, clientNonce);
 
-            log.debug("\t\t--> save VC to DB");
-            certificateVcQueryService.save(CertificateVc.builder()
-                    .vc(vc.toJson())
-                    .build());
+        log.debug("\t--> 4. confirm Enroll Entity");
+        ConfirmEnrollEntityApiResDto confirmResponse = confirmEnrollEntity(txId, vc.getId());
 
-            log.debug("== Finish");
-            return EnrollEntityResDto.builder()
-                    .build();
-        } catch (Exception e) {
-            log.error("An unknown error occurred while enrolling entity", e);
-            throw new OpenDidException(ErrorCode.FAILED_TO_ISSUE_CERTIFICATE_VC);
-        }
+        log.debug("\t\t--> save VC to DB");
+        certificateVcQueryService.save(CertificateVc.builder()
+                .vc(vc.toJson())
+                .build());
+
+        log.debug("== Finish");
+        return EnrollEntityResDto.builder()
+                .build();
+
     }
 
     /**

@@ -69,18 +69,10 @@ public class PolicyService {
     public PolicyDTO updatePolicy(PolicyDTO policyDTO) {
         Policy findPolicy = policyRepository.findById(policyDTO.getId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
-
             findPolicy.setPayloadId(policyDTO.getPayloadId());
             findPolicy.setPolicyProfileId(policyDTO.getPolicyProfileId());
-        try {
             Policy savedPolicy = policyRepository.save(findPolicy);
             return PolicyDTO.toDTO(savedPolicy);
-        } catch (Exception e) {
-            log.error("Failed to update policy: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.VP_POLICY_UPDATE_FAILED);
-
-        }
-
     }
 
     public void deletePolicy(Long id) {

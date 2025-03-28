@@ -18,11 +18,12 @@ puppeteer:
 Open DID Verifier Server Installation And Operation Guide
 ==
 
-- Date: 2024-09-02
+- Date: 2025-04-01
 - Version: v1.0.0
 
 목차
 ==
+
 
 - [1. 소개](#1-소개)
   - [1.1. 개요](#11-개요)
@@ -36,21 +37,16 @@ Open DID Verifier Server Installation And Operation Guide
   - [3.1. 소스코드 복제](#31-소스코드-복제)
   - [3.2. 디렉토리 구조](#32-디렉토리-구조)
 - [4. 서버 구동 방법](#4-서버-구동-방법)
-  - [4.1. IntelliJ IDEA로 구동하기 (Gradle 지원)](#41-intellij-idea로-구동하기-gradle-지원)
-    - [4.1.1. IntelliJ IDEA 설치 및 설정](#411-intellij-idea-설치-및-설정)
-    - [4.1.2. IntelliJ에서 프로젝트 열기](#412-intellij에서-프로젝트-열기)
-    - [4.1.3. Gradle 빌드](#413-gradle-빌드)
-    - [4.1.4. 서버 구동](#414-서버-구동)
-    - [4.1.5. 데이터베이스 설치](#415-데이터베이스-설치)
-    - [4.1.6. 서버 설정](#416-서버-설정)
+  - [4.1. IDE로 구동하기 (Gradle 및 React 프로젝트 실행)](#41-ide로-구동하기-gradle-및-react-프로젝트-실행)
+    - [4.1.1. IntelliJ IDEA에서 백엔드(Spring Boot) 실행](#411-intellij-idea에서-백엔드spring-boot-실행)
+    - [4.1.2. VS Code에서 프론트엔드(React) 실행](#412-vs-code에서-프론트엔드react-실행)
   - [4.2. 콘솔 명령어로 구동하기](#42-콘솔-명령어로-구동하기)
     - [4.2.1. Gradle 빌드 명령어](#421-gradle-빌드-명령어)
-    - [4.2.2. 서버 구동 방법](#422-서버-구동-방법)
   - [4.3. Docker로 구동하기](#43-docker로-구동하기)
 - [5. 설정 가이드](#5-설정-가이드)
   - [5.1. application.yml](#51-applicationyml)
     - [5.1.1. Spring 기본 설정](#511-spring-기본-설정)
-    - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)  
+    - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)
     - [5.1.3. 서버 설정](#513-서버-설정)
     - [5.1.4. TAS 설정](#514-tas-설정)
   - [5.3. database.yml](#53-databaseyml)
@@ -60,11 +56,10 @@ Open DID Verifier Server Installation And Operation Guide
   - [5.4. application-logging.yml](#54-application-loggingyml)
     - [5.4.1. 로깅 설정](#541-로깅-설정)
   - [5.5. application-spring-docs.yml](#55-application-spring-docsyml)
-  - [5.6. application-wallet.yml](#56-application-walletyml)
-  - [5.7. application-verifier.yml](#57-application-verifieryml)
-  - [5.8. VP policy(VP 정책)](#58-vp-policyvp-정책)
-  - [5.9. blockchain.properties](#59-blockchainproperties)
-    - [5.9.1. 블록체인 연동 설정](#591-블록체인-연동-설정)
+  - [5.6. application-wallet.yml](#56-application-walletyml)  
+  - [5.7. VP policy(VP 정책)](#57-vp-policyvp-정책)
+  - [5.8. blockchain.properties](#58-blockchainproperties)
+    - [5.8.1. 블록체인 연동 설정](#581-블록체인-연동-설정)
 - [6. 프로파일 설정 및 사용](#6-프로파일-설정-및-사용)
   - [6.1. 프로파일 개요 (`sample`, `dev`)](#61-프로파일-개요-sample-dev)
     - [6.1.1. `sample` 프로파일](#611-sample-프로파일)
@@ -608,48 +603,7 @@ logging:
   - 월렛 접근에 사용되는 비밀번호입니다. 월렛 파일의 접근시 사용되는 비밀번호입니다. 높은 보안이 요구되는 정보입니다.
   - 예시: `your_secure_wallet_password`
 
-## 5.7. application-verifier.yml
-
-이 설정 파일은 Verifier 서버의 기본 정보와 VP정책에 Offer 만료시간등을 정의합니다.
-
-- `verifier.name`:
-  - Verifier 서버의 이름을 지정합니다. 해당 값은 가입증명서 VC에서 name의 값으로 사용 됩니다.
-  - 예시: raonsecure
-
-- `verifier.did`:
-  - Verifier 서버의 DID를 설정합니다.
-  - 예시: did:omn:verifier
-
-- `verifier.certificate-vc`:
-  - Verifier의 가입 증명서(VC)를 조회할 수 있는 주소(URL)를 지정합니다.
-  - 이 URL을 통해 해당 Issuer가 발급한 인증서의 진위를 확인할 수 있습니다.
-  - 포맷: {Verifier 도메인}/verifier/api/v1/certificate-vc
-  - 예시: <http://127.0.0.1:8092/verifier/api/v1/certificate-vc>
-
-- `verifier.cipher-type:`: 🔒
-  - Verifier 서버에서 사용할 암호화 알고리즘을 지정합니다.
-  - 예시: AES-256-CBC
-
-- `verifier.padding-type:`: 🔒
-  - 암호화에서 사용할 패딩 방식을 지정합니다.
-  - 예시: PKCS5
-
-- `verifier.token-expiration-time-hours:`:
-  - 인증 토큰의 만료 시간을 시간 단위로 설정합니다.
-  - 예시: 1
-
-- `verifier.sample-path`:
-  - 설명: 샘플 데이터를 저장할 경로를 설정합니다. sample 폴더는 소스 폴더의 루트 경로에 위치해 있습니다.
-    Verifier서버는 sample 및 데모의 구현을 위해 임의의 VP정책에 대한 sample 파일을 2개 제공합니다. 이는 참고용이며, 규격이 아닙니다.(Out of scope)
-  - 예시: ./source/did-verifier-server/sample/data/vpPolicy
-
-- `verifier.valid-seconds`:
-  - 설명: VP offer 요청시 QR코드에 대한 유효시간(초단위)입니다. 기본값은 180초입니다.
-  - 예시: 180
-
-<br/>
-
-## 5.8. VP policy(VP 정책)
+## 5.7. VP policy(VP 정책)
 
 VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 파일은 파일의 형태 혹은 저장방식은 규정된것은 없으나 offer 요청에 대한 구현 및 데모를 위해 저장했습니다. 데이터의 구조 및 주된 내용은 데이터명세서를 참고하기 바랍니다. 아래 주소값은 구축하신 서버의 값으로 수정이 필요합니다.
 
@@ -665,7 +619,7 @@ VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 
     "device": "WEB",
     "service": "signup",
     "endpoints": [      
-      "http://{verifier_domain}:8092/verifier"
+      "http://127.0.0.1:8092/verifier"
     ],
     "locked": false,
     "mode": "Direct"
@@ -681,16 +635,16 @@ VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 
       "verifier": {
         "did": "did:omn:verifier",
         // Verifier Cert VC URL
-        "certVcRef": "http://{verifier_domain}:8092/verifier/api/v1/certificate-vc",
+        "certVcRef": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc",
         "name": "verifier",
         "description": "verifier",
-        "ref": "http://{verifier_domain}:8092/verifier/api/v1/certificate-vc"
+        "ref": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc"
       },
       "filter": {
         "credentialSchemas": [
           {
             //Issuer Server's domain
-            "id": "http://{issuer_domain}:8091/issuer/api/v1/vc/vcschema?name=mdl",
+            "id": "http://127.0.0.1:8091/issuer/api/v1/vc/vcschema?name=mdl",
             "type": "OsdSchemaCredential",
             "requiredClaims": [
               "org.iso.18013.5.birth_date",
@@ -709,7 +663,7 @@ VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 
       },
       "process": {
         "endpoints": [
-          "http://{verifier_domain}:8092/verifier"
+          "http://127.0.0.1:8092/verifier"
         ],
         "reqE2e": {
           "nonce": "",
@@ -726,13 +680,13 @@ VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 
 }
 ```
 
-## 5.9. blockchain.properties
+## 5.8. blockchain.properties
 
 - 역할: Verifier 서버에서 연동할 블록체인 서버 정보를 설정합니다. [Open DID Installation Guide]의 '5.1.1. Hyperledger Fabric 테스트 네트워크 설치'에 따라 Hyperledger Fabric 테스트 네트워크를 설치하면, 개인 키, 인증서, 서버 접속 정보 설정 파일이 자동으로 생성됩니다. blockchain.properties에서는 이들 파일이 위치한 경로와, Hyperledger Fabric 테스트 네트워크 설치 시 입력한 네트워크 이름을 설정합니다. 또한, '5.1.2. Open DID 체인코드 배포'에서 배포한 Open DID의 체인코드 이름도 설정합니다.
 
 - 위치: `src/main/resources/properties`
 
-### 5.9.1. 블록체인 연동 설정
+### 5.8.1. 블록체인 연동 설정
 
 - `fabric.configFilePath:`:
   - Hyperledger Fabric의 접속 정보 파일이 위치한 경로를 설정합니다. 해당 파일은 Hyperledger Fabric 테스트 네트워크 설치시 자동으로 생성되며, 기본 파일명은 'connection-org1.json' 입니다.
@@ -910,3 +864,4 @@ docker-compose up -d
 이 명령어는 백그라운드에서 PostgreSQL 컨테이너를 실행합니다. 설정된 환경 변수에 따라 PostgreSQL 서버가 실행되며, 데이터베이스가 준비됩니다. 이 데이터베이스를 애플리케이션에서 사용할 수 있도록 연동 설정을 진행하면 됩니다.
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+[Open DID Admin Console Guide] : https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/
