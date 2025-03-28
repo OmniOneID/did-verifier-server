@@ -18,8 +18,11 @@ puppeteer:
 Open DID Verifier Server Installation And Operation Guide
 ==
 
-- Date: 2024-09-02
+- Date: 2025-04-01
 - Version: v1.0.0
+
+목차
+==
 
 목차
 ==
@@ -36,21 +39,16 @@ Open DID Verifier Server Installation And Operation Guide
   - [3.1. 소스코드 복제](#31-소스코드-복제)
   - [3.2. 디렉토리 구조](#32-디렉토리-구조)
 - [4. 서버 구동 방법](#4-서버-구동-방법)
-  - [4.1. IntelliJ IDEA로 구동하기 (Gradle 지원)](#41-intellij-idea로-구동하기-gradle-지원)
-    - [4.1.1. IntelliJ IDEA 설치 및 설정](#411-intellij-idea-설치-및-설정)
-    - [4.1.2. IntelliJ에서 프로젝트 열기](#412-intellij에서-프로젝트-열기)
-    - [4.1.3. Gradle 빌드](#413-gradle-빌드)
-    - [4.1.4. 서버 구동](#414-서버-구동)
-    - [4.1.5. 데이터베이스 설치](#415-데이터베이스-설치)
-    - [4.1.6. 서버 설정](#416-서버-설정)
+  - [4.1. IDE로 구동하기 (Gradle 및 React 프로젝트 실행)](#41-ide로-구동하기-gradle-및-react-프로젝트-실행)
+    - [4.1.1. IntelliJ IDEA에서 백엔드(Spring Boot) 실행](#411-intellij-idea에서-백엔드spring-boot-실행)
+    - [4.1.2. VS Code에서 프론트엔드(React) 실행](#412-vs-code에서-프론트엔드react-실행)
   - [4.2. 콘솔 명령어로 구동하기](#42-콘솔-명령어로-구동하기)
     - [4.2.1. Gradle 빌드 명령어](#421-gradle-빌드-명령어)
-    - [4.2.2. 서버 구동 방법](#422-서버-구동-방법)
   - [4.3. Docker로 구동하기](#43-docker로-구동하기)
 - [5. 설정 가이드](#5-설정-가이드)
   - [5.1. application.yml](#51-applicationyml)
     - [5.1.1. Spring 기본 설정](#511-spring-기본-설정)
-    - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)  
+    - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)
     - [5.1.3. 서버 설정](#513-서버-설정)
     - [5.1.4. TAS 설정](#514-tas-설정)
   - [5.3. database.yml](#53-databaseyml)
@@ -910,3 +908,4 @@ docker-compose up -d
 이 명령어는 백그라운드에서 PostgreSQL 컨테이너를 실행합니다. 설정된 환경 변수에 따라 PostgreSQL 서버가 실행되며, 데이터베이스가 준비됩니다. 이 데이터베이스를 애플리케이션에서 사용할 수 있도록 연동 설정을 진행하면 됩니다.
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+[Open DID Admin Console Guide] : https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/

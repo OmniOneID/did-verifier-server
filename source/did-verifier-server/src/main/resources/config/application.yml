@@ -48,7 +48,7 @@ server:
   port: 8092
 
 tas:
-  url:
+  url: http://localhost:8091
 
 wallet:
   file-path:
