@@ -16,6 +16,7 @@
 
 package org.omnione.did.verifier.v1.agent.service.sample;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
@@ -59,14 +60,15 @@ public class VerifierServiceSample implements VerifierService {
 
         String txId = "685c38cb-1e15-4bdb-bc1f-2355b4d845c1";
         String jsonStr = "{\"profile\":{\"description\":\"OpenDID 가입을 위해 제출이 필요한 VP에 대한 프로파일 입니다.\",\"encoding\":\"UTF-8\",\"id\":\"3ab4f3be-82f7-4150-b729-693637d60a59\",\"language\":\"ko\",\"profile\":{\"filter\":{\"credentialSchemas\":[{\"allowedIssuers\":[\"did:omn:issuer\"],\"displayClaims\":[\"testId.aa\"],\"id\":\"http://192.168.3.130:8090/tas/api/v1/vc-schema?name=mdl\",\"requiredClaims\":[\"org.iso.18013.5.birth_date\",\"org.iso.18013.5.family_name\",\"org.iso.18013.5.given_name\"],\"type\":\"OsdSchemaCredential\",\"value\":\"VerifiableProfile\"}]},\"process\":{\"authType\":0,\"endpoints\":[\"http://192.168.3.130:8092/verifier\"],\"reqE2e\":{\"cipher\":\"AES-256-CBC\",\"curve\":\"Secp256r1\",\"nonce\":\"mvMq9QM1y9nYStddUn89B3Q\",\"padding\":\"PKCS5\",\"publicKey\":\"z24pnogvV1HaRMFEkpzEPudGkFcv7KE56ZWz3q7cqi9EWh\"},\"verifierNonce\":\"mvMq9QM1y9nYStddUn89B3Q\"},\"verifier\":{\"certVcRef\":\"http://192.168.3.130:8092/verifier/api/v1/certificate-vc\",\"description\":\"verifier\",\"did\":\"did:omn:verifier\",\"name\":\"verifier\",\"ref\":\"http://192.168.3.130:8092/verifier/api/v1/certificate-vc\"}},\"proof\":{\"created\":\"2024-09-05T17:47:42.098726Z\",\"proofPurpose\":\"assertionMethod\",\"proofValue\":\"z3oY15rx7h4hvE4u8bDuhAj2mV5Rx3dQPrrqXe7CdsmxZcRtVneMYkUZa6257ihuvc4T9FghsePLhnif214Ffce94d\",\"type\":\"Secp256r1Signature2018\",\"verificationMethod\":\"did:omn:verifier?versionId=1#assert\"},\"title\":\"OpenDID 가입 VP 프로파일\",\"type\":\"VerifyProfile\"},\"txId\":\"a9bf02bd-0946-4f0e-9c4c-3193b7ff843f\"}";
+        RequestProfileResDto requestProfileResDto = null;
         try {
-            RequestProfileResDto requestProfileResDto = JsonUtil.deserializeFromJson(jsonStr, RequestProfileResDto.class);
-            requestProfileResDto.setTxId(txId);
-            return requestProfileResDto;
-        } catch (Exception e) {
-            log.error("Error deserializing JSON: {}", e.getMessage());
-            return null;
+            requestProfileResDto = JsonUtil.deserializeFromJson(jsonStr, RequestProfileResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+        requestProfileResDto.setTxId(txId);
+        return requestProfileResDto;
+
     }
 
 
@@ -82,11 +84,12 @@ public class VerifierServiceSample implements VerifierService {
     @Override
     public ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto) {
         String JsonStr = "{\"claims\":[{\"caption\":\"Family Name\",\"code\":\"org.iso.18013.5.family_name\",\"format\":\"plain\",\"hideValue\":false,\"type\":\"text\",\"value\":\"Kim\"},{\"caption\":\"Given Name\",\"code\":\"org.iso.18013.5.given_name\",\"format\":\"plain\",\"hideValue\":false,\"type\":\"text\",\"value\":\"Raon\"},{\"caption\":\"Birth date\",\"code\":\"org.iso.18013.5.birth_date\",\"format\":\"plain\",\"hideValue\":false,\"type\":\"text\",\"value\":\"2024-01-01\"}],\"result\":true}\n";
+
         try {
             return JsonUtil.deserializeFromJson(JsonStr, ConfirmVerifyResDto.class);
-        } catch (Exception e) {
-            log.error("Error deserializing JSON: {}", e.getMessage());
-            return null;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+
     }
 }

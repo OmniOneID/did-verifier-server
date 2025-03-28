@@ -28,6 +28,9 @@ import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.exception.BlockChainException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Service for managing DID Document operations, including registration and retrieval.
@@ -37,9 +40,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Profile("!repository")
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BlockChainServiceImpl implements StorageService {
-
-    private ContractApi contractApiInstance = null;
 
     private final BlockchainProperty blockchainProperty;
 
@@ -48,26 +50,10 @@ public class BlockChainServiceImpl implements StorageService {
      *
      * @return a ContractApi instance.
      */
-    public ContractApi initBlockChain() {
+    private ContractApi initBlockChain() {
         log.debug("Initializing block chain :: file-path {}", blockchainProperty.getFilePath());
         return ContractFactory.FABRIC.create(blockchainProperty.getFilePath());
     }
-
-    /**
-     * Resets the ContractApi instance.
-     * Use this method to reinitialize the blockchain connection.
-     */
-    public ContractApi getContractApiInstance() {
-        if (contractApiInstance == null) {
-            synchronized (BlockChainServiceImpl.class) {
-                if (contractApiInstance == null) {
-                    contractApiInstance = initBlockChain();
-                }
-            }
-        }
-        return contractApiInstance;
-    }
-
 
     /**
      * Retrieves a DID document and its status from the blockchain.
@@ -78,12 +64,16 @@ public class BlockChainServiceImpl implements StorageService {
      */
     @Override
     public DidDocument findDidDoc(String didKeyUrl) {
-
         try {
-            ContractApi contractApi = getContractApiInstance();
-            DidDocAndStatus didDocAndStatus = (DidDocAndStatus) contractApi.getDidDoc(didKeyUrl);
-
-            return didDocAndStatus.getDocument();
+            ContractApi contractApi = initBlockChain();
+            try {
+                DidDocAndStatus didDocAndStatus = (DidDocAndStatus) contractApi.getDidDoc(didKeyUrl);
+                return didDocAndStatus.getDocument();
+            } finally {
+                // Clean up resources if necessary
+                // If ContractApi has a close() method or similar, call it here
+                // contractApi.close();
+            }
         } catch (BlockChainException e) {
             log.error("Failed to get DID Document: " + e.getMessage());
             throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_DID_DOC_FAILED);
@@ -92,9 +82,4 @@ public class BlockChainServiceImpl implements StorageService {
             throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
         }
     }
-
-
-
-
-
 }

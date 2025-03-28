@@ -42,6 +42,6 @@ public class VerifierInfoQueryService {
     }
 
     public void save(VerifierInfo verifierInfo) {
-        VerifierInfo savedVerifierInfo = verifierInfoRepository.save(verifierInfo);
+        verifierInfoRepository.save(verifierInfo);
     }
 }
