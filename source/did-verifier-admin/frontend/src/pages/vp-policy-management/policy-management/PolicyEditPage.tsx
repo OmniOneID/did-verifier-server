@@ -297,8 +297,8 @@ const PolicyEditPage = (props: Props) => {
     }
   };
   
-  const handleCancel = () => {
-    navigate('/vp-policy-management/policy-management');
+  const handleCancel = () => {    
+    navigate(`/vp-policy-management/policy-management/${policyId}`);
   };
   
   const handleSubmit = async () => {

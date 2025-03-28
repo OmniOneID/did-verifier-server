@@ -32,8 +32,6 @@ public class VerifierInfoQueryService {
 
     private final VerifierInfoRepository verifierInfoRepository;
 
-    private static VerifierInfo verifierInfo;
-
     public VerifierInfo getVerifierInfo() {
         return verifierInfoRepository.findFirstBy().orElseThrow(()
                 -> new OpenDidException(ErrorCode.VERIFIER_NOT_FOUND));
@@ -45,6 +43,5 @@ public class VerifierInfoQueryService {
 
     public void save(VerifierInfo verifierInfo) {
         VerifierInfo savedVerifierInfo = verifierInfoRepository.save(verifierInfo);
-        this.verifierInfo = savedVerifierInfo;
     }
 }
