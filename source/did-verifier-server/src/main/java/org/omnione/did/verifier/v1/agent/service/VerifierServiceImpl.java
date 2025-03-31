@@ -137,7 +137,7 @@ public class VerifierServiceImpl implements VerifierService {
 
             log.debug("\t Saving VP Offer");
             SaveVpOffer(transaction.getId(), vpOfferId, requestOfferReqDto,
-                    verifyOfferResult.getVpPolicyId(),
+                    verifyOfferResult,
                     JsonUtil.serializeToJson(payload), Instant.parse(payload.getValidUntil()));
 
             log.debug("*** Finished request VpOfferbyQR ***");
@@ -493,18 +493,18 @@ public class VerifierServiceImpl implements VerifierService {
      * @param transactionId      The ID of the associated transaction
      * @param vpOfferId          The ID of the VP Offer
      * @param requestOfferReqDto The request data for VP Offer
-     * @param policyId           The ID of the associated policy
+     * @param verifyOfferResult  The result of the offer verification
      * @param extractedPayload   The extracted payload
      * @param validUntil         The expiration time of the offer
      */
     private void SaveVpOffer(Long transactionId, String vpOfferId, RequestOfferReqDto requestOfferReqDto,
-                             String policyId, String extractedPayload, Instant validUntil) {
+                             VerifyOfferResult verifyOfferResult, String extractedPayload, Instant validUntil) {
         vpOfferQueryService.insertVpOffer(VpOffer.builder()
                 .transactionId(transactionId)
                 .offerId(vpOfferId)
-                .device(requestOfferReqDto.getDevice())
-                .service(requestOfferReqDto.getService())
-                .vpPolicyId(policyId)
+                .device(verifyOfferResult.getOfferPayload().getDevice())
+                .service(verifyOfferResult.getOfferPayload().getService())
+                .vpPolicyId(verifyOfferResult.getVpPolicyId())
                 .payload(extractedPayload)
                 .validUntil(validUntil)
                 .build());

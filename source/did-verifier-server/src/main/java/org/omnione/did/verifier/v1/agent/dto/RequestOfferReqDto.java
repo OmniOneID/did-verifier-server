@@ -36,29 +36,9 @@ public class RequestOfferReqDto {
      */
     private String id;
 
-    /**
-     * Presentation mode.
-     */
-    @NotNull(message = "mode cannot be null")
-    @Schema(example = "Direct")
-    private PresentMode mode;
 
     /**
-     * Device type.
-     */
-    @NotNull(message = "device cannot be null")
-    @Schema(example = "WEB")
-    private String device;
-
-    /**
-     * Service name.
-     */
-    @Schema(example = "login")
-    @NotNull(message = "service cannot be null")
-    private String service;
-
-    /**
-     * Service id.
+     * policy id.
      */
     @Schema(example = "f1a2b3c4-d5e6-7890-1234-56789abcdef0")
     @NotNull(message = "policy id cannot be null")
