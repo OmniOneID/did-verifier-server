@@ -66,20 +66,12 @@ public class BlockChainServiceImpl implements StorageService {
     public DidDocument findDidDoc(String didKeyUrl) {
         try {
             ContractApi contractApi = initBlockChain();
-            try {
-                DidDocAndStatus didDocAndStatus = (DidDocAndStatus) contractApi.getDidDoc(didKeyUrl);
-                return didDocAndStatus.getDocument();
-            } finally {
-                // Clean up resources if necessary
-                // If ContractApi has a close() method or similar, call it here
-                // contractApi.close();
-            }
+            DidDocAndStatus didDocAndStatus = (DidDocAndStatus) contractApi.getDidDoc(didKeyUrl);
+            return didDocAndStatus.getDocument();
+
         } catch (BlockChainException e) {
             log.error("Failed to get DID Document: " + e.getMessage());
             throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_DID_DOC_FAILED);
-        } catch (Exception e) {
-            log.error("Failed to find DID Document: " + e.getMessage());
-            throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
         }
     }
 }

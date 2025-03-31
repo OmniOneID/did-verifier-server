@@ -196,6 +196,9 @@ did-verifier-server
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
+│   └── admin
+│       └── Open DID Verifier Admin Console Guide.md
+│       └── Open DID Verifier Admin Console Guide_ko.md
 │   └── api
 │       └── Verifier_API_ko.md
 │   └── errorCode
@@ -233,6 +236,7 @@ did-verifier-server
 | RELEASE-PROCESS.md      | 새로운 버전을 릴리스하는 절차            |
 | SECURITY.md             | 보안 정책 및 취약성 보고 방법            |
 | docs                    | 문서                                     |
+| ┖ admin                 | Admin 가이드 문서                          |
 | ┖ api                   | API 가이드 문서                          |
 | ┖ errorCode             | 오류 코드 및 문제 해결 가이드            |
 | ┖ installation          | 설치 및 설정 가이드                      |
@@ -863,5 +867,5 @@ docker-compose up -d
 
 이 명령어는 백그라운드에서 PostgreSQL 컨테이너를 실행합니다. 설정된 환경 변수에 따라 PostgreSQL 서버가 실행되며, 데이터베이스가 준비됩니다. 이 데이터베이스를 애플리케이션에서 사용할 수 있도록 연동 설정을 진행하면 됩니다.
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
-[Open DID Admin Console Guide] : https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/feature/yklee0911/v1.0.1.0/unrelease-V1.0.1.0/OpenDID_Documentation_Hub.md
+[Open DID Admin Console Guide]: ../admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md

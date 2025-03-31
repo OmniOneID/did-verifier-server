@@ -46,6 +46,8 @@ Open DID Verifier Admin Console Guide
     - [3.2.5. Policy Management](#325-policy-management)
   - [3.3. VP History Page](#33-vp-history-page)
   - [3.4. Admin Management](#34-admin-management)
+    - [3.4.1 Admin 목록 조회](#341-admin-목록-조회)
+    - [3.4.2 Admin 등록](#342-admin-등록)
 
 # 1. 소개
 
@@ -86,7 +88,7 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 2. 로그인 화면에서 관리자 계정의 이메일과 비밀번호를 입력합니다.
    - 기본 관리자 계정: <admin@opendid.omnione.net>
-   - 초기 비밀번호: password123 (최초 로그인 시 변경 필요)
+   - 초기 비밀번호: password (최초 로그인 시 변경 필요)
 
 3. '로그인' 버튼을 클릭합니다.
 
@@ -393,9 +395,9 @@ VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습
 
 ## 3.4. Admin Management
 
-`Admin Management` 메뉴는 TA Admin Console에 접근할 수 있는 관리자 계정을 관리하는 기능입니다.  
+`Admin Management` 메뉴는 Verifier Admin Console에 접근할 수 있는 관리자 계정을 관리하는 기능입니다.  
 
-TA 서버를 설치하면 기본적으로 `admin@opendid.omnione.net` 계정이 ROOT 권한으로 자동 생성됩니다.  
+Verifier 서버를 설치하면 기본적으로 `admin@opendid.omnione.net` 계정이 ROOT 권한으로 자동 생성됩니다.  
 이 계정은 시스템 내 유일한 ROOT 계정이며, 삭제할 수 없습니다.
 
 관리자 계정은 **ROOT**와 **Normal Admin** 두 가지 권한 유형으로 구분됩니다.  
@@ -410,7 +412,7 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 <br/>
 
-## 3.15.1 Admin 목록 조회
+## 3.4.1 Admin 목록 조회
 
 
 `Admin Management` 메뉴에 진입하면 등록된 관리자 계정들의 목록이 테이블 형태로 표시됩니다.
@@ -430,7 +432,7 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 <br/>
 
-## 3.15.2. Admin 등록
+## 3.4.2. Admin 등록
 
 `Admin Management` 화면에서 **REGISTER** 버튼을 클릭하면, 아래와 같은 등록 화면으로 이동합니다.
 
