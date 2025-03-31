@@ -57,9 +57,6 @@ class VerifierControllerTest {
         // 1. 요청 DTO 설정
         RequestOfferReqDto reqDto = new RequestOfferReqDto();
         reqDto.setId("202303241738241234561234ABCD");
-        reqDto.setDevice("WEB");
-        reqDto.setMode(PresentMode.DIRECT);
-        reqDto.setService("login");
         reqDto.setPolicyId("f1a2b3c4-d5e6-7890-1234-56789abcdef0");
 
         //2. 컨트롤러 호출 및 응답 검증
