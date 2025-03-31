@@ -292,6 +292,7 @@ const ServiceEditPage = (props: Props) => {
             <StyledInputArea>
                 <TextField 
                     fullWidth
+                    required
                     label="Service" 
                     variant="outlined"
                     margin="normal" 
@@ -304,7 +305,7 @@ const ServiceEditPage = (props: Props) => {
                 />
 
                 <FormControl fullWidth margin="normal" error={!!errors.locked}>
-                    <InputLabel>Lock Status</InputLabel>
+                    <InputLabel>Lock Status *</InputLabel>
                     <Select 
                         value={formData.locked === undefined ? "" : String(formData.locked)}
                         onChange={(event) => setFormData((prev) => ({
@@ -321,6 +322,7 @@ const ServiceEditPage = (props: Props) => {
 
                 <TextField 
                     fullWidth
+                    required
                     label="Device" 
                     variant="outlined"
                     margin="normal" 
@@ -333,7 +335,7 @@ const ServiceEditPage = (props: Props) => {
                 />
 
                 <FormControl fullWidth margin="normal" error={!!errors.mode}>
-                    <InputLabel>Submission Mode</InputLabel>
+                    <InputLabel>Submission Mode *</InputLabel>
                     <Select 
                         value={formData.mode} 
                         onChange={handleChange('mode')}

@@ -242,6 +242,7 @@ const ProfileDetailData = (props: Props) => {
                                             <TableCell>
                                                 <TextField 
                                                     fullWidth 
+                                                    disabled
                                                     size="small" 
                                                     value={profileData.verifier.did || ''} 
                                                     slotProps={{ input: { readOnly: true } }} 
@@ -252,6 +253,7 @@ const ProfileDetailData = (props: Props) => {
                                             <TableCell>Cert VC Ref</TableCell>
                                             <TableCell>
                                                 <TextField 
+                                                    disabled
                                                     fullWidth 
                                                     size="small" 
                                                     value={profileData.verifier.certVcRef || ''} 
@@ -264,6 +266,7 @@ const ProfileDetailData = (props: Props) => {
                                             <TableCell>
                                                 <TextField 
                                                     fullWidth 
+                                                    disabled
                                                     size="small" 
                                                     value={profileData.verifier.name || ''} 
                         slotProps={{ input: { readOnly: true } }} 
@@ -275,6 +278,7 @@ const ProfileDetailData = (props: Props) => {
                                             <TableCell>
                                                 <TextField 
                                                     fullWidth 
+                                                    disabled
                                                     size="small" 
                                                     value={profileData.verifier.ref || ''} 
                         slotProps={{ input: { readOnly: true } }} 
@@ -293,7 +297,7 @@ const ProfileDetailData = (props: Props) => {
                         <input type="hidden" value={profileData?.processId || ''} />
                         
                         <TextField
-                            sx={{ flex: 1 }}
+                            sx={{ flex: 1 }}                            
                             label="Process Title"
                             value={profileData?.processTitle || ''}
                             variant="outlined" 
@@ -308,7 +312,7 @@ const ProfileDetailData = (props: Props) => {
                         <input type="hidden" value={profileData?.filterId || ''} />
                         
                         <TextField
-                            sx={{ flex: 1 }}
+                            sx={{ flex: 1 }}                            
                             label="Filter Title"
                             value={profileData?.filterTitle || ''}
                             variant="outlined" 

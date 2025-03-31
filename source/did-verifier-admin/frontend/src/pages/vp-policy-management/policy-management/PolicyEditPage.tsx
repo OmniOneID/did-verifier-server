@@ -443,6 +443,7 @@ const PolicyEditPage = (props: Props) => {
               
               <TextField
                 sx={{ flex: 1 }}
+                required
                 label="Profile Title"
                 value={policyData?.profileTitle || ''}
                 variant="outlined" 
@@ -467,6 +468,7 @@ const PolicyEditPage = (props: Props) => {
               
               <TextField
                 sx={{ flex: 1 }}
+                required
                 label="Payload Service"                        
                 value={policyData?.payloadService || ''}
                 variant="outlined" 

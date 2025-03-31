@@ -825,6 +825,7 @@ const ProfileEdit = (props: Props) => {
                                     <TableCell>
                                         <TextField 
                                             fullWidth 
+                                            disabled
                                             size="small" 
                                             value={profileData.verifier?.did || ''} 
                                             InputProps={{ readOnly: true }}
@@ -836,6 +837,7 @@ const ProfileEdit = (props: Props) => {
                                     <TableCell>
                                         <TextField 
                                             fullWidth 
+                                            disabled
                                             size="small" 
                                             value={profileData.verifier?.certVcRef || ''} 
                                             InputProps={{ readOnly: true }}
@@ -847,6 +849,7 @@ const ProfileEdit = (props: Props) => {
                                     <TableCell>
                                         <TextField 
                                             fullWidth 
+                                            disabled
                                             size="small" 
                                             value={profileData.verifier?.name || ''} 
                                             InputProps={{ readOnly: true }}
@@ -858,6 +861,7 @@ const ProfileEdit = (props: Props) => {
                                     <TableCell>
                                         <TextField 
                                             fullWidth 
+                                            disabled
                                             size="small" 
                                             value={profileData.verifier?.ref || ''} 
                                             InputProps={{ readOnly: true }}
@@ -875,6 +879,7 @@ const ProfileEdit = (props: Props) => {
                         
                         <TextField
                             sx={{ flex: 1 }}
+                            required
                             label="Process Title"
                             value={profileData?.processTitle || ''}
                             variant="outlined" 
@@ -898,6 +903,7 @@ const ProfileEdit = (props: Props) => {
                             
                             <TextField
                                 sx={{ flex: 1 }}
+                                required
                                 label="Filter Title"
                                 value={profileData?.filterTitle || ''}
                                 variant="outlined" 

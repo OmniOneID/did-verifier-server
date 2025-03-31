@@ -239,6 +239,7 @@ const ProcessRegistrationPage = (props: Props) => {
                 <StyledInputArea>
                     <TextField 
                         fullWidth
+                        required
                         label="Title" 
                         variant="outlined"
                         margin="normal" 
@@ -327,7 +328,7 @@ const ProcessRegistrationPage = (props: Props) => {
                     </TableContainer>
 
                     {/* Endpoints Section */}
-                    <Typography variant="h6" sx={{ mt: 3 }}>Endpoints</Typography>
+                    <Typography variant="h6" sx={{ mt: 3 }}>Endpoints *</Typography>
                     {errors.endpoints && (
                         <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
                             {errors.endpoints}
@@ -336,6 +337,7 @@ const ProcessRegistrationPage = (props: Props) => {
                     <Box sx={{ display: 'flex', mb: 2 }}>
                         <TextField 
                             fullWidth
+                            required
                             size="small"
                             value={newEndpoint}
                             onChange={(e) => setNewEndpoint(e.target.value)}
