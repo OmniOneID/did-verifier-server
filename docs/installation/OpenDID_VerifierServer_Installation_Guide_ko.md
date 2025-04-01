@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Open DID Verifier Server Installation And Operation Guide
+Open DID Verifier Server Installation Guide
 ==
 
 - Date: 2025-04-01

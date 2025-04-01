@@ -15,14 +15,12 @@ puppeteer:
         fullPage: false
 ---
 
-# Open DID Verifier Server Installation And Operation Guide
-==
+# Open DID Verifier Server Installation Guide
 
 - Date: 2025-04-01
 - Version: v1.0.0
 
 ## Table of Contents
-==
 
 - [1. Introduction](#1-introduction)
   - [1.1. Overview](#11-overview)

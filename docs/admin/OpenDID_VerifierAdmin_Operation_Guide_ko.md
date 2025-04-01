@@ -15,7 +15,7 @@ puppeteer:
         fullPage: false
 ---
 
-Open DID Verifier Admin Console Guide
+Open DID Verifier Admin Operation Guide
 ==
 
 - Date: 2025-03-31
