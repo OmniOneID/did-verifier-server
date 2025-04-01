@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.base.datamodel.data.AccE2e;
 import org.omnione.did.base.datamodel.enums.PresentMode;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.verifier.v1.agent.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import org.omnione.did.verifier.v1.dto.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,9 +57,7 @@ class VerifierControllerTest {
         // 1. 요청 DTO 설정
         RequestOfferReqDto reqDto = new RequestOfferReqDto();
         reqDto.setId("202303241738241234561234ABCD");
-        reqDto.setDevice("WEB");
-        reqDto.setMode(PresentMode.DIRECT);
-        reqDto.setService("login");
+        reqDto.setPolicyId("f1a2b3c4-d5e6-7890-1234-56789abcdef0");
 
         //2. 컨트롤러 호출 및 응답 검증
         MvcResult result = mockMvc.perform(post(UrlConstant.Verifier.V1 + UrlConstant.Verifier.REQUEST_OFFER_QR)

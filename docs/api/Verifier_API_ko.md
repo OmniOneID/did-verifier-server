@@ -20,6 +20,15 @@ Verifier API
 
 - 일자: 2024-08-19
 - 버전: v1.0.0
+
+## 개정 이력
+
+| 버전        | 일자       | 변경 내용                                                 |
+| ----------- | ---------- | --------------------------------------------------------- |
+| 1.0.0       | 2024-09-03 | 최초 작성                                                 |
+| 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] 요청 데이터 수정(policyId 추가, device, service, mode 삭제) |
+
+<!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
 목차
 ---
@@ -131,10 +140,8 @@ N/A
 ```c#
 def object RequestOfferQr: "Request Offer QR 요청문"
 {    
-    - messageId "id": "message id"
-    + PRESENT_MODE "mode": "VP 제출 모드" // 데이터 명세서 참고
-    + itemName "device": "응대장치 식별자"
-    + itemName "service": "서비스 식별자"
+    - messageId "id": "message id"       
+    + itemName "policyId": "VP 정책(Policy) 식별자"
 }
 ```
 
@@ -143,7 +150,7 @@ def object RequestOfferQr: "Request Offer QR 요청문"
 #### 4.1.2. Response
 
 **■ Process**
-1. mode, device, service로 VP Policy 조회
+1. policyId로 VP Policy 조회
 1. offerId 생성
 1. offer 유효시간 생성 (validUntil)
 1. Verify Offer Payload 생성
@@ -252,7 +259,6 @@ def object M310_RequestProfile: "Request Profile 요청문"
     //--- Common Part ---
     + messageId "id"  : "message id"
     - uuid      "txId": "transaction id"
-
     //--- Data Part ---
     + uuid "offerId" : "verify offer id"
 }

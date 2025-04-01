@@ -2,7 +2,7 @@ spring:
   application:
     name: Verifier
   profiles:
-    active: sample
+    active: dev
     group:
         dev:
           - databases
@@ -10,6 +10,7 @@ spring:
           - logging
           - spring-docs
           - verifier
+          - blockchain
         sample:
           - databases-sample
           - wallet
@@ -20,9 +21,60 @@ spring:
     default-property-inclusion: non_null
     serialization:
       fail-on-empty-beans: false
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml
+    enabled: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5430/verifier
+    username: omn
+    password: omn
+  jpa:
+    open-in-view: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    org.omnione: debug
 
 server:
   port: 8092
 
 tas:
-  url: http://127.0.0.1:8090/tas
+  url: http://localhost:8091
+
+wallet:
+  file-path:
+  password: omnioneopendid12!@
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, shutdown, refresh
+  endpoint:
+    shutdown:
+      enabled: true
+    startup:
+      enabled: true

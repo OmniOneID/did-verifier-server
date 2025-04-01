@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ public class VerifierProperty {
     private String did;
     private String certVcRef;
     private String ref;
-    private String samplePath;
+    private String name;
+    private String domain;
+    private String tasUrl;
     private ArrayList<String> verifierEndPoints = new ArrayList<>();
-    private int validSeconds;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,13 @@ public enum ErrorCode {
     VP_PROFILE_PARSE_ERROR("SSRVVRF00204", "Failed to parse VP profile.", 500),
     VERIFY_PROFILE_PARSE_ERROR("SSRVVRF00205", "Failed to parse verify profile.", 500),
     VP_POLICY_READ_ERROR("SSRVVRF00206", "Failed to read VP policy.", 500),
+    VP_PAYLOAD_NOT_FOUND("SSRVVRF00207", "VP_PAYLOAD is not found.", 400),
+    VP_POLICY_PROFILE_NOT_FOUND("SSRVVRF00208", "VP_POLICY_PROFILE is not found.", 400),
+    VP_PROCESS_NOT_FOUND("SSRVVRF00209", "VP_PROCESS is not found.", 400),
+    VP_FILTER_NOT_FOUND("SSRVVRF00210", "VP_FILTER is not found.", 400),
+    VP_POLICY_UPDATE_FAILED("SSRVVRF00211", "Failed to update VP policy.", 500),
+    VP_PAYLOAD_IN_USE("SSRVVRF00212", "PAYLOAD is in use by one or more policies",400 ),
+    VP_POLICY_PROFILE_IN_USE("SSRVVRF00213", "POLICY_PROFILE is in use by one or more policies",400 ),
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),
@@ -90,7 +97,20 @@ public enum ErrorCode {
     FAILED_TO_REQUEST_VERIFY("SSRVVRF00903", "Failed to process the 'request-verify' API request.", 500),
     FAILED_TO_REQUEST_CERTIFICATE_VC("SSRVVRF00904", "Failed to process the 'get-certificate-vc' API request.", 500),
     FAILED_TO_ISSUE_CERTIFICATE_VC("SSRVVRF00905", "Failed to process the 'issue-certificate-vc' API request.", 500),
-    ;
+
+
+    // Verifier Errors (1000~1099)
+    VERIFIER_NOT_FOUND("SSRVVRF01000", "Failed to find verifier: verifier is not registered.", 500),
+
+    // Admin Errors (1100~1199)
+    ADMIN_INFO_NOT_FOUND("SSRVVRF01100", "Failed to find admin: admin is not registered.", 400),
+    ADMIN_ALREADY_EXISTS("SSRVVRF01101", "Failed to register admin: admin is already registered.", 400);
+
+
+
+
+
+
 
     private final String code;
     private final String message;
