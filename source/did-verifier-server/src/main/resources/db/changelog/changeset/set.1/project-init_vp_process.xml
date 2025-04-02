@@ -52,7 +52,7 @@
         <insert tableName="vp_process">
             <column name="title" value="라온 시큐어 기준 제출 절차 입니다."/>
             <column name="endpoints" value='["http://127.0.0.1:8092/verifier"]'/>
-            <column name="auth_type" value="0"/>
+            <column name="auth_type" value="2"/>
             <column name="curve" value="Secp256r1"/>
             <column name="cipher" value="AES-256-CBC"/>
             <column name="padding" value="PKCS5"/>
