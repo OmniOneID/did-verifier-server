@@ -75,7 +75,7 @@ public class FilterService {
         VpFilter vpFilter = vpFilterRepository.findById(filterId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_FILTER_NOT_FOUND));
 
-        return modelMapper.map(vpFilter, FilterDTO.class);
+        return FilterDTO.fromVpFilter(vpFilter);
     }
 
     public Page<FilterDTO> searchFilterList(String searchKey, String searchValue, Pageable pageable) {
