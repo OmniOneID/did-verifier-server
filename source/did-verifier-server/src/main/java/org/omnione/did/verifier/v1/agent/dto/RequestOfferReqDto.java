@@ -36,7 +36,6 @@ public class RequestOfferReqDto {
      */
     private String id;
 
-
     /**
      * policy id.
      */

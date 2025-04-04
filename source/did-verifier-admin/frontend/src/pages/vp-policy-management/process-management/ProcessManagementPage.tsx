@@ -77,9 +77,12 @@ const ProcessManagementPage = (props: Props) => {
               },
             });
           })
-          .catch((error) => {
-            console.error("Failed to delete Process. ", error);            
-            navigate('/error', { state: { message: formatErrorMessage(error, "Failed to delete Process") } });
+          .catch((error) => {            
+            const result = dialogs.open(CustomDialog, {
+              title: 'Notification',
+              message: formatErrorMessage(error, "Failed to delete Process!! "),
+              isModal: true,
+            });            
           })
           .finally(() => setLoading(false));
       }

@@ -16,4 +16,7 @@ public interface PolicyProfileRepository extends JpaRepository<PolicyProfile, Lo
 
     List<PolicyProfile> findByTitleContainingIgnoreCase(String title, Sort sort);
     Optional<PolicyProfile> findByPolicyProfileId(String policyProfileId);
+
+    Optional<PolicyProfile> findByFilterId(Long filterId);
+    Optional<PolicyProfile> findByProcessId(Long processId);
 }

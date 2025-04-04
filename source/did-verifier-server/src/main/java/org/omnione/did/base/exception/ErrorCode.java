@@ -50,6 +50,8 @@ public enum ErrorCode {
     VP_POLICY_UPDATE_FAILED("SSRVVRF00211", "Failed to update VP policy.", 500),
     VP_PAYLOAD_IN_USE("SSRVVRF00212", "PAYLOAD is in use by one or more policies",400 ),
     VP_POLICY_PROFILE_IN_USE("SSRVVRF00213", "POLICY_PROFILE is in use by one or more policies",400 ),
+    VP_FILTER_IN_USE("SSRVVRF00214", "VP_FILTER is in use by one or more profile",400 ),
+    VP_PROCESS_IN_USE("SSRVVRF00215", "VP_PROCESS is in use by one or more profile.", 400),
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),

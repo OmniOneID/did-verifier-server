@@ -8,6 +8,7 @@ import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
+import { formatErrorMessage } from '../../../utils/error-handler';
 
 type Props = {}
 
@@ -45,7 +46,7 @@ const FilterManagementPage = (props: Props) => {
     if (id) {
       const result = await dialogs.open(CustomConfirmDialog, {
         title: 'Confirmation',
-        message: 'Are you sure you want to delete Service?',
+        message: 'Are you sure you want to delete Filter?',
         isModal: true,
       });
   
@@ -55,7 +56,7 @@ const FilterManagementPage = (props: Props) => {
           .then(() => {
             dialogs.open(CustomDialog, {
               title: 'Notification',
-              message: 'Service delete completed.',
+              message: 'Filter delete completed.',
               isModal: true,
             }, {
               onClose: async () => {
@@ -63,9 +64,12 @@ const FilterManagementPage = (props: Props) => {
               },
             });
           })
-          .catch((error) => {
-            console.error("Failed to delete Service. ", error);
-            navigate('/error', { state: { message: `Failed to delete Service: ${error}` } });
+          .catch((error) => {            
+            const result = dialogs.open(CustomDialog, {
+              title: 'Notification',
+              message: formatErrorMessage(error, "Failed to delete Filter!! "),
+              isModal: true,
+            });            
           })
           .finally(() => setLoading(false));
       }
@@ -84,8 +88,8 @@ const FilterManagementPage = (props: Props) => {
         setTotalRows(response.data.totalElements);
       })
       .catch((error) => {
-        console.error("Failed to retrieve Services. ", error);
-        navigate('/error', { state: { message: `Failed to retrieve Services: ${error}` } });
+        console.error("Failed to retrieve Filter. ", error);
+        navigate('/error', { state: { message: `Failed to retrieve Filters: ${error}` } });
       })
       .finally(() => setLoading(false));
   }, [paginationModel, navigate]);
