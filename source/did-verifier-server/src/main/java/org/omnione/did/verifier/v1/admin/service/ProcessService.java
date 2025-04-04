@@ -2,8 +2,10 @@ package org.omnione.did.verifier.v1.admin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.VpFilter;
 import org.omnione.did.base.db.domain.VpProcess;
+import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.VpProcessRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class ProcessService {
     private final VpProcessRepository vpProcessRepository;
     private final ModelMapper modelMapper;
     private final ProcessQueryService processQueryService;
+    private final PolicyProfileRepository policyProfileRepository;
 
     public ProcessDTO getProcessInfo(long processId) {
         VpProcess process = vpProcessRepository.findById(processId)
@@ -61,6 +65,11 @@ public class ProcessService {
     public void deleteProcess(long processId) {
         VpProcess process = vpProcessRepository.findById(processId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PROCESS_NOT_FOUND));
+        Optional<PolicyProfile> referencingProfiles = policyProfileRepository.findByProcessId(processId);
+        if (referencingProfiles.isPresent()) {
+            throw new OpenDidException(ErrorCode.VP_PROCESS_IN_USE);
+        }
+
         vpProcessRepository.delete(process);
     }
 

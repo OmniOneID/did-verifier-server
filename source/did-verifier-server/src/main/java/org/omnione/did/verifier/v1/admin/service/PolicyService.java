@@ -13,6 +13,7 @@ import org.omnione.did.base.db.repository.PolicyRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
+import org.omnione.did.verifier.v1.admin.dto.VpSubmitDTO;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -102,7 +103,6 @@ public class PolicyService {
     }
 
     private static String formatInstant(Instant instant, DateTimeFormatter formatter) {
-        if (instant == null) return null;
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter);
+        return VpSubmitDTO.formatInstant(instant, formatter);
     }
 }

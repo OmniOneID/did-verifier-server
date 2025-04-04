@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.VpFilter;
+import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,8 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class FilterService {
     private final VpFilterRepository vpFilterRepository;
-    private final ModelMapper modelMapper;
     private final FilterQueryService filterQueryService;
+    private final PolicyProfileRepository policyProfileRepository;
 
     @Transactional
     public void saveFilter(FilterDTO filterDTO) {
@@ -68,14 +71,14 @@ public class FilterService {
         existingFilter.setPresent_all(reqFilterDto.isPresentAll());
 
 
-        return modelMapper.map(vpFilterRepository.save(existingFilter), FilterDTO.class);
+        return FilterDTO.fromVpFilter(vpFilterRepository.save(existingFilter));
     }
 
     public FilterDTO getFilterInfo(long filterId) {
         VpFilter vpFilter = vpFilterRepository.findById(filterId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_FILTER_NOT_FOUND));
 
-        return modelMapper.map(vpFilter, FilterDTO.class);
+        return FilterDTO.fromVpFilter(vpFilter);
     }
 
     public Page<FilterDTO> searchFilterList(String searchKey, String searchValue, Pageable pageable) {
@@ -86,6 +89,10 @@ public class FilterService {
     public void deleteFilter(long filterId) {
         VpFilter vpFilter = vpFilterRepository.findById(filterId)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_FILTER_NOT_FOUND));
+        Optional<PolicyProfile> referencingProfiles = policyProfileRepository.findByFilterId(vpFilter.getFilterId());
+        if (referencingProfiles.isPresent()) {
+            throw new OpenDidException(ErrorCode.VP_FILTER_IN_USE);
+        }
 
         vpFilterRepository.delete(vpFilter);
     }
@@ -105,7 +112,7 @@ public class FilterService {
 
 
         return vpFilterList.stream()
-                .map(filter -> modelMapper.map(filter, FilterDTO.class))
+                .map(FilterDTO::fromVpFilter)
                 .collect(Collectors.toList());
     }
 }
