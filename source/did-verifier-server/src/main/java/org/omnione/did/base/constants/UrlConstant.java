@@ -49,6 +49,8 @@ public class UrlConstant {
         public static final String UPDATE_FILTER_INFO = "/filters/{filterId}";
         public static final String GET_POPUP_FILTER_LIST = "/filters/popups/{searchValue}";
 
+        public static final String GET_POPUP_VC_SCHEMAS = "/filters/popups/vc-schemas";
+
         // Process Manage
         public static final String SAVE_PROCESS_INFO = "/processes";
         public static final String GET_PROCESS_INFO = "/processes/{id}";
@@ -73,12 +75,17 @@ public class UrlConstant {
         public static final String UPDATE_POLICY_INFO = "/policies/{id}";
 
         //Verifier Manage
-        public static final String GET_VERIFIER_INFO = "/verifier/info";
+        public static final String GET_VERIFIER_INFO = "/info";
 
         //Verifier Manage
         public static final String GET_VP_SUBMIT_LIST = "/vpSubmitList";
 
         //Session
         public static final String LOGIN = "/login";
+    }
+    public static class Tas {
+        public static final String ADMIN_V1 = "/tas/admin/v1";
+        public static final String REGISTER_DID_PUBLIC = "/entities/register-did/public";
+        public static final String REQUEST_ENTITY_STATUS = "/entities/request-status";
     }
 }

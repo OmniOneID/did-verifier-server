@@ -1,9 +1,9 @@
 package org.omnione.did.verifier.v1.admin.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.VpFilter;
 import org.omnione.did.base.db.repository.PolicyProfileRepository;
@@ -12,7 +12,10 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.verifier.v1.admin.dto.CombinedIdListDto;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
+import org.omnione.did.verifier.v1.admin.api.ListFeign;
+import org.omnione.did.verifier.v1.admin.dto.VcSchemaListResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +34,8 @@ public class FilterService {
     private final VpFilterRepository vpFilterRepository;
     private final FilterQueryService filterQueryService;
     private final PolicyProfileRepository policyProfileRepository;
+    private final ListFeign listFeign;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public void saveFilter(FilterDTO filterDTO) {
@@ -114,5 +119,16 @@ public class FilterService {
         return vpFilterList.stream()
                 .map(FilterDTO::fromVpFilter)
                 .collect(Collectors.toList());
+    }
+
+    public VcSchemaListResDto getVcSchemas() {
+        try {
+            String jsonString = listFeign.requestVcSchemaList();
+
+            return objectMapper.readValue(jsonString, VcSchemaListResDto.class);
+
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
     }
 }

@@ -35,3 +35,6 @@ export const deleteFilter = async (id: number) => {
 export const searchFilterList = async (searchValue: string | '') => {    
     return getData(API_BASE_URL, `filters/popups/${searchValue}`);
 }
+export const getVcSchemes = async () => {
+    return getData(API_BASE_URL, `filters/popups/vc-schemas`);
+    }

@@ -13,13 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.omnione.did.base.db.domain;
 
-package org.omnione.did.base.db.constant;
+import jakarta.persistence.*;
+import lombok.*;
 
-public enum VerifierStatus {
-    ACTIVATE,
-    DEACTIVATE,
-    DID_DOCUMENT_REQUIRED,
-    DID_DOCUMENT_REQUESTED,
-    CERTIFICATE_VC_REQUIRED,
+import java.io.Serializable;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@Entity
+@Table(name = "\"did_document\"")
+public class EntityDidDocument extends BaseEntity implements Serializable {
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "did_document", nullable = false)
+    private String didDocument;
 }

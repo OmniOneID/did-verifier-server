@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package org.omnione.did.base.db.constant;
+package org.omnione.did.verifier.v1.admin.dto.server;
 
-public enum VerifierStatus {
-    ACTIVATE,
-    DEACTIVATE,
-    DID_DOCUMENT_REQUIRED,
-    DID_DOCUMENT_REQUESTED,
-    CERTIFICATE_VC_REQUIRED,
+import lombok.*;
+
+/**
+ * DTO for verifying server URL.
+ */
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class VerifyServerUrlResDto {
+    private Boolean isAvailable;
 }

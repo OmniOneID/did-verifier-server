@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.omnione.did.verifier.v1.admin.dto;
 
-package org.omnione.did.base.db.constant;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
-public enum VerifierStatus {
-    ACTIVATE,
-    DEACTIVATE,
-    DID_DOCUMENT_REQUIRED,
-    DID_DOCUMENT_REQUESTED,
-    CERTIFICATE_VC_REQUIRED,
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
+public class RequestRegisterDidReqDto {
+    @NotNull(message = "didDocument cannot be null")
+    private String didDocument;
 }

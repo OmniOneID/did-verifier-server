@@ -44,4 +44,8 @@ public class VerifierInfoQueryService {
     public void save(VerifierInfo verifierInfo) {
         verifierInfoRepository.save(verifierInfo);
     }
+
+    public VerifierInfo findVerifierOrNull() {
+        return verifierInfoRepository.findTop1ByOrderByIdAsc().orElse(null);
+    }
 }

@@ -8,10 +8,10 @@ plugins {
 
 
 group = 'org.omnione.did'
-version = '1.0.0'
+version = '1.0.1'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 jar {
@@ -31,6 +31,10 @@ ext {
     set("frontendResourceDir", "${project.projectDir}/../did-verifier-admin/frontend")
     set("backendResourceDir", "${projectDir}/src/main/resources/static")
 }
+
+
+
+println ">>> Project directory is: ${frontendResourceDir}"
 
 springBoot {
     buildInfo()
@@ -119,10 +123,32 @@ licenseReport {
 
 node {
     version = "22.9.0"
-    download = false
+    download = true
     nodeProjectDir = file("${frontendResourceDir}")
     workDir = file("${projectDir}/.gradle/nodejs")
     npmWorkDir = file("${projectDir}/.gradle/npm")
+    npmCommand = "/Users/jinhwan-notebook/.nvm/versions/node/v22.9.0/bin/npm"  // 명시적 경로 추가
+}
+
+
+import com.github.gradle.node.npm.task.NpmTask
+
+task printEnv {
+    doLast {
+        println "PATH: " + System.getenv('PATH')
+        println "Node executable: " + exec {
+            ignoreExitValue = true
+            commandLine 'which', 'node'
+            standardOutput = new ByteArrayOutputStream()
+            return standardOutput.toString().trim()
+        }
+        println "npm executable: " + exec {
+            ignoreExitValue = true
+            commandLine 'which', 'npm'
+            standardOutput = new ByteArrayOutputStream()
+            return standardOutput.toString().trim()
+        }
+    }
 }
 
 tasks.register('deleteFrontResources', Delete) {
@@ -132,16 +158,17 @@ tasks.register('deleteFrontResources', Delete) {
     delete "${frontendResourceDir}/dist"
 }
 
-tasks.register('npm_install', Exec) {
+tasks.register('npm_install', NpmTask) {
+    dependsOn tasks.named("nodeSetup")
     workingDir = file("${frontendResourceDir}")
-    commandLine = ["npm", "install"]
+    args = ['install']
 }
 
-tasks.register('npm_build', Exec) {
+tasks.register('npm_build', NpmTask) {
     dependsOn 'deleteFrontResources'
     dependsOn 'npm_install'
     workingDir = file("${frontendResourceDir}")
-    commandLine = ["npm", "run", "build"]
+    args = ['run', 'build']
 }
 
 tasks.register('copyFrontResources', Copy) {

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * EnrollFeign This class is a Feign client for the TAS API.
  */
-@FeignClient(value = "Tas", url = "${tas.url}", path = "/api/v1")
+@FeignClient(value = "Tas", url = "${tas.url}" + "/tas", path = "/api/v1")
 public interface EnrollFeign {
     /**
      * Request Enroll Entity API
