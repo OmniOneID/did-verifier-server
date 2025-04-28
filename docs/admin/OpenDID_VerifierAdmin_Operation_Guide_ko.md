@@ -19,11 +19,19 @@ Open DID Verifier Admin Operation Guide
 ==
 
 - Date: 2025-03-31
-- Version: v1.0.0
+- Version: v1.0.1
+
+개정 이력
+==
+| 버전   | 일자       | 변경 내용                  |
+| ------ | ---------- | -------------------------- |
+| v1.0.0 | 2025-03-31 | 최초 작성                  |
+| v1.0.1 | 2025-04-25 | `3.1. Verifier Registration` 장 추가 |
 
 목차
 ==
 
+- [개정 이력](#개정-이력)
 - [1. 소개](#1-소개)
   - [1.1. 개요](#11-개요)
   - [1.2. Admin Console 정의](#12-admin-console-정의)
@@ -34,7 +42,8 @@ Open DID Verifier Admin Operation Guide
   - [2.4. 비밀번호 변경 관리](#24-비밀번호-변경-관리)
 - [3. 기능별 상세 메뉴얼](#3-기능별-상세-메뉴얼)
   - [3.1. Verifier Management](#31-verifier-management)
-    - [3.1.1 DID Document 조회](#311-did-document-조회)
+    - [3.1.1. Verifier 등록](#311-verifier-등록)
+    - [3.1.2. 등록된 Verifier 관리](#312-등록된-verifier-관리)
   - [3.2. VP Policy Management](#32-vp-policy-management)
     - [3.2.1. Service Management](#321-service-management)
       - [3.2.1.1 Service Register](#3211-service-register)
@@ -152,6 +161,106 @@ Admin Console의 메뉴는 다음과 같이 구성되어 있습니다:
 이 장에서는 Open DID Verifier Admin Console의 주요 기능에 대한 상세 사용 방법을 안내합니다.
 
 ## 3.1. Verifier Management
+
+Verifier Management는 Verifier 서버의 등록 및 상태 관리를 위한 기능입니다.  
+
+
+Verifier 서버는 Open DID 시스템에서 사용자의 VC(Verifiable Credential)에서 제출된 VP(Verifiable Presentation)을 검증하는 역할을 수행합니다.    
+
+Verifier 등록은 최초 1회만 수행되며, 이후에는 관리 화면에서 등록된 상태를 확인할 수 있습니다.
+
+<br/>
+
+### 3.1.1. Verifier 등록
+
+Verifier 서버가 아직 Open DID 시스템에 등록되지 않은 초기 상태에서는,  
+Verifier Admin Console 좌측 메뉴에 `Verifier Registration` 항목만 표시됩니다.  
+
+Verifier 등록은 총 3단계의 스텝을 통해 순차적으로 진행됩니다.
+
+
+<br/>
+
+**Step 1 - Enter Verifier Info**
+
+Verifier 정보를 입력하는 단계입니다.
+
+<img src="./images/verifier-registration.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **Name**          | Verifier 서버의 이름을 입력합니다. 예: `verifier`                              |
+| **CA URL**        | CA 서버의 호출 URL을 입력합니다. `http://<IP>:8094/verifier` 형식 사용   |
+| **Test Connection 버튼** | 입력한 URL로 실제 연결이 가능한지 확인합니다.                 |
+| **NEXT 버튼**     | 다음 단계로 이동합니다.                                              |
+
+<br/>
+
+**Step 2 - Register DID Document**
+
+이 단계에서는 Verifier의 DID Document를 생성하고 TA Admin에 등록을 요청합니다.   
+한 번 등록된 DID Document는 **변경하거나 재등록할 수 없습니다.**
+
+▶ **Step 2-1: Generate DID Document**
+
+CA의 DID Document를 생성합니다.  
+
+<img src="./images/generate-did.png" width="600"/>
+
+| 항목               | 설명                                                               |
+| ------------------ | ------------------------------------------------------------------ |
+| **GENERATE 버튼**  | CA 서버의 DID Document를 생성합니다. 생성 후 하단 영역에 결과 표시 |
+| **요청 상태 표시** | 요청 성공 시 초록색 메시지로 확인 가능합니다.                      |
+
+DID Document가 성공적으로 생성되면, **Step 2-2 영역이 화면에 자동으로 표시됩니다.**
+
+<br/>
+
+▶ **Step 2-2 - Submit Registeration Request**
+
+생성된 DID Document를 TA Admin에 등록 요청합니다.
+
+<img src="./images/register-did-document-step2.png" width="600"/>
+<img src="./images/register-did-document-step2-1.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **REQUEST 버튼**  | 생성한 DID Document에 대한 등록 요청을 TA Admin에 보냅니다.        |
+| **요청 상태 표시** | 요청 성공 시 초록색 메시지로 확인 가능합니다.                        |
+
+DID Document가 성공적으로 생성되면, **Step 2-3 영역이 화면에 자동으로 표시됩니다.**
+
+<br/>
+
+▶ **Step 2-3 - Check Approval Status**
+
+TA 관리자가 DID Document 등록 요청을 승인했는지 확인합니다.
+
+<img src="./images/check-approval.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **CHECK 버튼**    | TA 관리자가 등록 요청을 승인했는지 확인합니다.                      |
+| **승인 상태 표시** | 승인 완료 시 초록색 메시지와 함께 다음 단계로 이동할 수 있습니다.     |
+
+<br/>
+
+
+**Step 3 - Enroll Entity**
+
+TA 서버에 Verifier를 Entity로 등록 요청하고, 가입증명서(Certificate VC)를 발급받는 단계입니다. 
+
+이때 등록 요청은 TA 프로토콜 중 사용자 등록 프로토콜(P132)의 흐름을 따르며,  
+Verifier Admin이 해당 프로토콜의 API들을 호출하여 등록 절차를 수행합니다.
+
+<img src="./images/verifier-regstration-step3.png" width="600"/>
+
+| 항목        | 설명                                       |
+| ----------- | ------------------------------------------ |
+| **REQUEST** | TA 서버에 Entity 등록 요청을 보냅니다.     |
+| **FINISH**  | 등록을 마치고 최종 완료 상태로 이동합니다. |
+
+## 3.1.2 등록된 Verifier 관리
 
 Verifier Management 메뉴에서는 가입증명서로 등록된 Verifier 서버의 정보를 조회할 수 있습니다. 이 화면에서는 Verifier의 기본 정보가 표시되며, 수정이나 삭제는 불가능합니다.
 
