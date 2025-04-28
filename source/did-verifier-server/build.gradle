@@ -127,7 +127,6 @@ node {
     nodeProjectDir = file("${frontendResourceDir}")
     workDir = file("${projectDir}/.gradle/nodejs")
     npmWorkDir = file("${projectDir}/.gradle/npm")
-    npmCommand = "/Users/jinhwan-notebook/.nvm/versions/node/v22.9.0/bin/npm"  // 명시적 경로 추가
 }
 
 
