@@ -74,12 +74,18 @@ Verifier Admin Console은 Open DID 시스템에서 Verifier 서버를 관리하�
 
 Admin Console은 다음과 같은 주요 기능을 제공합니다:
 
-- Verifier 기본 정보 관리
-- VP 정책 생성 및 관리
-- VP 검증 이력 조회
-- 관리자 계정 관리
-
-<br/>
+- **Verifier 기본 정보 관리**
+  - Verifier 서버 등록 및 상태 확인
+- **VP 정책 항목 관리**
+  - Service(payload) 등록 및 항목 구성
+  - Profile Filter 등록 및 관리
+  - Profile Process 등록 및 관리
+  - VP Profile 설정
+  - VP 정책(Policy) 설정
+- **VP 이력**
+  - VP 검증 이력 확인
+- **관리자 계정 관리**
+  - Admin Console 계정 관리
 
 # 2. 기본 메뉴얼
 
@@ -109,7 +115,7 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 로그인 후 표시되는 메인 화면은 다음과 같은 요소로 구성됩니다:
 
-<img src="./images/main_screen.jpg" width="800"/>
+<img src="./images/main_screen.jpg" width="450"/>
 
 | 번호 | 영역 | 설명 |
 |------|------|------|
@@ -122,9 +128,23 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 ## 2.3. 메뉴 구성
 
-Admin Console의 메뉴는 다음과 같이 구성되어 있습니다:
+Verifier Admin Console의 사이드바 메뉴는 **Verifier 등록 상태에 따라 화면 구성에 차이**가 있습니다.
 
-<img src="./images/menu_structure.jpg" width="800"/>
+### 2.3.1. Verifier 미등록 상태
+
+Verifier 서버가 아직 등록되지 않은 초기 상태에서는
+메뉴에 Verifier Registration 항목만 단독으로 표시됩니다.
+
+<img src="./images/verifier-menu-before-registration.jpg" width="250"/>
+
+> 참고: Verifier 등록이 완료되면 관련 기능들이 활성화되며, 전체 메뉴가 확장됩니다.
+등록 이후 메뉴 구성에 대한 자세한 내용은 추후 항목에서 설명합니다.
+
+### 2.3.2. Verifier 등록 상태
+
+Verifier 등록이 완료되면 전체 관리 기능이 활성화되며, 사이드바 메뉴는 다음과 같이 구성됩니다:
+
+<img src="./images/menu_structure.jpg" width="260"/>
 
 | 번호 | 기능 명칭 | 기능 설명 |
 |------|-----------|-----------|
@@ -370,10 +390,10 @@ Filter Management 화면은 다음과 같은 주요 기능을 제공합니다:
 | 번호 | 항목 | 설명 |
 |------|------|------|
 | 1 | Title | 필터의 제목을 입력하는 필드입니다. 해당값은 이후 filter 검색간에 활용됩니다. |
-| 2 | ID | 필터에서 사용할 VC 스키마 ID를 입력합니다. 예시에는 Issuer 서버의 VC 스키마 URL이 입력되어 있습니다. |
+| 2 | ID | 필터에서 사용할 VC 스키마 ID입니다.. SEARCH 버튼을 통해 List사업자로 부터  스키마 아이디를 찾아와 입력 합니다. |
 | 3 | Type | 스키마 유형을 선택합니다. 현재는 OsdSchemaCredential로 값이 고정되어있습니다.  |
-| 4 | Required Claims | 검증에 필요한 필수 클레임을 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 개의 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
-| 5 | Display Claims | 표시할 클레임 정보를 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 개의 표시 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 4 | Required Claims | 검증에 필요한 필수 클레임을 관리하는 섹션입니다. "ADD REQUIRED CLAIMS" 버튼을 클릭하여 스키마 아이디에 해당하는 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 5 | Display Claims | 표시할 클레임 정보를 관리하는 섹션입니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
 | 6 | Allowed Issuers | 허용된 발급자 DID를 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 발급자를 추가할 수 있습니다. 입력된 발급자를 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
 | 7 | Present All | 모든 클레임의 제출 필요 여부를 설정합니다. 드롭다운 메뉴에서 "true" 또는 "false"를 선택할 수 있습니다. |
 | 8 | 버튼 영역 | - REGISTER: 입력한 정보로 필터를 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(필터 목록)로 돌아갑니다. |
