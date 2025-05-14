@@ -73,7 +73,7 @@ public class VcSchemaListResDto {
                         String namespaceId = claim.namespace.id;
                         for (Item item : claim.items) {
                             if (item.id != null) {
-                                combinedIds.add(namespaceId + ":" + item.id);
+                                combinedIds.add(namespaceId + "." + item.id);
                             }
                         }
                     }

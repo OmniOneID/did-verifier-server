@@ -180,7 +180,7 @@ const FilterRegistrationPage = (props: Props) => {
             vcClaims.forEach(claim => {
                 claim.items.forEach(item => {
                     // Create a fully qualified claim ID with namespace
-                    const claimId = `${claim.namespace.id}:${item.id}`;
+                    const claimId = `${claim.namespace.id}.${item.id}`;
                     claims.push(claimId);
                 });
             });
