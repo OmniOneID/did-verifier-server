@@ -24,7 +24,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum OfferType {
     ISSUE_OFFER("IssueOffer"),
-    VERIFY_OFFER("VerifyOffer");
+    VERIFY_OFFER("VerifyOffer"),
+    VERIFY_PROOF_OFFER("VerifyProofOffer");
+
 
     private final String displayName;
 

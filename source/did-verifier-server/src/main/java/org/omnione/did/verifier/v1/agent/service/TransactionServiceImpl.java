@@ -91,11 +91,10 @@ public class TransactionServiceImpl implements TransactionService {
      * Saves a sub-transaction in the repository.
      *
      * @param subTransaction Sub-transaction to be saved.
-     * @return Saved sub-transaction.
      */
     @Override
-    public SubTransaction saveSubTransaction(SubTransaction subTransaction) {
-        return subTransactionRepository.save(subTransaction);
+    public void saveSubTransaction(SubTransaction subTransaction) {
+        subTransactionRepository.save(subTransaction);
     }
 
     /**

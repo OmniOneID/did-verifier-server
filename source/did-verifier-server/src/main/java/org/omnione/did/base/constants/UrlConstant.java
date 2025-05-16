@@ -23,10 +23,16 @@ public class UrlConstant {
 
     public static class Verifier {
         public static final String V1 = "/verifier/api/v1";
+        public static final String V2 = "/verifier/api/v2";
         public static final String REQUEST_OFFER_QR = "/request-offer-qr";
         public static final String REQUEST_VERIFY = "/request-verify";
         public static final String CONFIRM_VERIFY = "/confirm-verify";
         public static final String REQUEST_PROFILE = "/request-profile";
+
+        //ZKP API
+        public static final String REQUEST_PROOF_REQUEST_PROFILE = "/request-proof-request-profile";
+        public static final String REQUEST_VERIFY_PROOF = "/request-verify-proof";
+        public static final String CONFIRM_VERIFY_PROOF = "/confirm-verify-proof";
 
         //ADMIN urls
         public static final String ADMIN = "/verifier/admin/v1";

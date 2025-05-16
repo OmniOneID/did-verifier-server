@@ -16,6 +16,7 @@
 
 package org.omnione.did.verifier.v1.agent.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.omnione.did.base.constants.UrlConstant;
@@ -23,7 +24,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
+import org.opendid.zkp.zkptestcore.data.rest.ZkpResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 
 /**
@@ -83,6 +87,25 @@ public class VerifierController {
     @Operation(summary = "Request Verify confirm", description = "Request confirmation of verification from the VP")
     public ConfirmVerifyResDto confirmVerify(@RequestBody @Valid ConfirmVerifyReqDto confirmVerifyReqDto) {
         return verifierService.confirmVerify(confirmVerifyReqDto);
+    }
+
+    ////ZKP TEST////
+    @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
+    @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
+    public ProofRequestResDto requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
+        return verifierService.requestProofRequestProfile(requestProfileReqDto);
+    }
+
+    @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY_PROOF)
+    @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
+    public RequestVerifyResDto requestVerifyProof(@RequestBody @Valid RequestVerifyProofReqDto requestVerifyProofReqDto) {
+        return verifierService.requestVerifyProof(requestVerifyProofReqDto);
+    }
+
+    @PostMapping("/request-verify-proof-sample")
+    @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
+    public ZkpResponse requestVerifyProofSample(@RequestBody HashMap<String, Object> map) {
+        return verifierService.requestVerifyProofsample(map);
     }
 
 }
