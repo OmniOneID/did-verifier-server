@@ -20,4 +20,6 @@
   <include file="set.1/project-init_admin.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-did_document.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-issuer.xml" relativeToChangelogFile="true" />
+  <include file="set.2/admin-2phase-add_policy_profile.xml" relativeToChangelogFile="true" />
+  <include file="set.2/admin-2phase-add_vp_offer.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

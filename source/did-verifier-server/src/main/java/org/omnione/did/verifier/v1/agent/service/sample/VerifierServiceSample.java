@@ -25,7 +25,7 @@ import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
 
-import org.opendid.zkp.zkptestcore.data.rest.ZkpResponse;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -107,7 +107,7 @@ public class VerifierServiceSample implements VerifierService {
     }
 
     @Override
-    public ZkpResponse requestVerifyProofsample(HashMap<String, Object> map) {
+    public String requestVerifyProofsample(HashMap<String, Object> map) {
         return null;
     }
 }

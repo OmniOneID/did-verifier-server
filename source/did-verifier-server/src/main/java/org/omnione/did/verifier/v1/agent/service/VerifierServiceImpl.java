@@ -76,19 +76,10 @@ import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.sample.ZkpTestConstants;
 import org.omnione.did.verifier.v1.common.service.StorageService;
 
-import org.opendid.zkp.zkptestcore.data.rest.ZkpResponse;
-import org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialDefinition;
-import org.opendid.zkp.zkptestcore.datamodel.zkp.ProofRequest;
-import org.opendid.zkp.zkptestcore.datamodel.zkp.verifier.dto.ProofVerifyParam;
-import org.opendid.zkp.zkptestcore.datamodel.zkp.verifier.proof.Identifiers;
-import org.opendid.zkp.zkptestcore.exception.ZkpErrorCode;
-import org.opendid.zkp.zkptestcore.exception.ZkpException;
-import org.opendid.zkp.zkptestcore.manager.ZkpConstants;
-import org.opendid.zkp.zkptestcore.manager.ZkpCredentialManager;
-import org.opendid.zkp.zkptestcore.manager.ZkpProofManager;
-import org.opendid.zkp.zkptestcore.util.BigIntegerUtil;
-import org.opendid.zkp.zkptestcore.util.gson.ZkpGsonWrapper;
-import org.opendid.zkp.zkptestcore.util.logger.ZkpLogger;
+import org.omnione.did.zkp.core.manager.ZkpProofManager;
+import org.omnione.did.zkp.crypto.constant.ZkpCryptoConstants;
+import org.omnione.did.zkp.crypto.util.BigIntegerUtil;
+import org.omnione.did.zkp.datamodel.proofrequest.ProofRequest;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -129,6 +120,9 @@ public class VerifierServiceImpl implements VerifierService {
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
     private final ObjectMapper objectMapper;
+    private final ZkpPolicyRepository zkpPolicyRepository;
+    private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
+
 
     /**
      * Requests a VP Offer via QR code.
@@ -192,7 +186,7 @@ public class VerifierServiceImpl implements VerifierService {
             Transaction transaction = findTransactionByRequestDto(requestProfileReqDto);
             VpOffer vpOffer = findVpOfferByTransaction(transaction);
 
-            log.debug("\t --> Retrieving VP Policy by policyId in VP Offer");
+            log.debug("\t --> Retrieving VerifyProfile by policyId in VP Offer");
             VerifyProfile verifyProfile = getVerifyProfileFromPolicy(vpOffer.getVpPolicyId());
 
 
@@ -395,16 +389,30 @@ public class VerifierServiceImpl implements VerifierService {
     ////ZKP TEST/////
     @Override
     public ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto) {
+        //Dev Data
+        //1. txId로 transaction 조회, offerId 조회
+        log.info("=== Starting requestProofRequestProfile ===");
+        log.debug("\t --> Retrieving transaction information");
+//        Transaction transaction = findTransactionByRequestDto(requestProfileReqDto);
+//        VpOffer vpOffer = findVpOfferByTransaction(transaction);
 
-        BigInteger verifierNonce = new BigIntegerUtil().createRandomBigInteger(ZkpConstants.LARGE_NONCE);
+        log.debug("\t --> Retrieving ProofRequestProfile by policyId in VP Offer");
+        //ProofRequestProfile proofRequestProfile = getProofRequestProfileFromPolicy(vpOffer.getVpPolicyId());
+        //Dev Data
+        //DB에서 해당 값을 찾아와서 조회
+
+
+        //TestData
+        BigInteger verifierNonce = new BigIntegerUtil().createRandomBigInteger(ZkpCryptoConstants.LARGE_NONCE);
         ProofRequest proofRequest = ZkpProofManager.requestProofReq(
                 "mdl",
+                "11",
                 ZkpTestConstants.getProofRequestAttribute(),
                 ZkpTestConstants.getProofRequestPredicate(),
                 verifierNonce
         );
+
         String jsonStr = "{\n" +
-                "  \"txId\": \"6de2209a-a463-41b3-8620-7237865409ba\",\n" +
                 "  \"proofRequestProfile\": {\n" +
                 "    \"id\": \"f55044ba-fa69-4bba-91e3-38442043d6bc\",\n" +
                 "    \"type\": \"ProofRequestProfile\",\n" +
@@ -445,6 +453,19 @@ public class VerifierServiceImpl implements VerifierService {
         }
         proofRequestResDto.getProofRequestProfile().getProfile().setProofRequest(proofRequest);
         return proofRequestResDto;
+        //TestData
+    }
+
+    private ProofRequestProfile getProofRequestProfileFromPolicy(String vpPolicyId) {
+        ZkpPolicy zkpPolicy = zkpPolicyRepository.findByPolicyId(vpPolicyId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND));
+        //ZkpProofRequest 디시리얼라이징
+        String zkpPolicyProfileId = zkpPolicy.getProfileId();
+//        ZkpPolicyProfile zkpPolicyProfile = zkpPolicyProfileRepository.findByPolicyProfileId(zkpPolicyProfileId)
+//                .orElseThrow(() -> new OpenDidException(ErrorCode.ZKP_POLICY_PROFILE_NOT_FOUND));
+//        String zkpPolicyProfileStr = zkpPolicyProfile.getZkpPolicyProfile();
+        return null;
+
     }
 
     @Override
@@ -477,41 +498,49 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     @Override
-    public ZkpResponse requestVerifyProofsample(HashMap<String, Object> map) {
-        org.opendid.zkp.zkptestcore.datamodel.zkp.Proof proof = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proof")), org.opendid.zkp.zkptestcore.datamodel.zkp.Proof.class);
-        BigInteger verifierNonce = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proofNonce")), BigInteger.class);
+    public String requestVerifyProofsample(HashMap<String, Object> map) {
+        return  "{\n" +
+                "        \"result\": \"success\",\n" +
+                "}\n";
 
-        List<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
-
-        for (Identifiers identifiers : proof.getIdentifiers()) {
-            String schemaStr = loadZKPData("credentialSchema");
-            org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema schema = new Gson().fromJson(schemaStr, org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema.class);
-            String defStr = loadZKPData("credentialDefinition");
-            CredentialDefinition credentialDefinition = new Gson().fromJson(defStr, CredentialDefinition.class);
-
-            ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
-                    //todo : 메모리에서 load
-                    .setSchema(schema)
-                    .setCredentialDefinition(credentialDefinition)
-                    .build();
-            proofVerifyParams.add(proofVerifyParam);
-        }
-
-        ZkpResponse zkpResponse = new ZkpResponse(ZkpErrorCode.ERR_CODE_ZKP_SUCCESS, "success");
-
-
-
-//        try {
-//            zkpResponse = new ZkpProofManager().verifyProof(proof, verifierNonce, proofRequest, proofVerifyParams);
-//            sdkResponse.setResultCode(response.getErrorCode());
-//            sdkResponse.setResultMsg(response.getErrorMessage());
-//        } catch (ZkpException e) {
-//            sdkResponse.setResultCode(ZkpErrorCode.ERR_CODE_ZKP_FAIL.getCode());
-//            sdkResponse.setResultMsg(e.getErrorMsg());
-//        }
-
-        return zkpResponse;
     }
+
+//    @Override
+//    public ZkpResponse requestVerifyProofsample(HashMap<String, Object> map) {
+//        org.opendid.zkp.zkptestcore.datamodel.zkp.Proof proof = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proof")), org.opendid.zkp.zkptestcore.datamodel.zkp.Proof.class);
+//        BigInteger verifierNonce = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proofNonce")), BigInteger.class);
+//
+//        List<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
+//
+//        for (Identifiers identifiers : proof.getIdentifiers()) {
+//            String schemaStr = loadZKPData("credentialSchema");
+//            org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema schema = new Gson().fromJson(schemaStr, org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema.class);
+//            String defStr = loadZKPData("credentialDefinition");
+//            CredentialDefinition credentialDefinition = new Gson().fromJson(defStr, CredentialDefinition.class);
+//
+//            ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
+//                    //todo : 메모리에서 load
+//                    .setSchema(schema)
+//                    .setCredentialDefinition(credentialDefinition)
+//                    .build();
+//            proofVerifyParams.add(proofVerifyParam);
+//        }
+//
+//        ZkpResponse zkpResponse = new ZkpResponse(ZkpErrorCode.ERR_CODE_ZKP_SUCCESS, "success");
+//
+//
+//
+////        try {
+////            zkpResponse = new ZkpProofManager().verifyProof(proof, verifierNonce, proofRequest, proofVerifyParams);
+////            sdkResponse.setResultCode(response.getErrorCode());
+////            sdkResponse.setResultMsg(response.getErrorMessage());
+////        } catch (ZkpException e) {
+////            sdkResponse.setResultCode(ZkpErrorCode.ERR_CODE_ZKP_FAIL.getCode());
+////            sdkResponse.setResultMsg(e.getErrorMsg());
+////        }
+//
+//        return zkpResponse;
+//    }
 
 
     ////ZKP TEST END /////

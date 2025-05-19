@@ -17,7 +17,7 @@
 package org.omnione.did.verifier.v1.agent.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.omnione.did.verifier.v1.agent.dto.*;
-import org.opendid.zkp.zkptestcore.data.rest.ZkpResponse;
+
 
 import java.util.HashMap;
 
@@ -63,5 +63,5 @@ public interface VerifierService {
 
     RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto);
 
-    ZkpResponse requestVerifyProofsample(HashMap<String, Object> map);
+    String requestVerifyProofsample(HashMap<String, Object> map);
 }

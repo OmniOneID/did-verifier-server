@@ -126,7 +126,10 @@ public enum ErrorCode {
     ADMIN_INFO_NOT_FOUND("SSRVVRF01100", "Failed to find admin: admin is not registered.", 400),
     ADMIN_ALREADY_EXISTS("SSRVVRF01101", "Failed to register admin: admin is already registered.", 400),
     TAS_COMMUNICATION_ERROR("SSRVVRF01102", "Failed to communicate with tas: unknown error occurred.", 500),
-    TAS_UNKNOWN_RESPONSE("SSRVVRF01103", "Failed to process response: received unknown data from the tas.", 500);
+    TAS_UNKNOWN_RESPONSE("SSRVVRF01103", "Failed to process response: received unknown data from the tas.", 500),
+
+    //ZKP Errors (1200~1299)
+    PROOF_REQUEST_PROFILE_NOT_FOUND("SSRVVRF01201", "Failed to find Proof request profile : request proof profile not found" , 400);
 
 
 

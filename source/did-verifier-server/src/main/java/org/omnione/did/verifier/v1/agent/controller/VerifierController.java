@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
-import org.opendid.zkp.zkptestcore.data.rest.ZkpResponse;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -92,8 +92,9 @@ public class VerifierController {
     ////ZKP TEST////
     @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
     @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
-    public ProofRequestResDto requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
-        return verifierService.requestProofRequestProfile(requestProfileReqDto);
+    public String requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
+        ProofRequestResDto proofRequestResDto = verifierService.requestProofRequestProfile(requestProfileReqDto);
+        return proofRequestResDto.getProofRequestProfile().toJson();
     }
 
     @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY_PROOF)
@@ -104,7 +105,7 @@ public class VerifierController {
 
     @PostMapping("/request-verify-proof-sample")
     @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
-    public ZkpResponse requestVerifyProofSample(@RequestBody HashMap<String, Object> map) {
+    public String requestVerifyProofSample(@RequestBody HashMap<String, Object> map) {
         return verifierService.requestVerifyProofsample(map);
     }
 
