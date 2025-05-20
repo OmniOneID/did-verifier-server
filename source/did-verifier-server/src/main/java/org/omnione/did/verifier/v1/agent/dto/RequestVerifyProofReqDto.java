@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.omnione.did.base.datamodel.data.AccE2e;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,5 +21,8 @@ public class RequestVerifyProofReqDto {
     private AccE2e accE2e;
     @NotNull(message = "encVerifyProof cannot be null")
     private String encProof;
+
+    @NotNull(message = "Proof Nonce cannot be null")
+    private String nonce;
 
 }

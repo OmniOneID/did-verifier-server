@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet id="init-zkp_payload" author="jhkim6557">
+        <insert tableName="payload">
+            <column name="payload_id" value="f61f4306-ddf1-4510-a99c-d1f026d7bcd2"/>
+            <column name="device" value="WEB"/>
+            <column name="service" value="ZkpTestPayload"/>
+            <column name="endpoints" value="[&quot;http://127.0.0.1:8092/verifier&quot;]"/>
+            <column name="locked" value="false"/>
+            <column name="mode" value="Direct"/>
+            <column name="offer_type" value="VerifyProofOffer"/>
+            <column name="valid_second" value= "180" />
+            <column name="created_at" value="now()"/>
+            <column name="updated_at" value="now()"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-initial-zkp-proof-request" author="jhkim6557">
+        <!-- ZKP Proof Request 테이블에 초기 데이터 삽입 -->
+        <insert tableName="zkp_proof_request">
+            <column name="name">mdl</column>
+            <column name="version">1.1</column>
+            <column name="requested_attributes">{
+                "attributeReferent1": {
+                "name": "MDLNS.zkpsex",
+                "restrictions": [
+                {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0:Tag1"
+                }
+                ]
+                },
+                "attributeReferent2": {
+                "name": "MDLNS.zkpasort",
+                "restrictions": [
+                {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0:Tag1"
+                }
+                ]
+                },
+                "attributeReferent3": {
+                "name": "MDLNS.zkpaddr",
+                "restrictions": [
+                {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0:Tag1"
+                }
+                ]
+                }
+                }</column>
+            <column name="requested_predicates">{
+                "predicateReferent1": {
+                "name": "MDLNS.zkpbirth",
+                "pType": "LE",
+                "pValue": 20200103,
+                "restrictions": [
+                {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0:Tag1"
+                }
+                ]
+                }
+                }</column>
+            <column name="curve">Secp256r1</column>
+            <column name="cipher">AES-256-CBC</column>
+            <column name="padding">PKCS5</column>
+            <column name="created_at">now()</column>
+        </insert>
+
+        <!-- 방금 삽입한 zkp_proof_request 행의 ID를 가져오기 위한 SQL -->
+        <sql>SELECT setval('zkp_proof_request_id_seq', (SELECT MAX(id) FROM zkp_proof_request));</sql>
+    </changeSet>
+
+    <changeSet id="insert-initial-zkp-policy-profile" author="jhkim6557">
+        <!-- ZKP Policy Profile 테이블에 초기 데이터 삽입 -->
+        <insert tableName="zkp_policy_profile">
+            <column name="profile_id">f55044ba-fa69-4bba-91e3-38442043d6bc</column>
+            <column name="type">ProofRequestProfile</column>
+            <column name="title">zkp Test를 위한 임시 프로파일 입니다.</column>
+            <column name="description">하드코딩 용 임시 프로파일입니다..</column>
+            <column name="encoding">UTF-8</column>
+            <column name="language">ko</column>
+            <column name="zkp_proof_request_id">1</column>
+            <column name="created_at">2025-05-14 19:29:42.742437</column>
+        </insert>
+    </changeSet>
+    <changeSet id="insert-initial-policy" author="jhkim6557">
+        <!-- ZKP Policy 테이블에 초기 데이터 삽입 -->
+        <insert tableName="policy">
+            <column name="policy_id">5e28c9f1-3dba-4c02-9a97-8f3baf587aae</column>
+            <column name="policy_title">zkp Test를 위한 임시 프로파일 입니다.</column>
+            <column name="policy_type">ZKP</column>
+            <column name="payload_id">f61f4306-ddf1-4510-a99c-d1f026d7bcd2</column>
+            <column name="policy_profile_id">f55044ba-fa69-4bba-91e3-38442043d6bc</column>
+            <column name="created_at">2025-05-14 19:29:42.742437</column>
+        </insert>
+        <!-- 방금 삽입한 zkp_policy 행의 ID를 가져오기 위한 SQL -->
+        <sql>SELECT setval('policy_id_seq', (SELECT MAX(id) FROM policy));</sql>
+    </changeSet>
+
+</databaseChangeLog>

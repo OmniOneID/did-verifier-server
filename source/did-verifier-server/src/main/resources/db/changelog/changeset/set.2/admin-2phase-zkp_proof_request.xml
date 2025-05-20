@@ -12,6 +12,9 @@
             <column name="name" type="varchar(40)">
                 <constraints nullable="false" unique="false"/>
             </column>
+            <column name="version" type="varchar(10)">
+                <constraints nullable="false" unique="false"/>
+            </column>
             <column name="requested_attributes" type="text">
                 <constraints nullable="true" unique="false"/>
             </column>

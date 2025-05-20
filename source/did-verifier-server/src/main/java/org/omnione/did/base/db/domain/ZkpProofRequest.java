@@ -44,6 +44,9 @@ public class ZkpProofRequest extends BaseEntity implements Serializable {
     @Column(name = "name", nullable = false, length = 40)
     private String name;
 
+    @Column(name = "version", nullable = false, length = 10)
+    private String version;
+
     @Column(name = "requested_attributes", nullable = true)
     private String requestedAttributes;
 

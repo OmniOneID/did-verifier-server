@@ -18,6 +18,7 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.datamodel.enums.OfferType;
 import org.omnione.did.base.db.constant.ProfileMode;
 
 import java.io.Serializable;
@@ -57,4 +58,7 @@ public class Payload extends BaseEntity implements Serializable {
     private String endpoints;
     @Column(name = "valid_second", nullable = false)
     private Integer validSecond;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "offer_type", nullable = false)
+    private OfferType offerType;
 }

@@ -16,7 +16,6 @@
 
 package org.omnione.did.verifier.v1.agent.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.omnione.did.base.constants.UrlConstant;
@@ -25,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
 
+import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -89,12 +89,11 @@ public class VerifierController {
         return verifierService.confirmVerify(confirmVerifyReqDto);
     }
 
-    ////ZKP TEST////
+    ////ZKP ////
     @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
     @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
     public String requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
-        ProofRequestResDto proofRequestResDto = verifierService.requestProofRequestProfile(requestProfileReqDto);
-        return proofRequestResDto.getProofRequestProfile().toJson();
+        return GsonWrapper.getGson().toJson(verifierService.requestProofRequestProfile(requestProfileReqDto));
     }
 
     @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY_PROOF)

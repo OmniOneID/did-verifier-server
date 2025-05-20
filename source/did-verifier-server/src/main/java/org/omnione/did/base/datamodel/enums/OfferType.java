@@ -23,20 +23,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Represents different types of offers that can be made or processed.
  */
 public enum OfferType {
-    ISSUE_OFFER("IssueOffer"),
-    VERIFY_OFFER("VerifyOffer"),
-    VERIFY_PROOF_OFFER("VerifyProofOffer");
+    IssueOffer,
+    VerifyOffer,
+    VerifyProofOffer;
 
 
-    private final String displayName;
-
-    OfferType(String displayName) {
-        this.displayName = displayName;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-        return displayName;
-    }
 }

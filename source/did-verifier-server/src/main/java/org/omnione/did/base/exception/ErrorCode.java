@@ -117,7 +117,7 @@ public enum ErrorCode {
     FAILED_TO_REQUEST_VERIFY("SSRVVRF00903", "Failed to process the 'request-verify' API request.", 500),
     FAILED_TO_REQUEST_CERTIFICATE_VC("SSRVVRF00904", "Failed to process the 'get-certificate-vc' API request.", 500),
     FAILED_TO_ISSUE_CERTIFICATE_VC("SSRVVRF00905", "Failed to process the 'issue-certificate-vc' API request.", 500),
-
+    FAILED_TO_REQUEST_PROOF_REQUEST_PROFILE("SSRVVRF00906", "Failed to process the 'request-proof-request-profile' API request.", 500),
 
     // Verifier Errors (1000~1099)
     VERIFIER_NOT_FOUND("SSRVVRF01000", "Failed to find verifier: verifier is not registered.", 500),
@@ -129,13 +129,11 @@ public enum ErrorCode {
     TAS_UNKNOWN_RESPONSE("SSRVVRF01103", "Failed to process response: received unknown data from the tas.", 500),
 
     //ZKP Errors (1200~1299)
-    PROOF_REQUEST_PROFILE_NOT_FOUND("SSRVVRF01201", "Failed to find Proof request profile : request proof profile not found" , 400);
-
-
-
-
-
-
+    PROOF_REQUEST_PROFILE_NOT_FOUND("SSRVVRF01201", "Failed to find Proof request profile : request proof profile not found" , 400),
+    ZKP_POLICY_PROFILE_NOT_FOUND("SSRVVRF01202", "Failed to find ZKP policy profile : request proof profile not found" , 400),
+    PROOF_REQUEST_PROFILE_PARSE_ERROR("SSRVVRF01203", "Failed to parse proof request profile : request proof profile parse error" , 500),
+    ZKP_PROOF_REQUEST_NOT_FOUND("SSRVVRF01204", "Failed to find ZKP proof request : request proof profile not found" , 400),
+    FAILED_TO_VERIFY_PROOF("SSRVVRF01205", "Failed to verify proof : proof verify failed" , 500);
 
     private final String code;
     private final String message;

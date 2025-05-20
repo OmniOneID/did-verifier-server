@@ -43,7 +43,7 @@
                 baseColumnNames="profile_id"
                 constraintName="fk_zkp_policy_profile"
                 referencedTableName="zkp_policy_profile"
-                referencedColumnNames="zkp_profile_id"/>
+                referencedColumnNames="profile_id"/>
     </changeSet>
 
 </databaseChangeLog>

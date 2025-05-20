@@ -31,5 +31,8 @@ public class Policy extends BaseEntity implements Serializable {
     private String policyProfileId;
     @Column(name = "policy_title", nullable = false, length = 255)
     private String policyTitle;
+    @Column(name = "policy_type", nullable = false, length = 40)
+    @Builder.Default
+    private String policyType = "VP";
 
 }

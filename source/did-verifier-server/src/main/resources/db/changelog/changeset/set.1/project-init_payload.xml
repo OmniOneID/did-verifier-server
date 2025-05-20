@@ -64,6 +64,7 @@
             <column name="created_at" value="now()"/>
             <column name="updated_at" value="now()"/>
         </insert>
+
     </changeSet>
 
 </databaseChangeLog>

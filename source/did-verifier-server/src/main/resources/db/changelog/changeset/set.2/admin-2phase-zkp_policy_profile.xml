@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="profile_id" type="varchar(40)">
-                <constraints nullable="false" unique="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="type" type="varchar(40)">
                 <constraints nullable="false" unique="false"/>
