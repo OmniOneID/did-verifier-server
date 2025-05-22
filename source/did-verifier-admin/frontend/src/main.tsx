@@ -16,12 +16,12 @@ import FilterManagementPage from './pages/vp-policy-management/filter-management
 import PolicyManagementPage from './pages/vp-policy-management/policy-management/PolicyManagementPage';
 import ProcessManagementPage from './pages/vp-policy-management/process-management/ProcessManagementPage';
 import ProfileManagementPage from './pages/vp-policy-management/profile-management/ProfileManagementPage';
-import ServiceManagementPage from './pages/vp-policy-management/service-management/ServiceManagementPage';
+import ServiceManagementPage from './pages/service-management/ServiceManagementPage';
 import VpPolicyManagementPage from './pages/vp-policy-management/VpPolicyManagementPage';
 import VpHistoryPage from './pages/vp-submission-management/VpHistoryPage';
-import ServiceRegistrationPage from './pages/vp-policy-management/service-management/ServiceRegistrationPage';
-import ServiceDetailPage from './pages/vp-policy-management/service-management/ServiceDetailPage';
-import ServiceEditPage from './pages/vp-policy-management/service-management/ServiceEditPage';
+import ServiceRegistrationPage from './pages/service-management/ServiceRegistrationPage';
+import ServiceDetailPage from './pages/service-management/ServiceDetailPage';
+import ServiceEditPage from './pages/service-management/ServiceEditPage';
 import FilterEditPage from './pages/vp-policy-management/filter-management/FilterEditPage';
 import FilterDetailPage from './pages/vp-policy-management/filter-management/FilterDetailPage';
 import FilterRegistrationPage from './pages/vp-policy-management/filter-management/FilterRegistrationPage';
@@ -34,6 +34,9 @@ import ProfileRegistrationPage from './pages/vp-policy-management/profile-manage
 import PolicyDetailPage from './pages/vp-policy-management/policy-management/PolicyDetailPage';
 import PolicyEditPage from './pages/vp-policy-management/policy-management/PolicyEditPage';
 import PolicyRegistrationPage from './pages/vp-policy-management/policy-management/PolicyRegistrationPage';
+import ProofRequestConfigurationPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationPage';
+import ZkpPolicyManagementPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyManagementPage';
+import ZkpProfileManagementPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileManagementPage';
 
 
 const router = createBrowserRouter([
@@ -56,6 +59,12 @@ const router = createBrowserRouter([
             path: '/verifier-management',
             Component: VerifierManagementPage,
           },
+          // Service Configuration
+          {
+            path: '/service-configuration',
+            Component: ServiceManagementPage,
+          },
+          // VP Policy Management
           {
             path: '/vp-policy-management/service-management/service-registration',
             Component: ServiceRegistrationPage,
@@ -144,6 +153,7 @@ const router = createBrowserRouter([
             path: '/vp-submission-management',
             Component: VpHistoryPage,
           },
+          // Admin Management
           {
             path: 'admin-management/admin-registration',
             Component: AdminRegisterPage,
@@ -159,6 +169,23 @@ const router = createBrowserRouter([
           {
             path: '/server-management',
             Component: ServerManagementPage,
+          },
+          // ZKP Policy Management
+          {
+            path: '/zkp-policy-management/proof-request-configuration',
+            Component: ProofRequestConfigurationPage,
+          },
+          {
+            path: '/zkp-policy-management/zkp-profile-management',
+            Component: ZkpProfileManagementPage,
+          },
+          {
+            path: '/zkp-policy-management/zkp-policy-management',
+            Component: ZkpPolicyManagementPage,
+          },
+          {
+            path: '/zkp-policy-management',
+            Component: ProofRequestConfigurationPage,
           },
         ],
       },

@@ -1,6 +1,7 @@
 package org.omnione.did.base.db.repository;
 
 import org.omnione.did.base.db.domain.Payload;
+import org.omnione.did.base.db.repository.projection.PayloadIdProjection;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;

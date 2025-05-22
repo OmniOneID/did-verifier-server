@@ -2,9 +2,9 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, Table, T
 import { useDialogs } from '@toolpad/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getService } from '../../../apis/vp-payload-api';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from '../../../components/loading/FullscreenLoader';
+import { getService } from '../../apis/vp-payload-api';
+import CustomDialog from '../../components/dialog/CustomDialog';
+import FullscreenLoader from '../../components/loading/FullscreenLoader';
 
 type Props = {}
 
@@ -13,6 +13,7 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
+    offerType?: string;
     validSeconds: number;
     endpoints: string[];
 }
@@ -56,6 +57,7 @@ const ServiceDetailPage = (props: Props) => {
                     locked: data.locked,
                     device: data.device,
                     mode: data.mode,
+                    offerType: data.offerType,
                     validSeconds: data.validSecond || 180,
                     endpoints: JSON.parse(data.endpoints),
                 });
@@ -145,6 +147,18 @@ const ServiceDetailPage = (props: Props) => {
                             <MenuItem value="Direct">Direct</MenuItem>
                             <MenuItem value="Indirect">inDirect</MenuItem>
                             <MenuItem value="Proxy">Proxy</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal" variant='standard'>
+                        <InputLabel>Verification Type</InputLabel>
+                        <Select 
+                            value={serviceData?.offerType || ''} 
+                            label="Verification Type"
+                            slotProps={{ input: { readOnly: true } }} 
+                        >
+                            <MenuItem value="VerifyOffer">VP</MenuItem>
+                            <MenuItem value="VerifyProofOffer">ZKP</MenuItem>
                         </Select>
                     </FormControl>
 

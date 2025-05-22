@@ -3,12 +3,12 @@ import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { deleteService, fetchServices } from "../../../apis/vp-payload-api";
-import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
-import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from "../../../components/loading/FullscreenLoader";
-import { formatErrorMessage } from '../../../utils/error-handler';
+import { deleteService, fetchServices } from "../../apis/vp-payload-api";
+import CustomDataGrid from "../../components/data-grid/CustomDataGrid";
+import CustomConfirmDialog from '../../components/dialog/CustomConfirmDialog';
+import CustomDialog from '../../components/dialog/CustomDialog';
+import FullscreenLoader from "../../components/loading/FullscreenLoader";
+import { formatErrorMessage } from '../../utils/error-handler';
 
 type Props = {}
 
@@ -18,6 +18,8 @@ type ServiceRow = {
   device: string;
   locked: boolean;
   mode: string;
+  offerType: string;
+  policyCount: number;
 };
 
 const modeMapping: { [key: string]: string } = {
@@ -29,6 +31,12 @@ const modeMapping: { [key: string]: string } = {
 const lockedMapping: { [key: string]: string } = {
   true: "locked",
   false: "unlocked",
+};
+
+const offerTypeMapping: { [key: string]: string} = {
+  VerifyOffer: "VP",
+  VerifyProofOffer: "ZKP",
+  IssueOffer: "-", 
 };
 
 const ServiceManagementPage = (props: Props) => {
@@ -49,7 +57,19 @@ const ServiceManagementPage = (props: Props) => {
   }, [rows, selectedRow]);
   
   const handleDelete = async () => {
+    if (!selectedRowData) return;
     const id = selectedRowData?.id as number;
+    const policyCount = selectedRowData?.policyCount as number;
+    
+    if (policyCount > 0) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: 'This service is in use by one or more policies and cannot be deleted.',
+        isModal: true,
+      });
+      return;
+    }
+
     if (id) {
       const result = await dialogs.open(CustomConfirmDialog, {
         title: 'Confirmation',
@@ -140,9 +160,13 @@ const ServiceManagementPage = (props: Props) => {
               { field: 'locked', headerName: "Lock Status", width: 100,
                 renderCell: (params) => lockedMapping[params.value],
               },
-              { field: 'mode', headerName: "Submission Mode", width: 200,
+              { field: 'mode', headerName: "Submission Mode", width: 150,
                 renderCell: (params) => modeMapping[params.value],
               },
+              { field: 'offerType', headerName: "Verification Type", width: 150,
+                renderCell: (params) => offerTypeMapping[params.value] || params.value,
+              },
+              { field: 'policyCount', headerName: "Policy Count", width: 100},
             ]} 
             selectedRow={selectedRow} 
             setSelectedRow={setSelectedRow}
