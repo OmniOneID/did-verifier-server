@@ -29,6 +29,8 @@ import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.verifier.v1.agent.api.RepositoryFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
+import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
+import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -74,7 +76,19 @@ public class RepositoryServiceImpl implements StorageService {
             log.error("Failed to find DID document.", e);
             throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
         }
-    };
+    }
+
+    @Override
+    public CredentialSchema getZKPCredential(String credentialSchemaId) {
+        return null;
+    }
+
+    @Override
+    public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
+        return null;
+    }
+
+    ;
 
 
 }

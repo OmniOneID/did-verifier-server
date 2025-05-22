@@ -88,13 +88,16 @@ dependencies {
     implementation('org.hyperledger.fabric:fabric-gateway-java:2.2.9')
     implementation fileTree(dir: "libs", includes: ["*"])
 
-    implementation 'org.modelmapper:modelmapper:3.0.0'  // 최신 버전 확인 후 사용
+    implementation 'org.modelmapper:modelmapper:3.0.0'
 
     // Query DSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //B/C
+    implementation("org.web3j:core:4.13.0")
 }
 
 dependencyManagement {

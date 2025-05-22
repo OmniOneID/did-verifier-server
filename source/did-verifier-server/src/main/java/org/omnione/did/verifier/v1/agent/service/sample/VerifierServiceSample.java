@@ -106,8 +106,4 @@ public class VerifierServiceSample implements VerifierService {
         return null;
     }
 
-    @Override
-    public String requestVerifyProofsample(HashMap<String, Object> map) {
-        return null;
-    }
 }

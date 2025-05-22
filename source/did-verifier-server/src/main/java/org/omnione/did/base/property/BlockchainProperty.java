@@ -12,4 +12,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "blockchain")
 public class BlockchainProperty {
     private String filePath;
+
 }

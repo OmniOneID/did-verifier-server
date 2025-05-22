@@ -102,11 +102,6 @@ public class VerifierController {
         return verifierService.requestVerifyProof(requestVerifyProofReqDto);
     }
 
-    @PostMapping("/request-verify-proof-sample")
-    @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
-    public String requestVerifyProofSample(@RequestBody HashMap<String, Object> map) {
-        return verifierService.requestVerifyProofsample(map);
-    }
 
 }
 

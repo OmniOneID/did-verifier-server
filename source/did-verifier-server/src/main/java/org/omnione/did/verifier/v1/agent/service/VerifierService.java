@@ -63,5 +63,5 @@ public interface VerifierService {
 
     RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto);
 
-    String requestVerifyProofsample(HashMap<String, Object> map);
+
 }

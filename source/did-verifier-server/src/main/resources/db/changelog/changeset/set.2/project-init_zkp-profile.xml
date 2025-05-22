@@ -22,7 +22,7 @@
         <!-- ZKP Proof Request 테이블에 초기 데이터 삽입 -->
         <insert tableName="zkp_proof_request">
             <column name="name">mdl</column>
-            <column name="version">1.1</column>
+            <column name="version">1.0</column>
             <column name="requested_attributes">{
                 "attributeReferent1": {
                 "name": "MDLNS.zkpsex",

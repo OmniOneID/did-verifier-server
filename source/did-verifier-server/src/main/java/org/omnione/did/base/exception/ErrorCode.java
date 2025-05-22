@@ -133,7 +133,9 @@ public enum ErrorCode {
     ZKP_POLICY_PROFILE_NOT_FOUND("SSRVVRF01202", "Failed to find ZKP policy profile : request proof profile not found" , 400),
     PROOF_REQUEST_PROFILE_PARSE_ERROR("SSRVVRF01203", "Failed to parse proof request profile : request proof profile parse error" , 500),
     ZKP_PROOF_REQUEST_NOT_FOUND("SSRVVRF01204", "Failed to find ZKP proof request : request proof profile not found" , 400),
-    FAILED_TO_VERIFY_PROOF("SSRVVRF01205", "Failed to verify proof : proof verify failed" , 500);
+    FAILED_TO_VERIFY_PROOF("SSRVVRF01205", "Failed to verify proof : proof verify failed" , 500),
+    BLOCKCHAIN_GET_ZKP_CREDENTIAL_FAILED("SSRVVRF01206", "Failed to retrieve ZKP credential on the blockchain.", 500),
+    BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500);
 
     private final String code;
     private final String message;
