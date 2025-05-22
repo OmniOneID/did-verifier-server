@@ -651,9 +651,9 @@ public class VerifierServiceImpl implements VerifierService {
     private ReqE2e setReqE2e(ZkpProofRequest zkpProofRequest) {
         ReqE2e reqE2e = new ReqE2e();
 
-        reqE2e.setCurve(zkpProofRequest.getCurve());
-        reqE2e.setCipher(zkpProofRequest.getCipher());
-        reqE2e.setPadding(zkpProofRequest.getPadding());
+        reqE2e.setCurve(zkpProofRequest.getCurve().toString());
+        reqE2e.setCipher(zkpProofRequest.getCipher().toString());
+        reqE2e.setPadding(zkpProofRequest.getPadding().toString());
         return reqE2e;
     }
 

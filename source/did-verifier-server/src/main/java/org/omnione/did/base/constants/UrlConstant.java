@@ -88,6 +88,9 @@ public class UrlConstant {
 
         //Session
         public static final String LOGIN = "/login";
+
+        //Proof Request urls
+        public static final String GET_PROOF_REQUEST = "/zkp/proof-requests";
     }
     public static class Tas {
         public static final String ADMIN_V1 = "/tas/admin/v1";

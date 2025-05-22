@@ -18,6 +18,12 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.datamodel.enums.EccCurveType;
+import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
+import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
+import org.omnione.did.base.db.converter.EccCurveTypeConverter;
+import org.omnione.did.base.db.converter.SymmetricCipherTypeConverter;
+import org.omnione.did.base.db.converter.SymmetricPaddingTypeConverter;
 
 import java.io.Serializable;
 
@@ -53,12 +59,15 @@ public class ZkpProofRequest extends BaseEntity implements Serializable {
     @Column(name = "requested_predicates", nullable = true)
     private String requestedPredicates;
 
+    @Convert(converter = EccCurveTypeConverter.class)
     @Column(name = "curve", nullable = false, length = 40)
-    private String curve;
+    private EccCurveType curve;
 
+    @Convert(converter = SymmetricCipherTypeConverter.class)
     @Column(name = "cipher", nullable = false, length = 40)
-    private String cipher;
+    private SymmetricCipherType cipher;
 
+    @Convert(converter = SymmetricPaddingTypeConverter.class)
     @Column(name = "padding", nullable = false, length = 40)
-    private String padding;
+    private SymmetricPaddingType padding;
 }

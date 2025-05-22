@@ -15,16 +15,11 @@
  */
 package org.omnione.did.base.db.repository;
 
+import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.base.db.domain.ZkpProofRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-public interface ZkpProofRequestRepository extends JpaRepository<ZkpProofRequest, Long>, QuerydslPredicateExecutor<ZkpProofRequest>, ZkpProofRequestRepositoryAdmin {
-    ZkpProofRequest findById(long id);
-//
-//    ZkpProofRequest findByPolicyId(String policyId);
-//
-//    ZkpProofRequest findByPayloadId(String payloadId);
-//
-//    ZkpProofRequest findByPolicyProfileId(String policyProfileId);
+public interface ZkpProofRequestRepositoryAdmin {
+    Page<ZkpProofRequest> searchZkpProofRequestList(String searchKey, String searchValue, Pageable pageable);
 }

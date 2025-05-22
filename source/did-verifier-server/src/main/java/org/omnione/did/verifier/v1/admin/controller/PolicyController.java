@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * The PolicyController class provides methods for managing policies in the DID Verifier application.
  * It is designed to facilitate the retrieval, creation, updating, and deletion of policies in the application.
@@ -30,7 +28,7 @@ public class PolicyController {
 
     @Operation(summary = "Get Policy List", description = "Get a list of policies by title (optional).")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_LIST)
-    public Page<PolicyDTO> searchPolicyProfileListString(String searchKey, String searchValue, Pageable pageable, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+    public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, @RequestParam(defaultValue = "VP") PolicyType policyType) {
         return policyService.searchPolicyList(searchKey, searchValue, pageable, policyType);
     }
 
