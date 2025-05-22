@@ -2,6 +2,7 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.db.constant.PolicyType;
 
 import java.io.Serializable;
 
@@ -31,8 +32,9 @@ public class Policy extends BaseEntity implements Serializable {
     private String policyProfileId;
     @Column(name = "policy_title", nullable = false, length = 255)
     private String policyTitle;
-    @Column(name = "policy_type", nullable = false, length = 40)
+    @Column(name = "policy_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private String policyType = "VP";
+    private PolicyType policyType = PolicyType.VP;
 
 }

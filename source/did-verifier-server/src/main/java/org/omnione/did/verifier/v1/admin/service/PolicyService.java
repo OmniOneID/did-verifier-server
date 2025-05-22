@@ -1,9 +1,25 @@
+/*
+ * Copyright 2024 - 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.omnione.did.verifier.v1.admin.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
@@ -14,6 +30,8 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
 import org.omnione.did.verifier.v1.admin.dto.VpSubmitDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +55,7 @@ public class PolicyService {
     private final PolicyRepository policyRepository;
     private final PayloadRepository payloadRepository;
     private final PolicyProfileRepository policyProfileRepository;
+    private final PolicyQueryService policyQueryService;
 
 
     public List<PolicyDTO> getPolicyList() {
@@ -55,12 +74,13 @@ public class PolicyService {
     }
 
 
-    public void savePolicy(PolicyDTO policyDTO) {
+    public void savePolicy(PolicyDTO policyDTO, PolicyType policyType) {
         Policy policy = Policy.builder()
                 .policyId(UUID.randomUUID().toString())
                 .payloadId(policyDTO.getPayloadId())
                 .policyProfileId(policyDTO.getPolicyProfileId())
                 .policyTitle(policyDTO.getPolicyTitle())
+                .policyType(policyType)
                 .build();
 
         policyRepository.save(policy);
@@ -105,4 +125,10 @@ public class PolicyService {
     private static String formatInstant(Instant instant, DateTimeFormatter formatter) {
         return VpSubmitDTO.formatInstant(instant, formatter);
     }
+
+
+    public Page<PolicyDTO> searchPolicyList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType) {
+        return policyQueryService.searchPolicyProfileList(searchKey, searchValue, pageable, policyType);
+    }
+
 }
