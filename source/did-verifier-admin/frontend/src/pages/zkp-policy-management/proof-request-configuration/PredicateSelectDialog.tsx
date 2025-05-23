@@ -1,11 +1,51 @@
 import {
   Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle,
-  MenuItem, Select, SelectChangeEvent, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField, Typography
+  MenuItem, Select, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, TextField, Typography
 } from '@mui/material';
 import { DialogProps } from '@toolpad/core/useDialogs';
 import React, { useEffect, useState } from 'react';
-import { getZkpNamespaceAll, getZkpAttributes, getCredentialDefinitionsByNamespace } from '../../../apis/zkp-proof-api';
+import { getCredentialSchemas } from '../../../apis/zkp-proof-api';
+
+interface Attribute {
+  id: number;
+  zkpNamespaceId: string;
+  label: string;
+  caption: string;
+  type: string;
+}
+
+interface CredentialDefinition {
+  id: number;
+  tag: string;
+  credentialDefinitionId: string;
+}
+
+interface CredentialSchema {
+  id: string;
+  name: string;
+  version: string;
+  tag: string;
+  attrTypes: {
+    namespace: {
+      id: string;
+      name: string;
+    };
+    items: {
+      label: string;
+      caption: string;
+      type: string;
+    }[];
+  }[];
+}
+
+interface CredentialSchemaOption {
+  id: number;
+  name: string;
+  credentialSchemaId: string;
+  credentialSchema: CredentialSchema;
+  credentialDefinitions: CredentialDefinition[];
+}
 
 interface PredicateDialogResult {
   attributeName: string;
@@ -13,109 +53,125 @@ interface PredicateDialogResult {
   type: string;
   predicateType: string;
   predicateValue: string;
-  definitionTag: string;
+  definitionId: string;
   namespaceIdentifier: string;
 }
 
-type PredicateSelectDialogProps = DialogProps<PredicateDialogResult[], unknown>;
+interface PredicateSelectDialogProps extends DialogProps<PredicateDialogResult[], unknown> {}
+
+const predicateTypeOptions = [
+ { value: "GE", label: "Greater or Equal" },
+ { value: "LE", label: "Less or Equal" },
+ { value: "GT", label: "Greater Than" },
+ { value: "LT", label: "Less Than" }
+];
 
 const PredicateSelectDialog: React.FC<PredicateSelectDialogProps> = ({ open, onClose }) => {
-  const [namespaceId, setNamespaceId] = useState<number | ''>('');
-  const [namespaceOptions, setNamespaceOptions] = useState<
-    { id: number; name: string; namespaceId: string }[]
-  >([]);
-  const [attributes, setAttributes] = useState<
-    { id: number; attributeName: string; label: string; type: string; zkpNamespaceId: number }[]
-  >([]);
+  const [schemaId, setSchemaId] = useState<number | ''>('');
+  const [schemaOptions, setSchemaOptions] = useState<CredentialSchemaOption[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [selectedMap, setSelectedMap] = useState<Record<number, boolean>>({});
   const [predicateTypeMap, setPredicateTypeMap] = useState<Record<number, string>>({});
   const [predicateValueMap, setPredicateValueMap] = useState<Record<number, string>>({});
-  const [definitionMap, setDefinitionMap] = useState<Record<number, string>>({});
-  const [definitionOptions, setDefinitionOptions] = useState<{ id: number; tag: string }[]>([]);
+  const [definitionMap, setDefinitionMap] = useState<Record<number, string[]>>({});
+  const [errorSet, setErrorSet] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    const fetchNamespaces = async () => {
-      const res = await getZkpNamespaceAll();
-      setNamespaceOptions(res.data.map((ns: any) => ({
-        id: ns.id,
-        name: ns.name,
-        namespaceId: ns.namespaceId,
-      })));
-    };
-
-    fetchNamespaces();
-  }, []);
-
-  useEffect(() => {
-    const fetchAttributesAndDefinitions = async () => {
-      if (!namespaceId) return;
-
+    const fetchSchemas = async () => {
       try {
-        const [attrRes, defRes] = await Promise.all([
-          getZkpAttributes(namespaceId),
-          getCredentialDefinitionsByNamespace(namespaceId),
-        ]);
-
-        const filteredAttrs = attrRes.data
-          .filter((item: any) => item.type === 'Number' || item.type === 'Date')
-          .map((item: any) => ({
-            id: item.id,
-            attributeName: item.name,
-            label: item.label,
-            type: item.type,
-            zkpNamespaceId: item.zkpNamespaceId,
+        const res = await getCredentialSchemas();
+        const options = res.data
+          .filter((schema: any) => Array.isArray(schema.credentialDefinitions) && schema.credentialDefinitions.length > 0)
+          .map((schema: any) => ({
+            id: schema.id,
+            name: schema.name,
+            credentialSchemaId: schema.credentialSchemaId,
+            credentialSchema: schema.credentialSchema,
+            credentialDefinitions: schema.credentialDefinitions.map((def: any) => ({
+              id: def.id,
+              tag: def.credentialDefinitionTag,
+              credentialDefinitionId: def.credentialDefinitionId
+            }))
           }));
-
-        const defs = defRes.data.map((item: any) => ({
-          id: item.id,
-          tag: item.tag,
-        }));
-
-        setAttributes(filteredAttrs);
-        setDefinitionOptions(defs);
-        setSelectedMap({});
-        setPredicateTypeMap({});
-        setPredicateValueMap({});
-        setDefinitionMap({});
+        setSchemaOptions(options);
       } catch (error) {
-        console.error('Failed to fetch attributes or definitions:', error);
+        console.error('Failed to fetch schemas with definitions:', error);
       }
     };
 
-    fetchAttributesAndDefinitions();
-  }, [namespaceId]);
+    fetchSchemas();
+  }, []);
 
-  const handleToggle = (id: number) => {
-    setSelectedMap((prev) => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    if (!schemaId) return;
+    const selectedSchema = schemaOptions.find(s => s.id === schemaId);
+    if (!selectedSchema) return;
+
+    const attrs: Attribute[] = [];
+    selectedSchema.credentialSchema.attrTypes.forEach(group => {
+      const nsId = group.namespace.id;
+      group.items.forEach(item => {
+        if (item.type === 'Number') {
+          attrs.push({
+            id: Math.random(),
+            zkpNamespaceId: nsId,
+            label: item.label,
+            caption: item.caption,
+            type: item.type
+          });
+        }
+      });
+    });
+
+    setAttributes(attrs);
+    setSelectedMap({});
+    setPredicateTypeMap({});
+    setPredicateValueMap({});
+    setDefinitionMap({});
+    setErrorSet(new Set());
+  }, [schemaId, schemaOptions]);
+
+  const handleToggle = (id: number) => setSelectedMap(prev => ({ ...prev, [id]: !prev[id] }));
+  const handlePredicateTypeChange = (id: number) => (e: any) => setPredicateTypeMap(prev => ({ ...prev, [id]: e.target.value }));
+  const handlePredicateValueChange = (id: number) => (e: any) => setPredicateValueMap(prev => ({ ...prev, [id]: e.target.value }));
+  const handleDefinitionChange = (id: number) => (e: any) => {
+    const selected = e.target.value as string[];
+    setDefinitionMap(prev => ({ ...prev, [id]: selected }));
   };
 
-  const handlePredicateTypeChange = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPredicateTypeMap(prev => ({ ...prev, [id]: e.target.value }));
-  };
-
-  const handlePredicateValueChange = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPredicateValueMap(prev => ({ ...prev, [id]: e.target.value }));
-  };
-
-  const handleDefinitionChange = (id: number) => (e: SelectChangeEvent<string>) => {
-    setDefinitionMap(prev => ({ ...prev, [id]: e.target.value }));
-  };
 
   const handleAdd = () => {
-    const selectedAttrs = attributes.filter(attr => selectedMap[attr.id]);
-    const selectedNamespace = namespaceOptions.find(ns => ns.id === namespaceId);
+    const selectedSchema = schemaOptions.find(s => s.id === schemaId);
+    if (!selectedSchema) return;
 
-    const result: PredicateDialogResult[] = selectedAttrs.map(attr => ({
-      attributeName: attr.attributeName,
-      label: attr.label,
-      type: attr.type,
-      predicateType: predicateTypeMap[attr.id] || '',
-      predicateValue: predicateValueMap[attr.id] || '',
-      definitionTag: definitionMap[attr.id] || '',
-      namespaceIdentifier: selectedNamespace?.namespaceId ?? '',
-    }));
+    const selectedAttributes = attributes.filter(attr => selectedMap[attr.id]);
+    const invalids = selectedAttributes.filter(attr => {
+      return !predicateTypeMap[attr.id] || !predicateValueMap[attr.id] || !definitionMap[attr.id];
+    }).map(attr => attr.id);
 
-    onClose(result);
+    if (invalids.length > 0) {
+      setErrorSet(new Set(invalids));
+      return;
+    }
+
+    const results: PredicateDialogResult[] = [];
+
+    selectedAttributes.forEach(attr => {
+      const defs = definitionMap[attr.id] || [];
+      defs.forEach(defId => {
+        results.push({
+          attributeName: `${attr.zkpNamespaceId}.${attr.label}`,
+          label: attr.caption,
+          type: attr.type,
+          predicateType: predicateTypeMap[attr.id],
+          predicateValue: predicateValueMap[attr.id],
+          definitionId: defId,
+          namespaceIdentifier: selectedSchema.credentialSchemaId
+        });
+      });
+    });
+
+    onClose(results);
   };
 
   const handleClose = (event: unknown, reason?: string) => {
@@ -124,28 +180,23 @@ const PredicateSelectDialog: React.FC<PredicateSelectDialogProps> = ({ open, onC
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
       <Box sx={{ px: 2 }}>
         <DialogTitle sx={{ p: 0, pt: 2, fontWeight: 700 }}>Add Requested Predicates</DialogTitle>
         <Box sx={{ height: '1px', backgroundColor: '#BFBFBF', width: '100%', mt: 1 }} />
       </Box>
-
       <DialogContent sx={{ px: 2 }}>
-        <Typography variant="body2" sx={{ my: 1 }}>
-          ※ Only numeric/date-like attributes are shown
-        </Typography>
-
         <Typography sx={{ mt: 2, mb: 1 }}>Select Schema*</Typography>
         <Select
-          value={namespaceId}
-          onChange={(e) => setNamespaceId(Number(e.target.value))}
+          value={schemaId}
+          onChange={(e) => setSchemaId(Number(e.target.value))}
           fullWidth
           size="small"
           displayEmpty
         >
           <MenuItem value="" disabled>Select a schema</MenuItem>
-          {namespaceOptions.map(ns => (
-            <MenuItem key={ns.id} value={ns.id}>{ns.name}</MenuItem>
+          {schemaOptions.map(schema => (
+            <MenuItem key={schema.id} value={schema.id}>{schema.name}</MenuItem>
           ))}
         </Select>
 
@@ -154,8 +205,8 @@ const PredicateSelectDialog: React.FC<PredicateSelectDialogProps> = ({ open, onC
           <Table size="small">
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell>Select</TableCell>
-                <TableCell>Attribute Name</TableCell>
+                <TableCell></TableCell>
+                <TableCell>Namespace ID</TableCell>
                 <TableCell>Attribute Label</TableCell>
                 <TableCell>Attribute Type</TableCell>
                 <TableCell>Predicate Type</TableCell>
@@ -167,39 +218,57 @@ const PredicateSelectDialog: React.FC<PredicateSelectDialogProps> = ({ open, onC
               {attributes.map(attr => (
                 <TableRow key={attr.id}>
                   <TableCell>
-                    <Checkbox
-                      checked={!!selectedMap[attr.id]}
-                      onChange={() => handleToggle(attr.id)}
-                    />
+                    <Checkbox checked={!!selectedMap[attr.id]} onChange={() => handleToggle(attr.id)} />
                   </TableCell>
-                  <TableCell>{attr.attributeName}</TableCell>
-                  <TableCell>{attr.label}</TableCell>
+                  <TableCell>{attr.zkpNamespaceId}</TableCell>
+                  <TableCell>{attr.caption}</TableCell>
                   <TableCell>{attr.type}</TableCell>
                   <TableCell>
-                    <TextField
+                    <Select
                       size="small"
                       value={predicateTypeMap[attr.id] || ''}
                       onChange={handlePredicateTypeChange(attr.id)}
-                    />
+                      fullWidth
+                      error={selectedMap[attr.id] && !predicateTypeMap[attr.id] && errorSet.has(attr.id)}
+                      displayEmpty
+                    >
+                      <MenuItem disabled value="">Select</MenuItem>
+                      {predicateTypeOptions.map(opt => (
+                        <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                      ))}
+                    </Select>
                   </TableCell>
                   <TableCell>
                     <TextField
+                      type="number"
                       size="small"
                       value={predicateValueMap[attr.id] || ''}
                       onChange={handlePredicateValueChange(attr.id)}
+                      error={selectedMap[attr.id] && !predicateValueMap[attr.id] && errorSet.has(attr.id)}
+                      fullWidth
                     />
                   </TableCell>
                   <TableCell>
                     <Select
+                      multiple
                       size="small"
-                      value={definitionMap[attr.id] || ''}
-                      onChange={handleDefinitionChange(attr.id)}
-                      displayEmpty
                       fullWidth
+                      value={definitionMap[attr.id] || []}
+                      onChange={handleDefinitionChange(attr.id)}
+                      error={selectedMap[attr.id] && (!definitionMap[attr.id] || definitionMap[attr.id].length === 0) && errorSet.has(attr.id)}
+                      displayEmpty
+                      renderValue={(selected) => {
+                        const defs = schemaOptions.find(s => s.id === schemaId)?.credentialDefinitions || [];
+                        return (selected as string[]).map(defId =>
+                          defs.find(d => d.credentialDefinitionId === defId)?.tag || defId
+                        ).join(', ');
+                      }}
                     >
-                      <MenuItem value="" disabled>Select tag</MenuItem>
-                      {definitionOptions.map(def => (
-                        <MenuItem key={def.id} value={def.tag}>{def.tag}</MenuItem>
+                      <MenuItem value="" disabled>Select</MenuItem>
+                      {(schemaOptions.find(s => s.id === schemaId)?.credentialDefinitions || []).map(def => (
+                        <MenuItem key={def.id} value={def.credentialDefinitionId}>
+                          {def.tag}
+                        </MenuItem>
                       ))}
                     </Select>
                   </TableCell>
@@ -209,13 +278,12 @@ const PredicateSelectDialog: React.FC<PredicateSelectDialogProps> = ({ open, onC
           </Table>
         </TableContainer>
       </DialogContent>
-
       <DialogActions sx={{ px: 2, pt: 0, display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-        <Button variant="outlined" onClick={() => onClose([])} sx={{ width: '40%', height: '44px', mr: 2 }}>
-          닫기
+        <Button variant="contained" onClick={handleAdd} disabled={!schemaId} sx={{ width: '40%', height: '44px' }}>
+          Add
         </Button>
-        <Button variant="contained" onClick={handleAdd} disabled={!namespaceId} sx={{ width: '40%', height: '44px' }}>
-          추가
+        <Button variant="outlined" onClick={() => onClose([])} sx={{ width: '40%', height: '44px', mr: 2 }}>
+          Close
         </Button>
       </DialogActions>
     </Dialog>

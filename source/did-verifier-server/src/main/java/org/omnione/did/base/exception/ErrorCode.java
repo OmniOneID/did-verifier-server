@@ -135,7 +135,9 @@ public enum ErrorCode {
     ZKP_PROOF_REQUEST_NOT_FOUND("SSRVVRF01204", "Failed to find ZKP proof request : request proof profile not found" , 400),
     FAILED_TO_VERIFY_PROOF("SSRVVRF01205", "Failed to verify proof : proof verify failed" , 500),
     BLOCKCHAIN_GET_ZKP_CREDENTIAL_FAILED("SSRVVRF01206", "Failed to retrieve ZKP credential on the blockchain.", 500),
-    BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500);
+    BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500),
+    CREDENTIAL_SCHEMA_NOT_FOUND("SSRVVRF01208", "Failed to find credential schema : credential schema not found" , 400),
+    ;
 
     private final String code;
     private final String message;

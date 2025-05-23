@@ -27,4 +27,5 @@ public interface ZkpProofRequestRepository extends JpaRepository<ZkpProofRequest
 //    ZkpProofRequest findByPayloadId(String payloadId);
 //
 //    ZkpProofRequest findByPolicyProfileId(String policyProfileId);
+    long countByName(String name);
 }

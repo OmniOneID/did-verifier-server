@@ -20,8 +20,8 @@ export const deleteProofRequest = async (id: number) => {
     return deleteData(API_BASE_URL, `zkp/proof-requests/${id}`);
 }
 
-export const getZkpNamespaceAll = async () => {
-    return getData(API_BASE_URL, `zkp/namespaces`);
+export const getCredentialSchemas = async () => {
+    return getData(API_BASE_URL, `zkp/proof-requests/credential-schemas`);
 }
 
 export const getZkpAttributes = async (namespaceId: number) => {
@@ -30,4 +30,12 @@ export const getZkpAttributes = async (namespaceId: number) => {
 
 export const getCredentialDefinitionsByNamespace = async (namespaceId: number) => {
     return getData(API_BASE_URL, `zkp/namespaces/credential-definitions?namespaceId=${namespaceId}`);
+}
+
+export const postProofRequest = async (data: any) => {
+    return postData(API_BASE_URL, "zkp/proof-requests", data);
+}
+
+export const verifyNameUnique = async (name: string) => {
+    return getData(API_BASE_URL, `zkp/proof-requests/check-name?name=${name}`);
 }

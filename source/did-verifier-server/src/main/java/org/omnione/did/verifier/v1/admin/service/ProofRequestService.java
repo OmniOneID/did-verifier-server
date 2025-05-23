@@ -15,15 +15,26 @@
  */
 package org.omnione.did.verifier.v1.admin.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.omnione.did.base.db.constant.PolicyType;
-import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
+import org.omnione.did.base.db.domain.ZkpProofRequest;
+import org.omnione.did.base.db.repository.ZkpProofRequestRepository;
+import org.omnione.did.base.exception.ErrorCode;
+import org.omnione.did.base.exception.OpenDidException;
+import org.omnione.did.verifier.v1.admin.api.ListFeign;
+import org.omnione.did.verifier.v1.admin.api.dto.ListCredentialSchemaDto;
+import org.omnione.did.verifier.v1.admin.dto.ProofRequestDto;
+import org.omnione.did.verifier.v1.admin.dto.VerifyUniqueResDto;
 import org.omnione.did.verifier.v1.admin.dto.ZkpProofRequestDto;
+import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +42,55 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ProofRequestService {
     private final ZkpProofRequestQueryService zkpProofRequestQueryService;
+    private final ListFeign listFeign;
+    private final ZkpProofRequestRepository zkpProofRequestRepository;
 
     public Page<ZkpProofRequestDto> searchProofRequestList(String searchKey, String searchValue, Pageable pageable) {
         return zkpProofRequestQueryService.searchProofRequestList(searchKey, searchValue, pageable);
+    }
+
+    public List<ListCredentialSchemaDto> getCredentialSchemaList() {
+        try {
+            List<ListCredentialSchemaDto> listCredentialSchemaDtos = listFeign.requestCredentialSchemaList();
+            return listFeign.requestCredentialSchemaList();
+        } catch (OpenDidException e) {
+            throw new OpenDidException(ErrorCode.CREDENTIAL_SCHEMA_NOT_FOUND);
+        } catch (Exception e) {
+            throw new OpenDidException(ErrorCode.CREDENTIAL_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    public EmptyResDto createProofRequest(ProofRequestDto request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String requestedAttributesJson;
+        String requestedPredicatesJson;
+
+        try {
+            requestedAttributesJson = objectMapper.writeValueAsString(request.getRequestedAttributes());
+            requestedPredicatesJson = objectMapper.writeValueAsString(request.getRequestedPredicates());
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
+
+        zkpProofRequestRepository.save(ZkpProofRequest.builder()
+                .name(request.getName())
+                .version(request.getVersion())
+                .curve(request.getCurve())
+                .cipher(request.getCipher())
+                .padding(request.getPadding())
+                .requestedPredicates(requestedPredicatesJson)
+                .requestedAttributes(requestedAttributesJson)
+                .build()
+        );
+
+        return new EmptyResDto();
+    }
+
+    public VerifyUniqueResDto verifyNameUnique(String name) {
+        long count = zkpProofRequestQueryService.countByName(name);
+        return VerifyUniqueResDto.builder()
+                .isUnique(count == 0)
+                .build();
     }
 }

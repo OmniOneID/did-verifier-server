@@ -22,6 +22,7 @@ import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.base.db.repository.ZkpProofRequestRepository;
 import org.omnione.did.base.db.repository.projection.ZkpProofRequestIdProjection;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
+import org.omnione.did.verifier.v1.admin.dto.VerifyUniqueResDto;
 import org.omnione.did.verifier.v1.admin.dto.ZkpProofRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -64,5 +65,9 @@ public class ZkpProofRequestQueryService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(zkpNamespaceDtos, pageable, zkpProofRequestPage.getTotalElements());
+    }
+
+    public long countByName(String name) {
+        return zkpProofRequestRepository.countByName(name);
     }
 }

@@ -19,13 +19,24 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
+import org.omnione.did.base.constants.UrlConstant.Verifier;
+import org.omnione.did.verifier.v1.admin.api.dto.ListCredentialSchemaDto;
+import org.omnione.did.verifier.v1.admin.dto.ProofRequestDto;
+import org.omnione.did.verifier.v1.admin.dto.VerifyUniqueResDto;
 import org.omnione.did.verifier.v1.admin.dto.ZkpProofRequestDto;
 import org.omnione.did.verifier.v1.admin.service.ProofRequestService;
+import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +49,25 @@ public class ProofRequestController {
     @GetMapping(UrlConstant.Verifier.GET_PROOF_REQUEST)
     public Page<ZkpProofRequestDto> searchProofRequestList(String searchKey, String searchValue, Pageable pageable) {
         return proofRequestService.searchProofRequestList(searchKey, searchValue, pageable);
+    }
+
+    @Operation(summary = "Get Credential Schema List", description = "Get a list of credential request.")
+    @GetMapping(Verifier.GET_CREDENTIAL_SCHEMA_LIST)
+    public ResponseEntity<List<ListCredentialSchemaDto>> getCredentialSchemaList() {
+        List<ListCredentialSchemaDto> credentialSchemaList = proofRequestService.getCredentialSchemaList();
+        return ResponseEntity.ok(credentialSchemaList);
+    }
+
+    @Operation(summary = "Save Proof Request", description = "Save a new proof request")
+    @PostMapping(UrlConstant.Verifier.SAVE_PROOF_REQUEST)
+    public ResponseEntity<EmptyResDto> createProofRequest(@RequestBody ProofRequestDto request) {
+        return ResponseEntity.ok(proofRequestService.createProofRequest(request));
+    }
+
+    @Operation(summary = "Check Proof Request name", description = "Check name of proof request")
+    @GetMapping(UrlConstant.Verifier.CHECK_PROOF_REQUEST_NAME)
+    public ResponseEntity<VerifyUniqueResDto> verifyNameUnique(@RequestParam String name) {
+        return ResponseEntity.ok(proofRequestService.verifyNameUnique(name));
     }
 
 }
