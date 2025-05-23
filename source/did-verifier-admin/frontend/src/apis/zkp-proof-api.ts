@@ -39,3 +39,7 @@ export const postProofRequest = async (data: any) => {
 export const verifyNameUnique = async (name: string) => {
     return getData(API_BASE_URL, `zkp/proof-requests/check-name?name=${name}`);
 }
+
+export const getProofRequest = async (id: number) => {    
+    return getData(API_BASE_URL, `zkp/proof-requests/${id}`);
+}

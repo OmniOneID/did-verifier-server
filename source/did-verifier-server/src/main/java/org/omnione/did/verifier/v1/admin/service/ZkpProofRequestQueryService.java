@@ -21,6 +21,8 @@ import org.omnione.did.base.db.domain.ZkpProofRequest;
 import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.base.db.repository.ZkpProofRequestRepository;
 import org.omnione.did.base.db.repository.projection.ZkpProofRequestIdProjection;
+import org.omnione.did.base.exception.ErrorCode;
+import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
 import org.omnione.did.verifier.v1.admin.dto.VerifyUniqueResDto;
 import org.omnione.did.verifier.v1.admin.dto.ZkpProofRequestDto;
@@ -69,5 +71,10 @@ public class ZkpProofRequestQueryService {
 
     public long countByName(String name) {
         return zkpProofRequestRepository.countByName(name);
+    }
+
+    public ZkpProofRequest findById(Long id) {
+        return zkpProofRequestRepository.findById(id)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.PROOF_REQUEST_NOT_FOUND));
     }
 }

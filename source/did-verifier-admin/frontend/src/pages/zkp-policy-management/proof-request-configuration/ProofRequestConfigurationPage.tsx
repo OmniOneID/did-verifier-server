@@ -85,7 +85,7 @@ const ProofRequestConfigurationPage = () => {
                   <Link
                     component="button"
                     variant='body2'
-                    onClick={() => navigate(`/zkp-management/credential-definition-management/${params.row.id}`)}
+                    onClick={() => navigate(`/zkp-policy-management/proof-request-configuration/${params.row.id}`)}
                     sx={{ cursor: 'pointer', color: 'primary.main' }}
                   >
                     {params.value}

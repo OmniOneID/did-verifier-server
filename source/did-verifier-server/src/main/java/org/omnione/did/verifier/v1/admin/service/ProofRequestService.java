@@ -93,4 +93,9 @@ public class ProofRequestService {
                 .isUnique(count == 0)
                 .build();
     }
+
+    public ProofRequestDto getProofRequestInfo(Long id) {
+        ZkpProofRequest zkpProofRequest = zkpProofRequestQueryService.findById(id);
+        return ProofRequestDto.fromProofRequest(zkpProofRequest);
+    }
 }

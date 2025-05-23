@@ -15,6 +15,8 @@
  */
 package org.omnione.did.verifier.v1.admin.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,10 +25,14 @@ import lombok.Setter;
 import org.omnione.did.base.datamodel.enums.EccCurveType;
 import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
 import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
-import org.omnione.did.zkp.datamodel.proofrequest.AttributeInfo;
-import org.omnione.did.zkp.datamodel.proofrequest.PredicateInfo;
+import org.omnione.did.base.db.domain.ZkpProofRequest;
+import org.omnione.did.base.exception.ErrorCode;
+import org.omnione.did.base.exception.OpenDidException;
 
-import java.util.List;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Getter
@@ -35,6 +41,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProofRequestDto {
+    private Long id;
     private String name;
     private String version;
     private Map<String, AttributeRequestDto> requestedAttributes;
@@ -42,4 +49,41 @@ public class ProofRequestDto {
     private EccCurveType curve;
     private SymmetricCipherType cipher;
     private SymmetricPaddingType padding;
+    private String createdAt;
+    private String updatedAt;
+
+    public static ProofRequestDto fromProofRequest(ZkpProofRequest proofRequest) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        Map<String, AttributeRequestDto> requestedAttributes = null;
+        Map<String, PredicateRequestDto> requestedPredicates = null;
+
+        try {
+            requestedAttributes = objectMapper.readValue(proofRequest.getRequestedAttributes(), objectMapper.getTypeFactory().constructMapType(Map.class, String.class, AttributeRequestDto.class));
+            requestedPredicates = objectMapper.readValue(proofRequest.getRequestedPredicates(), objectMapper.getTypeFactory().constructMapType(Map.class, String.class, PredicateRequestDto.class));
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
+
+        return ProofRequestDto.builder()
+                .id(proofRequest.getId())
+                .name(proofRequest.getName())
+                .version(proofRequest.getVersion())
+                .requestedAttributes(requestedAttributes)
+                .requestedPredicates(requestedPredicates)
+                .curve(proofRequest.getCurve())
+                .cipher(proofRequest.getCipher())
+                .padding(proofRequest.getPadding())
+                .createdAt(formatInstant(proofRequest.getCreatedAt(), formatter))
+                .updatedAt(formatInstant(proofRequest.getUpdatedAt(), formatter))
+                .build();
+    }
+
+    private static String formatInstant(Instant instant, DateTimeFormatter formatter) {
+        if (instant == null) return null;
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter);
+    }
+
+
 }
