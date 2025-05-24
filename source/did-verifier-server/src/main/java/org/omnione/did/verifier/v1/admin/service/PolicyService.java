@@ -23,9 +23,11 @@ import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
+import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.omnione.did.base.db.repository.PayloadRepository;
 import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.PolicyRepository;
+import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
@@ -56,21 +58,12 @@ public class PolicyService {
     private final PayloadRepository payloadRepository;
     private final PolicyProfileRepository policyProfileRepository;
     private final PolicyQueryService policyQueryService;
+    private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
 
-
-    public List<PolicyDTO> getPolicyList() {
-        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        List<Policy> policyList = policyRepository.findAll(sort);
-        return policyList.stream()
-                .map(this::convertToPolicyDTO)
-                .collect(Collectors.toList());
-    }
-
-
-    public PolicyDTO getPolicyInfo(Long id) {
+    public PolicyDTO getPolicyInfo(Long id, PolicyType policyType) {
         Policy policy = policyRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
-        return convertToPolicyDTO(policy);
+        return convertToPolicyDTO(policy, policyType);
     }
 
 
@@ -92,6 +85,7 @@ public class PolicyService {
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
             findPolicy.setPayloadId(policyDTO.getPayloadId());
             findPolicy.setPolicyProfileId(policyDTO.getPolicyProfileId());
+            findPolicy.setPolicyTitle(policyDTO.getPolicyTitle());
             Policy savedPolicy = policyRepository.save(findPolicy);
             return PolicyDTO.toDTO(savedPolicy);
     }
@@ -102,13 +96,18 @@ public class PolicyService {
         policyRepository.delete(policy);
     }
 
-    private PolicyDTO convertToPolicyDTO(Policy policy) {
+    private PolicyDTO convertToPolicyDTO(Policy policy, PolicyType policyType) {
         String payloadService = payloadRepository.findByPayloadId(policy.getPayloadId())
                 .map(Payload::getService)
                 .orElse("Unknown Payload Service");
-        String profileTitle = policyProfileRepository.findByPolicyProfileId(policy.getPolicyProfileId())
-                .map(PolicyProfile::getTitle)
-                .orElse("Unknown Profile Title");
+
+        String profileTitle = (policyType == PolicyType.ZKP)
+                ? zkpPolicyProfileRepository.findByProfileId(policy.getPolicyProfileId())
+                .map(ZkpPolicyProfile::getTitle)
+                .orElse("Unknown Profile Title")
+                : policyProfileRepository.findByPolicyProfileId(policy.getPolicyProfileId())
+                        .map(PolicyProfile::getTitle)
+                        .orElse("Unknown Profile Title");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return PolicyDTO.builder()
                 .id(policy.getId())

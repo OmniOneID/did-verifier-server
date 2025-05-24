@@ -26,9 +26,13 @@ import org.omnione.did.verifier.v1.admin.dto.ZkpPolicyProfileDto;
 import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,5 +90,20 @@ public class ZkpProfileService {
     public EmptyResDto deleteZkpProfile(Long id) {
         zkpPolicyProfileRepository.deleteById(id);
         return new EmptyResDto();
+    }
+
+    public List<ZkpPolicyProfileDto> getZkpProfileList(String searchValue) {
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+
+        List<ZkpPolicyProfile> zkpPolicyProfileList;
+        if(Objects.equals(searchValue, "all")) {
+            zkpPolicyProfileList = zkpPolicyProfileRepository.findAll(sort);
+        } else {
+            zkpPolicyProfileList = zkpPolicyProfileRepository.findByTitleContainingIgnoreCase(searchValue, sort);
+        }
+
+        return zkpPolicyProfileList.stream()
+                .map(ZkpPolicyProfileDto::fromDomain)
+                .collect(Collectors.toList());
     }
 }

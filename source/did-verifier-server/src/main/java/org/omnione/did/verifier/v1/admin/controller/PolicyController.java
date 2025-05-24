@@ -34,8 +34,8 @@ public class PolicyController {
 
     @Operation(summary = "Get Policy Info", description = "Get a single policy's information.")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_INFO)
-    public PolicyDTO getPolicyInfo(@PathVariable Long id) {
-        return policyService.getPolicyInfo(id);
+    public PolicyDTO getPolicyInfo(@PathVariable Long id, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+        return policyService.getPolicyInfo(id, policyType);
     }
 
     @Operation(summary = "Save Policy", description = "Save a new policy.")

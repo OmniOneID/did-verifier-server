@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -71,5 +73,11 @@ public class ZkpProfileController {
     @DeleteMapping(Verifier.DELETE_ZKP_PROFILE)
     public ResponseEntity<EmptyResDto> deleteZkpProfile(@PathVariable Long id) {
         return ResponseEntity.ok(zkpProfileService.deleteZkpProfile(id));
+    }
+
+    @Operation(summary = "Search ZKP Profile List", description = "Search a list of zkp profiles by name (optional).")
+    @GetMapping(UrlConstant.Verifier.GET_ZKP_POPUP_PROFILE_LIST)
+    public List<ZkpPolicyProfileDto> getZkpProfileList(@PathVariable String searchValue) {
+        return zkpProfileService.getZkpProfileList(searchValue);
     }
 }

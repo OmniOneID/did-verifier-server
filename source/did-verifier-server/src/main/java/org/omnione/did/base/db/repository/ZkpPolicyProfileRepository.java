@@ -1,7 +1,9 @@
 package org.omnione.did.base.db.repository;
 
+import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.omnione.did.base.db.repository.projection.ZkpProofRequestIdProjection;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -22,4 +24,5 @@ public interface ZkpPolicyProfileRepository extends JpaRepository<ZkpPolicyProfi
             "WHERE a.zkpProofRequestId IN :zkpProofRequestIds " +
             "GROUP BY a.zkpProofRequestId")
     List<ZkpProofRequestIdProjection> countByZkpProofRequestIdIn(List<Long> zkpProofRequestIds);
+    List<ZkpPolicyProfile> findByTitleContainingIgnoreCase(String title, Sort sort);
 }

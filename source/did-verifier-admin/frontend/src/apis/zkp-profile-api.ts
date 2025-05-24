@@ -31,3 +31,7 @@ export const getZkpProfile = async (id: number) => {
 export const putZkpProfile = async (data: any) => {    
     return putData(API_BASE_URL, `zkp/profiles`, data);
 }
+
+export const searchZkpProfileList = async (searchValue: string | '') => {    
+    return getData(API_BASE_URL, `zkp/profiles/popups/${searchValue}`);
+}

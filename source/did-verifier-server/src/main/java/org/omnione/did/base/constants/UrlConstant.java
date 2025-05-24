@@ -105,6 +105,7 @@ public class UrlConstant {
         public static final String GET_ZKP_PROFILE_INFO = "/zkp/profiles/{id}";
         public static final String UPDATE_ZKP_PROFILE = "/zkp/profiles/{id}";
         public static final String DELETE_ZKP_PROFILE = "/zkp/profiles/{id}";
+        public static final String GET_ZKP_POPUP_PROFILE_LIST = "/zkp/profiles/popups/{searchValue}";
     }
     public static class Tas {
         public static final String ADMIN_V1 = "/tas/admin/v1";

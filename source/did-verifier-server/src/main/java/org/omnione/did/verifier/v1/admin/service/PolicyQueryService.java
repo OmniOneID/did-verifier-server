@@ -20,9 +20,11 @@ import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
+import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.omnione.did.base.db.repository.PayloadRepository;
 import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.PolicyRepository;
+import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
 import org.omnione.did.verifier.v1.admin.dto.PolicyProfileDTO;
 import org.springframework.data.domain.Page;
@@ -39,23 +41,27 @@ public class PolicyQueryService {
     private final PolicyRepository policyRepository;
     private final PayloadRepository payloadRepository;
     private final PolicyProfileRepository policyProfileRepository;
+    private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
 
 
     public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType) {
         Page<Policy> policies = policyRepository.searchPolicyList(searchKey, searchValue, policyType, pageable);
-        List<PolicyDTO> policyDTOs = policies.getContent().stream()
-                .map(policy -> {
-                    String payloadService = payloadRepository.findByPayloadId(policy.getPayloadId())
-                            .map(Payload::getService)
-                            .orElse("Unknown Payload Service");
 
-                    String profileTitle = policyProfileRepository.findByPolicyProfileId(policy.getPolicyProfileId())
+        List<PolicyDTO> policyDTOs = policies.getContent().stream().map(policy -> {
+            String payloadService = payloadRepository.findByPayloadId(policy.getPayloadId())
+                    .map(Payload::getService)
+                    .orElse("Unknown Payload Service");
+
+            String profileTitle = (policyType == PolicyType.ZKP)
+                    ? zkpPolicyProfileRepository.findByProfileId(policy.getPolicyProfileId())
+                    .map(ZkpPolicyProfile::getTitle)
+                    .orElse("Unknown Profile Title")
+                    : policyProfileRepository.findByPolicyProfileId(policy.getPolicyProfileId())
                             .map(PolicyProfile::getTitle)
                             .orElse("Unknown Profile Title");
 
-                    return PolicyDTO.toDTO(policy, payloadService, profileTitle);
-                })
-                .collect(Collectors.toList());
+            return PolicyDTO.toDTO(policy, payloadService, profileTitle);
+        }).collect(Collectors.toList());
 
         return new PageImpl<>(policyDTOs, pageable, policies.getTotalElements());
     }

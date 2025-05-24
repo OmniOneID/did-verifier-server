@@ -33,8 +33,8 @@ export const getNavigationByStatus = (serverStatus: string | null): Navigation=>
       title: 'ZKP Policy Management', 
       children: [    
         { segment: 'proof-request-configuration', title: 'Proof Request Configuration' },
-        { segment: 'zkp-profile-management', title: 'Profile Management' },
-        { segment: 'zkp-policy-management', title: 'Policy Management' },
+        { segment: 'zkp-profile-management', title: 'ZKP Profile Management' },
+        { segment: 'zkp-policy-management', title: 'ZKP Policy Management' },
       ],
     },
     {

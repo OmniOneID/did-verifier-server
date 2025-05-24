@@ -43,6 +43,9 @@ import ProofRequestConfigurationEditPage from './pages/zkp-policy-management/pro
 import ZkpProfileRegistrationPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileRegistrationPage';
 import ZkpProfileDetailPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileDetailPage';
 import ZkpProfileEditPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileEditPage';
+import ZkpPolicyRegistration from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyRegistrationPage';
+import ZkpPolicyEditPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyEditPage';
+import ZkpPolicyDetailPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyDetailPage';
 
 
 const router = createBrowserRouter([
@@ -209,6 +212,20 @@ const router = createBrowserRouter([
           {
             path: '/zkp-policy-management/zkp-profile-management',
             Component: ZkpProfileManagementPage,
+          },
+
+          // ZKP Policy Management
+          {
+            path: '/zkp-policy-management/zkp-policy-management/zkp-policy-registration',
+            Component: ZkpPolicyRegistration,
+          },
+          {
+            path: '/zkp-policy-management/zkp-policy-management/zkp-policy-edit/:id',
+            Component: ZkpPolicyEditPage,
+          },
+          {
+            path: '/zkp-policy-management/zkp-policy-management/:id',
+            Component: ZkpPolicyDetailPage,
           },
           {
             path: '/zkp-policy-management/zkp-policy-management',
