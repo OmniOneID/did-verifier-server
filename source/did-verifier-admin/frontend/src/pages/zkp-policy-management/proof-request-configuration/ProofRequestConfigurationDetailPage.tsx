@@ -128,6 +128,7 @@ const ProofRequestConfigurationDetailPage = () => {
           <Typography variant="h4" gutterBottom>Proof Request Detail Information</Typography>
 
           <TextField
+            variant="standard" 
             label="Name"
             fullWidth
             size="small"
@@ -138,6 +139,7 @@ const ProofRequestConfigurationDetailPage = () => {
           />
 
           <TextField
+            variant="standard" 
             label="Version"
             fullWidth
             size="small"
@@ -148,6 +150,7 @@ const ProofRequestConfigurationDetailPage = () => {
           />
 
           <TextField
+            variant="standard" 
             label="Curve"
             fullWidth
             size="small"
@@ -158,6 +161,7 @@ const ProofRequestConfigurationDetailPage = () => {
           />
 
           <TextField
+            variant="standard" 
             label="Cipher"
             fullWidth
             size="small"
@@ -168,6 +172,7 @@ const ProofRequestConfigurationDetailPage = () => {
           />
 
           <TextField
+            variant="standard" 
             label="Padding"
             fullWidth
             size="small"
@@ -178,6 +183,7 @@ const ProofRequestConfigurationDetailPage = () => {
           />
 
           <TextField
+            variant="standard" 
             label="Created At"
             fullWidth
             size="small"
@@ -195,6 +201,7 @@ const ProofRequestConfigurationDetailPage = () => {
                 margin="normal" 
                 value={data?.updatedAt || ''} 
                 slotProps={{ input: { readOnly: true } }} 
+                sx={{ width: '60%' }}
             />
         )}
 
@@ -206,6 +213,9 @@ const ProofRequestConfigurationDetailPage = () => {
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
             <Button variant="contained" color="primary" onClick={() => navigate(-1)}>Back</Button>
+            <Button variant="outlined" color="primary" onClick={() => navigate('/zkp-policy-management/proof-request-configuration/proof-request-edit/' + numericId)}>
+                Go to Edit
+            </Button>
           </Box>
         </StyledContainer>
       )}

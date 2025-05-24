@@ -61,12 +61,11 @@ public class ProofRequestService {
     }
 
     public EmptyResDto createProofRequest(ProofRequestDto request) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         String requestedAttributesJson;
         String requestedPredicatesJson;
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
             requestedAttributesJson = objectMapper.writeValueAsString(request.getRequestedAttributes());
             requestedPredicatesJson = objectMapper.writeValueAsString(request.getRequestedPredicates());
         } catch (JsonProcessingException e) {
@@ -97,5 +96,36 @@ public class ProofRequestService {
     public ProofRequestDto getProofRequestInfo(Long id) {
         ZkpProofRequest zkpProofRequest = zkpProofRequestQueryService.findById(id);
         return ProofRequestDto.fromProofRequest(zkpProofRequest);
+    }
+
+    public EmptyResDto updateProofRequest(ProofRequestDto request) {
+        ZkpProofRequest zkpProofRequest = zkpProofRequestQueryService.findById(request.getId());
+
+        String requestedAttributesJson;
+        String requestedPredicatesJson;
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            requestedAttributesJson = objectMapper.writeValueAsString(request.getRequestedAttributes());
+            requestedPredicatesJson = objectMapper.writeValueAsString(request.getRequestedPredicates());
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
+
+        zkpProofRequest.setRequestedAttributes(requestedAttributesJson);
+        zkpProofRequest.setRequestedPredicates(requestedPredicatesJson);
+        zkpProofRequest.setVersion(request.getVersion());
+        zkpProofRequest.setCipher(request.getCipher());
+        zkpProofRequest.setCurve(request.getCurve());
+        zkpProofRequest.setPadding(request.getPadding());
+
+        zkpProofRequestRepository.save(zkpProofRequest);
+
+        return new EmptyResDto();
+    }
+
+    public EmptyResDto deleteProofRequest(Long id) {
+        zkpProofRequestRepository.deleteById(id);
+        return new EmptyResDto();
     }
 }

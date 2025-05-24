@@ -95,6 +95,8 @@ public class UrlConstant {
         public static final String SAVE_PROOF_REQUEST = "/zkp/proof-requests";
         public static final String CHECK_PROOF_REQUEST_NAME = "/zkp/proof-requests/check-name";
         public static final String GET_PROOF_REQUEST_INFO = "/zkp/proof-requests/{id}";
+        public static final String UPDATE_PROOF_REQUEST = "/zkp/proof-requests";
+        public static final String DELETE_PROOF_REQUEST = "/zkp/proof-requests/{id}";
     }
     public static class Tas {
         public static final String ADMIN_V1 = "/tas/admin/v1";

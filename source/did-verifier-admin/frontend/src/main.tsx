@@ -39,6 +39,7 @@ import ZkpPolicyManagementPage from './pages/zkp-policy-management/zkp-policy-ma
 import ZkpProfileManagementPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileManagementPage';
 import ProofRequestConfigurationRegistrationPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationRegistrationPage';
 import ProofRequestConfigurationDetailPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationDetailPage';
+import ProofRequestConfigurationEditPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationEditPage';
 
 
 const router = createBrowserRouter([
@@ -180,6 +181,10 @@ const router = createBrowserRouter([
           {
             path: '/zkp-policy-management/proof-request-configuration/:id',
             Component: ProofRequestConfigurationDetailPage,
+          },
+          {
+            path: '/zkp-policy-management/proof-request-configuration/proof-request-edit/:id',
+            Component: ProofRequestConfigurationEditPage,
           },
           {
             path: '/zkp-policy-management/proof-request-configuration',

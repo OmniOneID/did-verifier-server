@@ -5,7 +5,7 @@ import {
   FormHelperText
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
@@ -17,7 +17,8 @@ import { useDialogs } from "@toolpad/core";
 import { curveTypes } from "../../../constants/curve-types";
 import { cipherTypes } from "../../../constants/cipher-types";
 import { paddingTypes } from "../../../constants/padding-types";
-import { postProofRequest, verifyNameUnique } from "../../../apis/zkp-proof-api";
+import { putProofRequest, getProofRequest } from "../../../apis/zkp-proof-api";
+import { formatErrorMessage } from "../../../utils/error-handler";
 
 interface AttributeItem {
   attributeName: string;
@@ -68,10 +69,12 @@ interface ErrorState {
   attributesOrPredicates?: string;
 }
 
-const ProofRequestConfigurationRegistrationPage = () => {
+const ProofRequestConfigurationEditPage = () => {
+  const { id } = useParams();
   const theme = useTheme();
   const dialogs = useDialogs();
   const navigate = useNavigate();
+  const numericId = id ? parseInt(id, 10) : null;
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -82,10 +85,79 @@ const ProofRequestConfigurationRegistrationPage = () => {
     attributes: [],
     predicates: [],
   });
+  const [originalFormData, setOriginalFormData] = useState<FormData | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<ErrorState>({});
-  const [isNameIsValid, setIsNameValid] = useState(false);
+  const [isModified, setIsModified] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        if (numericId === null || isNaN(numericId)) {
+        await dialogs.open(CustomDialog, {
+            title: "Notification",
+            message: "Invalid Path.",
+            isModal: true,
+        }, {
+            onClose: async () =>
+            navigate("/zkp-policy-management/proof-request-configuration", { replace: true }),
+        });
+        return;
+        }
+
+        setIsLoading(true);
+        try {
+        const { data } = await getProofRequest(numericId);
+
+        const attributes = Object.values(data.requestedAttributes || {}).flatMap((item: any) =>
+            item.restrictions.map((r: any) => ({
+                attributeName: item.name,
+                definitionId: r.credDefId
+            }))
+        );
+
+        const predicates = Object.values(data.requestedPredicates || {}).flatMap((item: any) =>
+            item.restrictions.map((r: any) => ({
+                attributeName: item.name,
+                predicateType: item.pType,
+                predicateValue: item.pValue.toString(),
+                definitionId: [r.credDefId]
+            }))
+        );
+
+        setFormData({
+            name: data.name,
+            version: data.version,
+            curve: data.curve,
+            cipher: data.cipher,
+            padding: data.padding,
+            attributes,
+            predicates
+        });
+
+        setOriginalFormData({
+            name: data.name,
+            version: data.version,
+            curve: data.curve,
+            cipher: data.cipher,
+            padding: data.padding,
+            attributes,
+            predicates
+        });
+
+        setIsLoading(false);
+        } catch (err) {
+        console.error("Failed to fetch Proof Request Configuration:", err);
+        setIsLoading(false);
+        navigate("/error", {
+            state: { message: formatErrorMessage(err, "Failed to load Proof Request Configuration information.") },
+        });
+        }
+    };
+
+    fetchData();
+  }, [numericId]);
+
 
   const handleChange = (field: keyof FormData) =>
   (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -93,11 +165,6 @@ const ProofRequestConfigurationRegistrationPage = () => {
 
     if (field in errors) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-
-    if (field === "name") {
-      setIsNameValid(false);
-      setErrors((prev) => ({ ...prev, name: undefined }));
     }
   };
 
@@ -161,9 +228,7 @@ const ProofRequestConfigurationRegistrationPage = () => {
       tempErrors.name = "Name is required";
     } else if (formData.name.length < 4 || formData.name.length > 40) {
       tempErrors.name = "Name must be between 4 and 40 characters";
-    } else if (!isNameIsValid) {
-      tempErrors.name = "Please check name availability.";
-    }
+    } 
     
     // Version validation
     if (!formData.version.trim()) {
@@ -200,6 +265,7 @@ const ProofRequestConfigurationRegistrationPage = () => {
   
   const prepareRequestData = () => {
     const requestData = {
+      id: numericId,
       name: formData.name,
       version: formData.version,
       curve: formData.curve,
@@ -267,7 +333,7 @@ const ProofRequestConfigurationRegistrationPage = () => {
     
     const confirmed = await dialogs.open(CustomConfirmDialog, {
       title: "Confirmation",
-      message: "Are you sure you want to register Proof Request?",
+      message: "Are you sure you want to update Proof Request?",
       isModal: true,
     });
 
@@ -275,13 +341,13 @@ const ProofRequestConfigurationRegistrationPage = () => {
       setIsLoading(true);
       try {
         const requestData = prepareRequestData();
-        await postProofRequest(requestData);
+        await putProofRequest(requestData);
         
         setIsLoading(false);
 
         await dialogs.open(CustomDialog, {
           title: 'Notification',
-          message: 'Completed register Proof Request.',
+          message: 'Completed update Proof Request.',
           isModal: true,
         }, {
           onClose: async () => navigate('/zkp-policy-management/proof-request-configuration'),
@@ -290,39 +356,30 @@ const ProofRequestConfigurationRegistrationPage = () => {
         setIsLoading(false);
         await dialogs.open(CustomDialog, {
           title: "Error",
-          message: `Failed to register Proof Request: ${err}`,
+          message: `Failed to update Proof Request: ${err}`,
           isModal: true,
         });
       }
     }
   };
 
-  const handleCheckDuplicateName = async () => {
-    verifyNameUnique(formData.name)
-        .then((response) => {
-        if (response.data.unique === false) {
-            setErrors((prev) => ({ ...prev, name: 'Name already exists.' }));
-            setIsNameValid(false);
-        } else {        
-            setIsNameValid(true);
-            setErrors((prev) => ({ ...prev, name: undefined }));
-        }
-    });
+  const handleReset = () => {
+    if (originalFormData) {
+        setFormData({ ...originalFormData });
+        setErrors({});
+        setIsModified(false);
+    }
   };
 
-  const handleReset = () => {
-    setFormData({
-      name: "",
-      version: "",
-      curve: "Secp256r1",
-      cipher: "AES-256-CBC",
-      padding: "PKCS5",
-      attributes: [],
-      predicates: [],
-    });
-    setErrors({});
-    setIsNameValid(false);
+  const deepEqual = (a: any, b: any): boolean => {
+    return JSON.stringify(a) === JSON.stringify(b);
   };
+
+  useEffect(() => {
+    if (originalFormData) {
+      setIsModified(!deepEqual(formData, originalFormData));
+    }
+  }, [formData, originalFormData]);
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     width: 900,
@@ -350,11 +407,10 @@ const ProofRequestConfigurationRegistrationPage = () => {
       <FullscreenLoader open={isLoading} />
       <Typography variant="h4">Proof Request Configuration</Typography>
       <StyledContainer>
-        <StyledTitle>Proof Request Registration</StyledTitle>
+        <StyledTitle>Proof Request Update</StyledTitle>
         <StyledInputArea>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-               <TextField 
+            <TextField 
                 label="Name *" 
                 fullWidth 
                 size="small"
@@ -364,20 +420,8 @@ const ProofRequestConfigurationRegistrationPage = () => {
                 sx={{ width: '60%' }}
                 error={!!errors.name}
                 helperText={errors.name}
-              />
-               <Button 
-                  variant="contained" 
-                  onClick={handleCheckDuplicateName}
-                  disabled={!formData.name}
-                  sx={{ 
-                      minWidth: 150,  
-                      whiteSpace: 'nowrap', 
-                      textTransform: 'none' 
-                  }}
-              >
-                  Check Availability
-              </Button>
-            </Box>
+                disabled
+            />
 
             <TextField 
               label="Version *" 
@@ -593,7 +637,7 @@ const ProofRequestConfigurationRegistrationPage = () => {
               </Table>
             </TableContainer>
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>Register</Button>
+              <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!isModified}>Update</Button>
               <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
               <Button variant="outlined" onClick={() => navigate(-1)}>Cancel</Button>
             </Box>
@@ -603,4 +647,4 @@ const ProofRequestConfigurationRegistrationPage = () => {
   );
 };
 
-export default ProofRequestConfigurationRegistrationPage;
+export default ProofRequestConfigurationEditPage;

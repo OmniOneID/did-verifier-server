@@ -38,6 +38,53 @@ const ProofRequestConfigurationPage = () => {
     [rows, selectedRow]
   );
 
+  const handleDelete = async () => {
+  if (!selectedRowData) return;
+    const id = selectedRowData?.id as number;
+    const policyCount = selectedRowData?.profileCount as number;
+
+    if (policyCount > 0) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: 'This Proof Request is in use by one or more profiles and cannot be deleted.',
+        isModal: true,
+      });
+      return;
+    }
+
+    if (id) {
+      const result = await dialogs.open(CustomConfirmDialog, {
+        title: 'Confirmation',
+        message: 'Are you sure you want to delete Proof Request?',
+        isModal: true,
+      });
+
+      if (result) {
+        setLoading(true);
+        deleteProofRequest(id)
+          .then(() => {
+            dialogs.open(CustomDialog, {
+              title: 'Notification',
+              message: 'Proof Request delete completed.',
+              isModal: true,
+            }, {
+              onClose: async () => {
+                setPaginationModel(prev => ({ ...prev }));
+              },
+            });
+          })
+          .catch((error) => {
+            const result = dialogs.open(CustomDialog, {
+              title: 'Notification',
+              message: formatErrorMessage(error, "Failed to delete Proof Request!! "),
+              isModal: true,
+            });
+          })
+          .finally(() => setLoading(false));
+      }
+    }
+  };
+
   useEffect(() => {
     setLoading(true)
     fetchProofRequests(paginationModel.page, paginationModel.pageSize, null, null)
@@ -105,6 +152,12 @@ const ProofRequestConfigurationPage = () => {
             totalRows={totalRows}
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
+            onEdit={() => {
+              if (selectedRowData) {
+                navigate(`/zkp-policy-management/proof-request-configuration/proof-request-edit/${selectedRowData.id}`);
+              }
+            }}
+            onDelete={handleDelete}
           />
       </StyledContainer>
     </>
