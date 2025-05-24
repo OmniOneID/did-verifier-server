@@ -77,4 +77,8 @@ public class ZkpProofRequestQueryService {
         return zkpProofRequestRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.PROOF_REQUEST_NOT_FOUND));
     }
+
+    public List<ZkpProofRequest> findAll() {
+        return zkpProofRequestRepository.findAll();
+    }
 }

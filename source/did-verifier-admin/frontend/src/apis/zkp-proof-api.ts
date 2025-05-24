@@ -47,3 +47,7 @@ export const getProofRequest = async (id: number) => {
 export const putProofRequest = async (data: any) => {
     return putData(API_BASE_URL, `zkp/proof-requests`, data);
 }
+
+export const getProofRequestAll = async () => {
+    return getData(API_BASE_URL, `zkp/proof-requests/all`);
+}

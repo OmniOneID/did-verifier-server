@@ -4,11 +4,12 @@ import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.omnione.did.base.db.repository.projection.ZkpProofRequestIdProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ZkpPolicyProfileRepository extends JpaRepository<ZkpPolicyProfile, Long> {
+public interface ZkpPolicyProfileRepository extends JpaRepository<ZkpPolicyProfile, Long>, QuerydslPredicateExecutor<ZkpPolicyProfile>, ZkpPolicyProfileRepositoryAdmin {
 //    ZkpPolicyProfile findByPolicyId(String policyId);
 //
 //    ZkpPolicyProfile findByPayloadId(String payloadId);

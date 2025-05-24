@@ -15,10 +15,10 @@
  */
 package org.omnione.did.base.db.repository;
 
-import org.omnione.did.base.db.domain.ZkpProofRequest;
+import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ZkpProofRequestRepositoryAdmin {
-    Page<ZkpProofRequest> searchZkpProofRequestList(String searchKey, String searchValue, Pageable pageable);
+public interface ZkpPolicyProfileRepositoryAdmin {
+    Page<ZkpPolicyProfile> searchZkpPolicyProfileList(String searchKey, String searchValue, Pageable pageable);
 }

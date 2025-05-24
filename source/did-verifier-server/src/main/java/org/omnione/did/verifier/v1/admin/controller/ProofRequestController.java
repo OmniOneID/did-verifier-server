@@ -73,7 +73,7 @@ public class ProofRequestController {
         return ResponseEntity.ok(proofRequestService.verifyNameUnique(name));
     }
 
-    @Operation(summary = "Get Proof Request Info", description = "Get Proof Request Info")
+    @Operation(summary = "Get Proof Request Info", description = "Get Proof Request info")
     @GetMapping(UrlConstant.Verifier.GET_PROOF_REQUEST_INFO)
     public ResponseEntity<ProofRequestDto> getProofRequestInfo(@PathVariable Long id) {
         return ResponseEntity.ok(proofRequestService.getProofRequestInfo(id));
@@ -89,6 +89,12 @@ public class ProofRequestController {
     @DeleteMapping(UrlConstant.Verifier.DELETE_PROOF_REQUEST)
     public ResponseEntity<EmptyResDto> deleteProofRequest(@PathVariable Long id) {
         return ResponseEntity.ok(proofRequestService.deleteProofRequest(id));
+    }
+
+    @Operation(summary = "Get All Proof Request List", description = "Get all proof request list.")
+    @GetMapping(UrlConstant.Verifier.GET_PROOF_REQUEST_ALL)
+    public ResponseEntity<List<ZkpProofRequestDto>> getAllProofRequests() {
+        return ResponseEntity.ok(proofRequestService.getAllProofRequests());
     }
 
 }

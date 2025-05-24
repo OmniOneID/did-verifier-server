@@ -18,6 +18,8 @@ package org.omnione.did.base.db.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.omnione.did.base.datamodel.enums.ProfileType;
+import org.omnione.did.base.db.converter.ProfileTypeConverter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -45,7 +47,8 @@ public class ZkpPolicyProfile extends BaseEntity implements Serializable {
     private String profileId;
 
     @Column(name = "type", nullable = false, length = 40)
-    private String type;
+    @Convert(converter = ProfileTypeConverter.class)
+    private ProfileType type;
 
     @Column(name = "title", nullable = false, length = 40)
     private String title;

@@ -28,4 +28,6 @@ public interface ZkpProofRequestRepository extends JpaRepository<ZkpProofRequest
 //
 //    ZkpProofRequest findByPolicyProfileId(String policyProfileId);
     long countByName(String name);
+
+
 }

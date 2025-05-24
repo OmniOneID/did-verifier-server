@@ -128,4 +128,11 @@ public class ProofRequestService {
         zkpProofRequestRepository.deleteById(id);
         return new EmptyResDto();
     }
+
+    public List<ZkpProofRequestDto> getAllProofRequests() {
+        List<ZkpProofRequest> proofRequests = zkpProofRequestQueryService.findAll();
+        return proofRequests.stream()
+                .map(ZkpProofRequestDto::fromDomain)
+                .toList();
+    }
 }

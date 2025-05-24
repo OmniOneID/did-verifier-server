@@ -40,6 +40,9 @@ import ZkpProfileManagementPage from './pages/zkp-policy-management/zkp-profile-
 import ProofRequestConfigurationRegistrationPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationRegistrationPage';
 import ProofRequestConfigurationDetailPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationDetailPage';
 import ProofRequestConfigurationEditPage from './pages/zkp-policy-management/proof-request-configuration/ProofRequestConfigurationEditPage';
+import ZkpProfileRegistrationPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileRegistrationPage';
+import ZkpProfileDetailPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileDetailPage';
+import ZkpProfileEditPage from './pages/zkp-policy-management/zkp-profile-management/ZkpProfileEditPage';
 
 
 const router = createBrowserRouter([
@@ -189,6 +192,19 @@ const router = createBrowserRouter([
           {
             path: '/zkp-policy-management/proof-request-configuration',
             Component: ProofRequestConfigurationPage,
+          },
+          // ZKP Profile Management
+          {
+            path: '/zkp-policy-management/zkp-profile-management/zkp-profile-registration',
+            Component: ZkpProfileRegistrationPage,
+          },
+          {
+            path: '/zkp-policy-management/zkp-profile-management/profile-edit/:id',
+            Component: ZkpProfileEditPage,
+          },
+          {
+            path: '/zkp-policy-management/zkp-profile-management/:id',
+            Component: ZkpProfileDetailPage,
           },
           {
             path: '/zkp-policy-management/zkp-profile-management',
