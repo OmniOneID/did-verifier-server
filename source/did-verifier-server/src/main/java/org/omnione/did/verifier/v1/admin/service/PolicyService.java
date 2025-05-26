@@ -130,4 +130,11 @@ public class PolicyService {
         return policyQueryService.searchPolicyProfileList(searchKey, searchValue, pageable, policyType);
     }
 
+    public List<PolicyDTO> getAllPolicies() {
+        List<Policy> policies = policyRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        return policies.stream()
+                .map(policy -> convertToPolicyDTO(policy, policy.getPolicyType()))
+                .collect(Collectors.toList());
+    }
+
 }
