@@ -125,7 +125,7 @@ public class VerifierServiceImpl implements VerifierService {
     private final ObjectMapper objectMapper;
     private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
     private final ZkpProofRequestRepository zkpProofRequestRepository;
-
+    private final VpOfferRepository vpOfferRepository;
 
 
     /**
@@ -310,6 +310,7 @@ public class VerifierServiceImpl implements VerifierService {
             vpSubmitRepository.save(VpSubmit.builder()
                     .transactionId(transaction.getId())
                     .vp(vpData)
+                    .holderDid(verifiablePresentation.getHolder())
                     .build());
             transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
             transactionService.saveSubTransaction(SubTransaction.builder()
@@ -359,6 +360,7 @@ public class VerifierServiceImpl implements VerifierService {
     @Override
     public ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto) {
         try {
+
             Transaction transaction = transactionService.findTransactionByOfferId(confirmVerifyReqDto.getOfferId());
             VpSubmit vpSubmit = vpSubmitRepository.findByTransactionId(transaction.getId());
             List<Claim> returnClaims = new ArrayList<>();
@@ -367,18 +369,44 @@ public class VerifierServiceImpl implements VerifierService {
                         .result(false)
                         .build();
             } else {
-                String vp = vpSubmit.getVp();
-                VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
-                verifiablePresentation.fromJson(vp);
-                List<VerifiableCredential> verifiableCredentials =  verifiablePresentation.getVerifiableCredential();
-                verifiableCredentials.forEach(vc -> {
-                    List<@Valid Claim> claims = vc.getCredentialSubject().getClaims();
-                    returnClaims.addAll(claims);
-                });
-                return ConfirmVerifyResDto.builder()
-                        .result(true)
-                        .claims(returnClaims)
-                        .build();
+                VpOffer vpOffer = vpOfferRepository.findByOfferId(confirmVerifyReqDto.getOfferId())
+                        .orElseThrow(() -> new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND));
+                OfferType offerType = OfferType.valueOf(vpOffer.getOfferType());
+                if(offerType.equals(OfferType.VerifyProofOffer)){
+                    Claim claim = new Claim();
+                    String zkpClaim = "{"
+                            + "\"caption\": \"ZKP Verification Result\","
+                            + "\"code\": \"ZkpTestResult's Codes\","
+                            + "\"format\": \"plain\","
+                            + "\"hideValue\": false,"
+                            + "\"type\": \"text\","
+                            + "\"value\": \"Successful\""
+                            + "}";
+
+                    claim.fromJson(zkpClaim);
+                    returnClaims.add(claim);
+
+                    return ConfirmVerifyResDto.builder()
+                            .result(true)
+                            .claims(returnClaims)
+                            .build();
+                } else if(offerType.equals(OfferType.VerifyOffer)){
+                    String vp = vpSubmit.getVp();
+                    VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
+                    verifiablePresentation.fromJson(vp);
+                    List<VerifiableCredential> verifiableCredentials =  verifiablePresentation.getVerifiableCredential();
+                    verifiableCredentials.forEach(vc -> {
+                        List<@Valid Claim> claims = vc.getCredentialSubject().getClaims();
+                        returnClaims.addAll(claims);
+                    });
+                    return ConfirmVerifyResDto.builder()
+                            .result(true)
+                            .claims(returnClaims)
+                            .build();
+                } else {
+                    throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
+                }
+
             }
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during ConfirmVerify: {}", e.getErrorCode().getMessage());
@@ -390,12 +418,10 @@ public class VerifierServiceImpl implements VerifierService {
 
     }
 
-    ////ZKP /////
     @Override
     public ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto)  {
         try {
 
-            //1. txId로 transaction 조회, offerId 조회
             log.info("=== Starting requestProofRequestProfile ===");
             log.debug("\t --> ZkpProofRequestProfile - Retrieving transaction information");
             Transaction transaction = findTransactionByRequestDto(requestProfileReqDto);
@@ -403,8 +429,6 @@ public class VerifierServiceImpl implements VerifierService {
 
             log.debug("\t --> Retrieving ProofRequestProfile by policyId in VP Offer");
             ProofRequestProfile proofRequestProfile = getProofRequestProfileFromPolicy(vpOffer.getVpPolicyId());
-
-
 
             ReqE2e reqE2e = proofRequestProfile.getProfile().getReqE2e();
             String generateNonce = generateNonce();
@@ -448,62 +472,6 @@ public class VerifierServiceImpl implements VerifierService {
                     .build();
 
 
-        //Dev Data
-        //DB에서 해당 값을 찾아와서 조회
-
-
-        //TestData
-        //BigInteger verifierNonce = new BigIntegerUtil().createRandomBigInteger(ZkpCryptoConstants.LARGE_NONCE);
-//        ProofRequest proofRequest = ZkpProofManager.requestProofReq(
-//                "mdl",
-//                "11",
-//                ZkpTestConstants.getProofRequestAttribute(),
-//                ZkpTestConstants.getProofRequestPredicate(),
-//                verifierNonce
-//        );
-
-//        String jsonStr = "{\n" +
-//                "  \"proofRequestProfile\": {\n" +
-//                "    \"id\": \"f55044ba-fa69-4bba-91e3-38442043d6bc\",\n" +
-//                "    \"type\": \"ProofRequestProfile\",\n" +
-//                "    \"title\": \"zkp Test를 위한 임시 프로파일 입니다.\",\n" +
-//                "    \"description\": \"하드코딩 용 임시 프로파일입니다..\",\n" +
-//                "    \"encoding\": \"UTF-8\",\n" +
-//                "    \"language\": \"ko\",\n" +
-//                "    \"profile\": {\n" +
-//                "      \"verifier\": {\n" +
-//                "        \"did\": \"did:omn:verifier\",\n" +
-//                "        \"certVcRef\": \"http://10.48.17.129:8092/verifier/api/v1/certificate-vc\",\n" +
-//                "        \"name\": \"verifier\",\n" +
-//                "        \"description\": \"verifier\",\n" +
-//                "        \"ref\": \"http://10.48.17.129:8092/swagger-ui/index.html#/\"\n" +
-//                "      },\n" +
-//                "      \"reqE2e\": {\n" +
-//                "        \"nonce\": \"msG81SiTzYpOZLEolWB7t2w\",\n" +
-//                "        \"curve\": \"Secp256r1\",\n" +
-//                "        \"publicKey\": \"z28MKkcmEAMzvUUwDDmtSTD8DduyDq3iZCz9UgZBp1AADd\",\n" +
-//                "        \"cipher\": \"AES-256-CBC\",\n" +
-//                "        \"padding\": \"PKCS5\"\n" +
-//                "      }\n" +
-//                "    },\n" +
-//                "    \"proof\": {\n" +
-//                "      \"type\": \"Secp256r1Signature2018\",\n" +
-//                "      \"created\": \"2025-05-14T19:29:42.742437Z\",\n" +
-//                "      \"verificationMethod\": \"did:omn:verifier?versionId=1#assert\",\n" +
-//                "      \"proofPurpose\": \"assertionMethod\",\n" +
-//                "      \"proofValue\": \"z3r3GNPRnfzLUK9HLGGjkNSVdM6FtJnmB56DRxMaDmFtkgFN1ifTn5n45NgiTiwRY7QbSDf62WxU66q8WqiyfKT5i4\"\n" +
-//                "    }\n" +
-//                "  }\n" +
-//                "}";
-//        ProofRequestResDto proofRequestResDto = null;
-//        try {
-//            proofRequestResDto = JsonUtil.deserializeFromJson(jsonStr, ProofRequestResDto.class);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        proofRequestResDto.getProofRequestProfile().getProfile().setProofRequest(proofRequest);
-//        return proofRequestResDto;
-
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during RequestingProoofRequestProfile: {}", e.getErrorCode().getMessage());
             throw e;
@@ -534,19 +502,14 @@ public class VerifierServiceImpl implements VerifierService {
         BigInteger proofNonce = new BigInteger(requestVerifyProofReqDto.getNonce());
 
         List<ProofVerifyParam> proofVerifyParams = getProofVerifyParams(proof.getIdentifiers());
-        log.debug("TestLog## proof = " + proof.toJson());
-        log.debug("TestLog## proofNonce = " + proofNonce);
-        log.debug("TestLog## proofVerifyParams = " + GsonWrapper.getGson().toJson(proofVerifyParams));
-        log.debug("TestLog## proofRequest = " + GsonWrapper.getGson().toJson(findProofRequestProfile.getProfile().getProofRequest()));
-
-
 
         VerifyProof(proof, proofNonce, findProofRequestProfile.getProfile().getProofRequest(), proofVerifyParams);
 
 
         vpSubmitRepository.save(VpSubmit.builder()
                 .transactionId(transaction.getId())
-                .vp("ZKP Submit")
+                .vp("Zkp Proof")
+                .holderDid("Zkp VP Holder")
                 .build());
         transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
         transactionService.saveSubTransaction(SubTransaction.builder()
@@ -564,52 +527,10 @@ public class VerifierServiceImpl implements VerifierService {
 
     private LinkedList<ProofVerifyParam> getProofVerifyParams(List<Identifiers> identifiers) {
 
-        //@@TODO: 블록체인에서 가져와야함
         LinkedList<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
         for (Identifiers id : identifiers) {
-//            String schemaStr = " {\n" +
-//                    "  \"id\": \"did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0\",\n" +
-//                    "  \"name\": \"mdl\",\n" +
-//                    "  \"version\": \"1.0\",\n" +
-//                    "  \"attrNames\": [\n" +
-//                    "    \"zkpsex\",\n" +
-//                    "    \"zkpbirth\",\n" +
-//                    "    \"zkpasort\",\n" +
-//                    "    \"zkpaddr\"\n" +
-//                    "  ],\n" +
-//                    "  \"tag\": \"Tag1\"\n" +
-//                    "}";
-
             org.omnione.did.zkp.datamodel.schema.CredentialSchema zkpCredSchema = storageService.getZKPCredential(id.getSchemaId());
-
-
-//
-//            String defStr = "{\n" +
-//                    "  \"id\": \"did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0:Tag1\",\n" +
-//                    "  \"schemaId\": \"did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:mdl:1.0\",\n" +
-//                    "  \"ver\": \"1.0\",\n" +
-//                    "  \"type\": \"CL\",\n" +
-//                    "  \"value\": {\n" +
-//                    "    \"primary\": {\n" +
-//                    "      \"n\": \"92775526040564561686692065084198526388182965052935282919213101966498168538455855403734866233185600697532637603374230608927392371217905764468993212867731342552070099117167560805363206167456133168830781321739842895351453160406795952557662895731883300837340365480915043225592351933938942912364477352882497616416646372252852067477605128561602232477187158306658612482751740703029577426260284551923737989897429965794096108222439264266670479609111336321250438916920879772933864404383615945046782416756930307564650579911154642192284532062451046180714550385568468878314573777872613155664035129576807096185472992202354597905819\",\n" +
-//                    "      \"z\": \"43686372030520392901178678013277112308031276158148263133617645738733963962925874432344700742933184123929740127097742436041327182133633470202629679087590546787926089432071524845069707402923869182183581741625438069117159494007536799307629412567833377726001845802962737533720815907767966889320359488037682194017415542933748559674774290361739895146466067254544401115360044814465854246952418724764642790006483867687841067502397371664368533570528972257370102346454405444991834575631058665973366598480162991787829962060646243784193748283099983375596372908276139502233494457699605465545001843799796123920628981257914111811630\",\n" +
-//                    "      \"s\": \"39491553553325946539036179395177575610930217913368362160347502982041940121706543209205186925681250567611675997590774809752630525574063423133320070432886319376183480691305633507102081514167099568358039876608130741160386462798377414350237911601755513207619995428437591776226243275239699523970798094411343685159221553039937609603890319734835294875668136599689581212976229075236912743003175036347254957449633666699707818439488140637653218747180804521775493065155031445310228917054586989621251840607782259531431660294127013413142063014600722772823125540472754038974263690373845146352943477593046775364357731961008773490108\",\n" +
-//                    "      \"r\": {\n" +
-//                    "        \"zkpsex\": \"63481253450392554723608972411575005353287352671358074059874458708321784291990070631742274361146662429677996237887710528429101353867177653237387725779675355492241669431034004739006579372119086533300507445114734526431884769837981313133170254299666297943714456648772252377546453915318126402352735310221036865359445618414353698009079559168739353595297460032737716624261976636345366965072321696528244286455011570614684260880980068859109175378580410474397336219872660146655198680529730697616075045756014975847185114041949481311512559463123683049896310820978594264280249117685830215348589235922922548151777670245460766091013\",\n" +
-//                    "        \"zkpbirth\": \"25492686680706889388200627923395471731213053911684876307056664110131827137759797904990694456540954634667302639654569180616864154053493935623314882002961062178699081718983316726936380310419914276772045020961144677857315351282712340304413435684591811833420762241461295584876786068035814199365118454976349870021873139384539738840286028689171198683207077331354856526222101819994625486869549239857610476749658917897794097987070174317563263197254285527902318873800612498317669218977073927198097137160260572712521719152184854553804845328745599414408526747765286967047832419953529714528374996267419756950750059757094827264086\",\n" +
-//                    "        \"zkpasort\": \"87981414142670211420620140660570255424387117894396315960845333105530513446326256913129261496756609051210081386287551874039757615258264875788886541612613098422212109117791460074493711622016082156014116478461079237405311410580110979858300292664779076957010848535680995010803745570363514780281237152308374113154701817040274385293007590324643492459638911662267937597207479277426540930675307856883744168517370448791758540975269888013981166525571346917340382866815735011530275712483420723728217657450206015236190587598949478523742550574090511660379858398804289273419443168022080965286188924450331071023862315218086451679153\",\n" +
-//                    "        \"zkpaddr\": \"85659701271520010822062760833607562707144958499644193537806866105044265684127605307492471441203578699119805878723056573695785716066784342101039831341835413060762425369840545695469336721917816131021909352885905549796081111671838116382575836206586869181647004416070155294875541557989875791829691653687914791799028959619817913473760807139260483083541942167535092664303757692048296246396057538996572420064677404716877244675505523722495618874448508392649616623019032146905518229874779365693626432575328049947421737434473696960221688257600746869839204698250671515721646063981784810627447576396052175760782593481154456727317\",\n" +
-//                    "        \"masterSecret\": \"90768072314619617876859174927500335388484978421537439274050814305492431971509613515329693754472418219115012435420294045878342097669777527447263346252574086097489879939416271856146116575580360295891095487444705890397783110612114218129614016782432232858037993768551688170777726678327868776878403206427432535256442400578782003874178275515366068507827373239378559823325791790838303886640361310872115160425697881353556605894869263774406284266670697020256430748382299480709944961734227583245525893733239568120074778715475230401571564263966133767450313903185116942488335392804354763595904654596673155887924500027606394823033\"\n" +
-//                    "      },\n" +
-//                    "      \"rctxt\": \"36603345067563337549097037553020584544190852890343616984670941818945307595231711546544197134988824857656913286370035890586600848184672593292275430944567014241513950920918714055316471065518864044800354423159776835619239889122667760680473999087917018537846301507100674925413558317136397392305434025640769634477561121105331902936914880670136751471958051029880174410171693650138501333300700069452721023409107569379418110354392792710890398565018278733537372560589057798681467140920960248230051672136392338922370270566920369588191926452952169410214523821737016087168952915573991065156796313661924879193414874696252725241075\"\n" +
-//                    "    }\n" +
-//                    "  },\n" +
-//                    "  \"tag\": \"Tag1\"\n" +
-//                    "}";
-            //CredentialDefinition credentialDefinition = new Gson().fromJson(defStr, CredentialDefinition.class);
             CredentialDefinition zkpCredentialDefinition = storageService.getZKPCredentialDefinition(id.getCredDefId());
-            log.debug("CredentialDefinition: {}", zkpCredentialDefinition.toJson());
-            log.debug("CredentialSchema: {}", zkpCredSchema.toJson());
             ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
                     .setSchema(zkpCredSchema)
                     .setCredentialDefinition(zkpCredentialDefinition)
@@ -667,7 +588,6 @@ public class VerifierServiceImpl implements VerifierService {
                 .orElseThrow(() -> new OpenDidException(ErrorCode.ZKP_POLICY_PROFILE_NOT_FOUND));
         String jsonZkpProfile = objectMapper.writeValueAsString(zkpPolicyProfile);
         ProofRequestProfile proofRequestProfile = objectMapper.readValue(jsonZkpProfile, ProofRequestProfile.class);
-        log.debug("ZkpPolicyProfile: {}", proofRequestProfile.toJson());
         setInnerProfile(proofRequestProfile, zkpPolicyProfile.getZkpProofRequestId());
 
 
@@ -716,44 +636,6 @@ public class VerifierServiceImpl implements VerifierService {
         log.debug("ProofRequest: {}", proofRequestProfile.toJson());
     }
 
-
-
-//    @Override
-//    public ZkpResponse requestVerifyProofsample(HashMap<String, Object> map) {
-//        org.opendid.zkp.zkptestcore.datamodel.zkp.Proof proof = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proof")), org.opendid.zkp.zkptestcore.datamodel.zkp.Proof.class);
-//        BigInteger verifierNonce = ZkpGsonWrapper.getGson().fromJson(ZkpGsonWrapper.getGson().toJson(map.get("proofNonce")), BigInteger.class);
-//
-//        List<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
-//
-//        for (Identifiers identifiers : proof.getIdentifiers()) {
-//            String schemaStr = loadZKPData("credentialSchema");
-//            org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema schema = new Gson().fromJson(schemaStr, org.opendid.zkp.zkptestcore.datamodel.zkp.CredentialSchema.class);
-//            String defStr = loadZKPData("credentialDefinition");
-//            CredentialDefinition credentialDefinition = new Gson().fromJson(defStr, CredentialDefinition.class);
-//
-//            ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
-//                    //todo : 메모리에서 load
-//                    .setSchema(schema)
-//                    .setCredentialDefinition(credentialDefinition)
-//                    .build();
-//            proofVerifyParams.add(proofVerifyParam);
-//        }
-//
-//        ZkpResponse zkpResponse = new ZkpResponse(ZkpErrorCode.ERR_CODE_ZKP_SUCCESS, "success");
-//
-//
-//
-////        try {
-////            zkpResponse = new ZkpProofManager().verifyProof(proof, verifierNonce, proofRequest, proofVerifyParams);
-////            sdkResponse.setResultCode(response.getErrorCode());
-////            sdkResponse.setResultMsg(response.getErrorMessage());
-////        } catch (ZkpException e) {
-////            sdkResponse.setResultCode(ZkpErrorCode.ERR_CODE_ZKP_FAIL.getCode());
-////            sdkResponse.setResultMsg(e.getErrorMsg());
-////        }
-//
-//        return zkpResponse;
-//    }
 
 
     ////ZKP TEST END /////

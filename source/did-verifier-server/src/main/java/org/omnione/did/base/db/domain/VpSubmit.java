@@ -42,6 +42,8 @@ public class VpSubmit extends BaseEntity implements Serializable {
     private Long id;
     @Column(name = "vp", nullable = false)
     private String vp;
+    @Column(name = "holder_did", nullable = false)
+    private String holderDid;
     @Column(name = "transaction_id", nullable = false)
     private Long transactionId;
 }

@@ -88,8 +88,12 @@ public class VerifierController {
     public ConfirmVerifyResDto confirmVerify(@RequestBody @Valid ConfirmVerifyReqDto confirmVerifyReqDto) {
         return verifierService.confirmVerify(confirmVerifyReqDto);
     }
-
-    ////ZKP ////
+    /**
+     * Requests a ProofProfile for Zkp Credential.
+     *
+     * @param requestProfileReqDto The request data for ProofProfile
+     * @return String The response containing the requested ProofProfile
+     */
     @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
     @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
     public String requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){

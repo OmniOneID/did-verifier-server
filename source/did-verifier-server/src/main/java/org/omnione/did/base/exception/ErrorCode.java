@@ -54,7 +54,6 @@ public enum ErrorCode {
     VP_POLICY_PROFILE_IN_USE("SSRVVRF00213", "POLICY_PROFILE is in use by one or more policies",400 ),
     VP_FILTER_IN_USE("SSRVVRF00214", "VP_FILTER is in use by one or more profile",400 ),
     VP_PROCESS_IN_USE("SSRVVRF00215", "VP_PROCESS is in use by one or more profile.", 400),
-
     VC_SCHEMA_NOT_FOUND("SSRVVRF00216", "VC_SCHEMA not found",500 ),
 
     // Transaction Errors (300-399)

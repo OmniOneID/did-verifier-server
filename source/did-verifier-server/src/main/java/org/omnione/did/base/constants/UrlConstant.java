@@ -32,12 +32,9 @@ public class UrlConstant {
         //ZKP API
         public static final String REQUEST_PROOF_REQUEST_PROFILE = "/request-proof-request-profile";
         public static final String REQUEST_VERIFY_PROOF = "/request-verify-proof";
-        public static final String CONFIRM_VERIFY_PROOF = "/confirm-verify-proof";
 
         //ADMIN urls
         public static final String ADMIN = "/verifier/admin/v1";
-        //Verifier Manage
-        public static final String SAVE_VERIFIER_INFO = "/save_verifier-info";
 
         // Payload Manage
         public static final String SAVE_PAYLOAD_INFO = "/payloads";
