@@ -56,6 +56,7 @@ public enum ErrorCode {
     VP_PROCESS_IN_USE("SSRVVRF00215", "VP_PROCESS is in use by one or more profile.", 400),
     VC_SCHEMA_NOT_FOUND("SSRVVRF00216", "VC_SCHEMA not found",500 ),
 
+
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),
     TRANSACTION_INVALID("SSRVVRF00301", "Transaction status is not pending.", 400),
