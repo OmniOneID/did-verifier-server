@@ -26,7 +26,6 @@
   <include file="set.2/admin-2phase-zkp_proof_request.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-zkp_policy_profile.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-remove_fk_vp_policy.xml" relativeToChangelogFile="true" />
-  <include file="set.2/project-init_zkp-profile.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-modify_vp_submit.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

@@ -4,7 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <!-- 테이블 생성 -->
     <changeSet id="init-vp_filter" author="jhkim6557">
         <createTable tableName="vp_filter">
             <column name="filter_id" type="bigint" autoIncrement="true">
@@ -42,34 +41,4 @@
             </column>
         </createTable>
     </changeSet>
-
-    <!-- 초기값 삽입 -->
-    <changeSet id="insert-initial-data-vp_filter" author="jhkim6557">
-        <insert tableName="vp_filter">
-            <column name="title" value="초기 샘플 제출 요건 입니다."/>
-            <column name="id" value="http://127.0.0.1:8091/issuer/api/v1/vc/vcschema?name=mdl"/>
-            <column name="type" value="OsdSchemaCredential"/>
-            <column name="required_claims" value='["org.iso.18013.5.birth_date", "org.iso.18013.5.family_name", "org.iso.18013.5.given_name"]'/>
-            <column name="allowed_issuers" value='["did:omn:issuer"]'/>
-            <column name="display_claims" value='["testId.aa"]'/>
-            <column name="value" value="VerifiableProfile"/>
-            <column name="present_all" value="false"/>
-            <column name="created_at" valueDate="now()"/>
-            <column name="updated_at" valueDate="now()"/>
-        </insert>
-
-        <insert tableName="vp_filter">
-            <column name="title" value="초기 샘플 제출 요건 입니다.22"/>
-            <column name="id" value="http://127.0.0.1:8091/issuer/api/v1/vc/vcschema?name=mdl"/>
-            <column name="type" value="OsdSchemaCredential"/>
-            <column name="required_claims" value='["org.iso.18013.5.birth_date", "org.iso.18013.5.family_name", "org.iso.18013.5.given_name"]'/>
-            <column name="allowed_issuers" value='["did:omn:issuer"]'/>
-            <column name="display_claims" value='["testId.aa"]'/>
-            <column name="value" value="VerifiableProfile"/>
-            <column name="present_all" value="false"/>
-            <column name="created_at" valueDate="now()"/>
-            <column name="updated_at" valueDate="now()"/>
-        </insert>
-    </changeSet>
-
 </databaseChangeLog>
