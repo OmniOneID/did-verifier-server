@@ -2,7 +2,7 @@ spring:
   application:
     name: Verifier
   profiles:
-    active: dev
+    active: sample
     group:
         dev:
           - databases
@@ -48,7 +48,7 @@ server:
   port: 8092
 
 tas:
-  url: http://localhost:8091
+  url: http://localhost:8090
 
 wallet:
   file-path:
