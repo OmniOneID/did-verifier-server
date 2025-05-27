@@ -2,6 +2,7 @@ package org.omnione.did.verifier.v1.admin.dto;
 
 import lombok.*;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.base.db.domain.Policy;
 
 import java.time.Instant;
@@ -27,6 +28,7 @@ public class PolicyDTO {
     private String policyProfileId;
     private String profileTitle;
     private String createdAt;
+    private PolicyType policyType;
 
 
     public static PolicyDTO toDTO(Policy policy) {
@@ -37,9 +39,28 @@ public class PolicyDTO {
                 .payloadId(policy.getPayloadId())
                 .policyProfileId(policy.getPolicyProfileId())
                 .policyTitle(policy.getPolicyTitle())
+                .policyType(policy.getPolicyType())
+                .createdAt(formatInstant(policy.getCreatedAt(), formatter))
                 .build();
     }
 
+    public static PolicyDTO toDTO(Policy policy, String payloadService, String profileTitle) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return PolicyDTO.builder()
+                .id(policy.getId())
+                .policyId(policy.getPolicyId())
+                .payloadId(policy.getPayloadId())
+                .policyProfileId(policy.getPolicyProfileId())
+                .policyTitle(policy.getPolicyTitle())
+                .policyType(policy.getPolicyType())
+                .payloadService(payloadService)
+                .profileTitle(profileTitle)
+                .createdAt(formatInstant(policy.getCreatedAt(), formatter))
+                .build();
+    }
 
-
+    private static String formatInstant(Instant instant, DateTimeFormatter formatter) {
+        if (instant == null) return null;
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).format(formatter);
+    }
 }

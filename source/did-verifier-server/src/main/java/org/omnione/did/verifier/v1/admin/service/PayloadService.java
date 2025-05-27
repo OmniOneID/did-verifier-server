@@ -55,6 +55,7 @@ public class PayloadService {
                 .mode(payloadDTO.getMode())
                 .endpoints(payloadDTO.getEndpoints())
                 .validSecond(payloadDTO.getValidSecond())
+                .offerType(payloadDTO.getOfferType())
                 .build();
 
         payloadRepository.save(payload);
@@ -72,6 +73,7 @@ public class PayloadService {
         existingPayload.setMode(reqPayloadDto.getMode());
         existingPayload.setEndpoints(reqPayloadDto.getEndpoints());
         existingPayload.setValidSecond(reqPayloadDto.getValidSecond());
+        existingPayload.setOfferType(reqPayloadDto.getOfferType());
 
         return modelMapper.map(payloadRepository.save(existingPayload), PayloadDTO.class);
     }
@@ -79,7 +81,9 @@ public class PayloadService {
     public PayloadDTO getPayloadInfo(Long id) {
         Payload payload = payloadRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PAYLOAD_NOT_FOUND));
-        return modelMapper.map(payload, PayloadDTO.class);
+        long policyCount = policyRepository.countByPayloadId(payload.getPayloadId());
+
+        return PayloadDTO.fromPayload(payload, policyCount);
     }
 
     @Transactional

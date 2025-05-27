@@ -15,7 +15,6 @@
  */
 package org.omnione.did.verifier.v1.admin.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.omnione.did.base.db.domain.VerifierInfo;
 import org.omnione.did.base.db.repository.VerifierInfoRepository;
@@ -23,9 +22,6 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.springframework.stereotype.Service;
 
-/**
- * Description...
- */
 @RequiredArgsConstructor
 @Service
 public class VerifierInfoQueryService {
@@ -43,5 +39,9 @@ public class VerifierInfoQueryService {
 
     public void save(VerifierInfo verifierInfo) {
         verifierInfoRepository.save(verifierInfo);
+    }
+
+    public VerifierInfo findVerifierOrNull() {
+        return verifierInfoRepository.findTop1ByOrderByIdAsc().orElse(null);
     }
 }

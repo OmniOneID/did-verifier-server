@@ -17,14 +17,16 @@
 package org.omnione.did.verifier.v1.common.service;
 
 import org.omnione.did.data.model.did.DidDocument;
-import org.omnione.did.data.model.did.InvokedDidDoc;
-import org.omnione.did.data.model.enums.did.DidDocStatus;
-import org.omnione.did.data.model.enums.vc.RoleType;
-import org.omnione.did.data.model.vc.VcMeta;
+
+import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
+import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
 
 /**
  * Storage service interface for managing DID documents and verifiable credentials.
  */
 public interface StorageService {
-    DidDocument findDidDoc(String didKeyUrl);;
+    DidDocument findDidDoc(String didKeyUrl);
+    CredentialSchema getZKPCredential(String credentialSchemaId);
+    CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId);
+
 }

@@ -4,8 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
+import org.omnione.did.base.db.constant.PolicyType;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
 import org.omnione.did.verifier.v1.admin.service.PolicyService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -27,26 +30,26 @@ public class PolicyController {
 
     @Operation(summary = "Get Policy List", description = "Get a list of policies by title (optional).")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_LIST)
-    public List<PolicyDTO> getPolicyList() {
-        return policyService.getPolicyList();
+    public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+        return policyService.searchPolicyList(searchKey, searchValue, pageable, policyType);
     }
 
     @Operation(summary = "Get Policy Info", description = "Get a single policy's information.")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_INFO)
-    public PolicyDTO getPolicyInfo(@PathVariable Long id) {
-        return policyService.getPolicyInfo(id);
+    public PolicyDTO getPolicyInfo(@PathVariable Long id, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+        return policyService.getPolicyInfo(id, policyType);
     }
 
     @Operation(summary = "Save Policy", description = "Save a new policy.")
     @PostMapping(UrlConstant.Verifier.SAVE_POLICY_INFO)
-    public ResponseEntity<Void> savePolicy(@RequestBody PolicyDTO policyDTO) {
-        policyService.savePolicy(policyDTO);
+    public ResponseEntity<Void> savePolicy(@RequestBody PolicyDTO policyDTO, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+        policyService.savePolicy(policyDTO, policyType);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Update Policy", description = "Update an existing policy.")
     @PutMapping(UrlConstant.Verifier.UPDATE_POLICY_INFO)
-    public ResponseEntity<PolicyDTO> updatePolicy(@RequestBody PolicyDTO policyDTO) {
+    public ResponseEntity<PolicyDTO> updatePolicy(@RequestBody PolicyDTO policyDTO, @RequestParam(defaultValue = "VP") PolicyType policyType) {
         PolicyDTO updatedPolicyDTO = policyService.updatePolicy(policyDTO);
         return ResponseEntity.ok(updatedPolicyDTO);
     }
@@ -58,6 +61,8 @@ public class PolicyController {
         return ResponseEntity.noContent().build();
     }
 
-
-
+    @GetMapping(UrlConstant.Verifier.GET_ALL_POLICY_LIST)
+    public ResponseEntity<List<PolicyDTO>> getAllPolicies() {
+        return ResponseEntity.ok(policyService.getAllPolicies());
+    }
 }

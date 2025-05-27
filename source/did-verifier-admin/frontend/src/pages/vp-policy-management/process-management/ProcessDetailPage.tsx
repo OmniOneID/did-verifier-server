@@ -27,8 +27,8 @@ const modeMapping: { [key: string]: string } = {
     1 : "무인증",
     2 : "PIN",
     4 : "BIO",
-    5 : "PIN or BIO",
-    6 : "PIN and BIO",
+    6 : "PIN or BIO",
+    32774 : "PIN and BIO",
   };
   
   const eccCurveMapping: { [key: string]: string } = {

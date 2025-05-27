@@ -19,11 +19,19 @@ Open DID Verifier Admin Operation Guide
 ==
 
 - Date: 2025-03-31
-- Version: v1.0.0
+- Version: v1.0.1
+
+개정 이력
+==
+| 버전   | 일자       | 변경 내용                  |
+| ------ | ---------- | -------------------------- |
+| v1.0.0 | 2025-03-31 | 최초 작성                  |
+| v1.0.1 | 2025-04-25 | `3.1. Verifier Registration` 장 추가 |
 
 목차
 ==
 
+- [개정 이력](#개정-이력)
 - [1. 소개](#1-소개)
   - [1.1. 개요](#11-개요)
   - [1.2. Admin Console 정의](#12-admin-console-정의)
@@ -34,7 +42,8 @@ Open DID Verifier Admin Operation Guide
   - [2.4. 비밀번호 변경 관리](#24-비밀번호-변경-관리)
 - [3. 기능별 상세 메뉴얼](#3-기능별-상세-메뉴얼)
   - [3.1. Verifier Management](#31-verifier-management)
-    - [3.1.1 DID Document 조회](#311-did-document-조회)
+    - [3.1.1. Verifier 등록](#311-verifier-등록)
+    - [3.1.2. 등록된 Verifier 관리](#312-등록된-verifier-관리)
   - [3.2. VP Policy Management](#32-vp-policy-management)
     - [3.2.1. Service Management](#321-service-management)
       - [3.2.1.1 Service Register](#3211-service-register)
@@ -65,12 +74,18 @@ Verifier Admin Console은 Open DID 시스템에서 Verifier 서버를 관리하�
 
 Admin Console은 다음과 같은 주요 기능을 제공합니다:
 
-- Verifier 기본 정보 관리
-- VP 정책 생성 및 관리
-- VP 검증 이력 조회
-- 관리자 계정 관리
-
-<br/>
+- **Verifier 기본 정보 관리**
+  - Verifier 서버 등록 및 상태 확인
+- **VP 정책 항목 관리**
+  - Service(payload) 등록 및 항목 구성
+  - Profile Filter 등록 및 관리
+  - Profile Process 등록 및 관리
+  - VP Profile 설정
+  - VP 정책(Policy) 설정
+- **VP 이력**
+  - VP 검증 이력 확인
+- **관리자 계정 관리**
+  - Admin Console 계정 관리
 
 # 2. 기본 메뉴얼
 
@@ -100,7 +115,7 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 로그인 후 표시되는 메인 화면은 다음과 같은 요소로 구성됩니다:
 
-<img src="./images/main_screen.jpg" width="800"/>
+<img src="./images/main_screen.jpg" width="450"/>
 
 | 번호 | 영역 | 설명 |
 |------|------|------|
@@ -113,9 +128,23 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 ## 2.3. 메뉴 구성
 
-Admin Console의 메뉴는 다음과 같이 구성되어 있습니다:
+Verifier Admin Console의 사이드바 메뉴는 **Verifier 등록 상태에 따라 화면 구성에 차이**가 있습니다.
 
-<img src="./images/menu_structure.jpg" width="800"/>
+### 2.3.1. Verifier 미등록 상태
+
+Verifier 서버가 아직 등록되지 않은 초기 상태에서는
+메뉴에 Verifier Registration 항목만 단독으로 표시됩니다.
+
+<img src="./images/verifier-menu-before-registration.jpg" width="250"/>
+
+> 참고: Verifier 등록이 완료되면 관련 기능들이 활성화되며, 전체 메뉴가 확장됩니다.
+등록 이후 메뉴 구성에 대한 자세한 내용은 추후 항목에서 설명합니다.
+
+### 2.3.2. Verifier 등록 상태
+
+Verifier 등록이 완료되면 전체 관리 기능이 활성화되며, 사이드바 메뉴는 다음과 같이 구성됩니다:
+
+<img src="./images/menu_structure.jpg" width="260"/>
 
 | 번호 | 기능 명칭 | 기능 설명 |
 |------|-----------|-----------|
@@ -152,6 +181,106 @@ Admin Console의 메뉴는 다음과 같이 구성되어 있습니다:
 이 장에서는 Open DID Verifier Admin Console의 주요 기능에 대한 상세 사용 방법을 안내합니다.
 
 ## 3.1. Verifier Management
+
+Verifier Management는 Verifier 서버의 등록 및 상태 관리를 위한 기능입니다.  
+
+
+Verifier 서버는 Open DID 시스템에서 사용자의 VC(Verifiable Credential)에서 제출된 VP(Verifiable Presentation)을 검증하는 역할을 수행합니다.    
+
+Verifier 등록은 최초 1회만 수행되며, 이후에는 관리 화면에서 등록된 상태를 확인할 수 있습니다.
+
+<br/>
+
+### 3.1.1. Verifier 등록
+
+Verifier 서버가 아직 Open DID 시스템에 등록되지 않은 초기 상태에서는,  
+Verifier Admin Console 좌측 메뉴에 `Verifier Registration` 항목만 표시됩니다.  
+
+Verifier 등록은 총 3단계의 스텝을 통해 순차적으로 진행됩니다.
+
+
+<br/>
+
+**Step 1 - Enter Verifier Info**
+
+Verifier 정보를 입력하는 단계입니다.
+
+<img src="./images/verifier-registration.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **Name**          | Verifier 서버의 이름을 입력합니다. 예: `verifier`                              |
+| **CA URL**        | CA 서버의 호출 URL을 입력합니다. `http://<IP>:8094/verifier` 형식 사용   |
+| **Test Connection 버튼** | 입력한 URL로 실제 연결이 가능한지 확인합니다.                 |
+| **NEXT 버튼**     | 다음 단계로 이동합니다.                                              |
+
+<br/>
+
+**Step 2 - Register DID Document**
+
+이 단계에서는 Verifier의 DID Document를 생성하고 TA Admin에 등록을 요청합니다.   
+한 번 등록된 DID Document는 **변경하거나 재등록할 수 없습니다.**
+
+▶ **Step 2-1: Generate DID Document**
+
+CA의 DID Document를 생성합니다.  
+
+<img src="./images/generate-did.png" width="600"/>
+
+| 항목               | 설명                                                               |
+| ------------------ | ------------------------------------------------------------------ |
+| **GENERATE 버튼**  | CA 서버의 DID Document를 생성합니다. 생성 후 하단 영역에 결과 표시 |
+| **요청 상태 표시** | 요청 성공 시 초록색 메시지로 확인 가능합니다.                      |
+
+DID Document가 성공적으로 생성되면, **Step 2-2 영역이 화면에 자동으로 표시됩니다.**
+
+<br/>
+
+▶ **Step 2-2 - Submit Registeration Request**
+
+생성된 DID Document를 TA Admin에 등록 요청합니다.
+
+<img src="./images/register-did-document-step2.png" width="600"/>
+<img src="./images/register-did-document-step2-1.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **REQUEST 버튼**  | 생성한 DID Document에 대한 등록 요청을 TA Admin에 보냅니다.        |
+| **요청 상태 표시** | 요청 성공 시 초록색 메시지로 확인 가능합니다.                        |
+
+DID Document가 성공적으로 생성되면, **Step 2-3 영역이 화면에 자동으로 표시됩니다.**
+
+<br/>
+
+▶ **Step 2-3 - Check Approval Status**
+
+TA 관리자가 DID Document 등록 요청을 승인했는지 확인합니다.
+
+<img src="./images/check-approval.png" width="600"/>
+
+| 항목              | 설명                                                                 |
+| ----------------- | -------------------------------------------------------------------- |
+| **CHECK 버튼**    | TA 관리자가 등록 요청을 승인했는지 확인합니다.                      |
+| **승인 상태 표시** | 승인 완료 시 초록색 메시지와 함께 다음 단계로 이동할 수 있습니다.     |
+
+<br/>
+
+
+**Step 3 - Enroll Entity**
+
+TA 서버에 Verifier를 Entity로 등록 요청하고, 가입증명서(Certificate VC)를 발급받는 단계입니다. 
+
+이때 등록 요청은 TA 프로토콜 중 사용자 등록 프로토콜(P132)의 흐름을 따르며,  
+Verifier Admin이 해당 프로토콜의 API들을 호출하여 등록 절차를 수행합니다.
+
+<img src="./images/verifier-regstration-step3.png" width="600"/>
+
+| 항목        | 설명                                       |
+| ----------- | ------------------------------------------ |
+| **REQUEST** | TA 서버에 Entity 등록 요청을 보냅니다.     |
+| **FINISH**  | 등록을 마치고 최종 완료 상태로 이동합니다. |
+
+## 3.1.2 등록된 Verifier 관리
 
 Verifier Management 메뉴에서는 가입증명서로 등록된 Verifier 서버의 정보를 조회할 수 있습니다. 이 화면에서는 Verifier의 기본 정보가 표시되며, 수정이나 삭제는 불가능합니다.
 
@@ -261,10 +390,10 @@ Filter Management 화면은 다음과 같은 주요 기능을 제공합니다:
 | 번호 | 항목 | 설명 |
 |------|------|------|
 | 1 | Title | 필터의 제목을 입력하는 필드입니다. 해당값은 이후 filter 검색간에 활용됩니다. |
-| 2 | ID | 필터에서 사용할 VC 스키마 ID를 입력합니다. 예시에는 Issuer 서버의 VC 스키마 URL이 입력되어 있습니다. |
+| 2 | ID | 필터에서 사용할 VC 스키마 ID입니다.. SEARCH 버튼을 통해 List사업자로 부터  스키마 아이디를 찾아와 입력 합니다. |
 | 3 | Type | 스키마 유형을 선택합니다. 현재는 OsdSchemaCredential로 값이 고정되어있습니다.  |
-| 4 | Required Claims | 검증에 필요한 필수 클레임을 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 개의 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
-| 5 | Display Claims | 표시할 클레임 정보를 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 개의 표시 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 4 | Required Claims | 검증에 필요한 필수 클레임을 관리하는 섹션입니다. "ADD REQUIRED CLAIMS" 버튼을 클릭하여 스키마 아이디에 해당하는 클레임을 추가할 수 있습니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 5 | Display Claims | 표시할 클레임 정보를 관리하는 섹션입니다. 입력된 클레임을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
 | 6 | Allowed Issuers | 허용된 발급자 DID를 관리하는 섹션입니다. "ADD" 버튼을 클릭하여 여러 발급자를 추가할 수 있습니다. 입력된 발급자를 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
 | 7 | Present All | 모든 클레임의 제출 필요 여부를 설정합니다. 드롭다운 메뉴에서 "true" 또는 "false"를 선택할 수 있습니다. |
 | 8 | 버튼 영역 | - REGISTER: 입력한 정보로 필터를 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(필터 목록)로 돌아갑니다. |

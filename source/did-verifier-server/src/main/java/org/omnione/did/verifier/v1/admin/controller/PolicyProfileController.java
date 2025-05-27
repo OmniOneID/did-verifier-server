@@ -25,11 +25,11 @@ public class PolicyProfileController {
 
     private final PolicyProfileService policyProfileService;
 
-@Operation(summary = "Get Profile List", description = "Get a list of profiles by name (optional).")
-@GetMapping(UrlConstant.Verifier.GET_PROFILE_LIST)
-public Page<PolicyProfileDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable) {
-    return policyProfileService.searchPolicyProfileList(searchKey, searchValue, pageable);
-}
+    @Operation(summary = "Get Profile List", description = "Get a list of profiles by name (optional).")
+    @GetMapping(UrlConstant.Verifier.GET_PROFILE_LIST)
+    public Page<PolicyProfileDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable) {
+        return policyProfileService.searchPolicyProfileList(searchKey, searchValue, pageable);
+    }
 
     @Operation(summary = "Get Profile Info", description = "Get a single profile's information.")
     @GetMapping(UrlConstant.Verifier.GET_PROFILE_INFO)

@@ -16,6 +16,7 @@
 
 package org.omnione.did.verifier.v1.common.service;
 
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.ContractApi;
@@ -25,6 +26,9 @@ import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.BlockchainProperty;
 import org.omnione.did.data.model.did.DidDocAndStatus;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
+import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
+import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.omnione.exception.BlockChainException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -51,8 +55,8 @@ public class BlockChainServiceImpl implements StorageService {
      * @return a ContractApi instance.
      */
     private ContractApi initBlockChain() {
-        log.debug("Initializing block chain :: file-path {}", blockchainProperty.getFilePath());
-        return ContractFactory.FABRIC.create(blockchainProperty.getFilePath());
+
+        return ContractFactory.EVM.create(blockchainProperty.getFilePath());
     }
 
     /**
@@ -73,5 +77,30 @@ public class BlockChainServiceImpl implements StorageService {
             log.error("Failed to get DID Document: " + e.getMessage());
             throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_DID_DOC_FAILED);
         }
+    }
+
+    @Override
+    public CredentialSchema getZKPCredential(String credentialSchemaId) {
+        try {
+            ContractApi contractApi = initBlockChain();
+            CredentialSchema credentialSchema = (CredentialSchema) contractApi.getZKPCredential(credentialSchemaId);
+            return credentialSchema;
+        } catch (BlockChainException e) {
+            log.error("Failed to get ZKP Credential: " + e.getMessage());
+            throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_ZKP_CREDENTIAL_FAILED);
+        }
+    }
+
+    @Override
+    public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
+        try {
+            ContractApi contractApi = initBlockChain();
+            CredentialDefinition credentialDefinition = (CredentialDefinition) contractApi.getZKPCredentialDefinition(credentialDefinitionId);
+            return credentialDefinition;
+        } catch (BlockChainException e) {
+            log.error("Failed to get ZKP Credential Definition: " + e.getMessage());
+            throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED);
+        }
+
     }
 }

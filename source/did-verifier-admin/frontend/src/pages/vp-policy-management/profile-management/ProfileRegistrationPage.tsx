@@ -186,36 +186,17 @@ const ProfileRegistration = (props: Props) => {
     const processApiResponse = (data: any): {id: number, title: string}[] => {
         if (!data) return [];
         
-        // Check if data is an array
-        if (Array.isArray(data)) {
-            return data.map((item: ApiResponseItem) => ({
-                id: item.id || 0,
-                title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
-                filterId: item.filterId || 0,
-            }));
-        }
+        // Extract the array from whatever response format we received
+        const items = Array.isArray(data) ? data : 
+                     data.data && Array.isArray(data.data) ? data.data :
+                     data.content && Array.isArray(data.content) ? data.content :
+                     data.items && Array.isArray(data.items) ? data.items : [];
         
-        // Check if data has a data property that's an array
-        if (data.data && Array.isArray(data.data)) {
-            return data.data.map((item: ApiResponseItem) => ({
-                id: item.id || 0,
-                title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
-                filterId: item.filterId || 0,
-            }));
-        }
-        
-        // Check if data is an object with items array
-        if (data.items && Array.isArray(data.items)) {
-            return data.items.map((item: ApiResponseItem) => ({
-                id: item.id || 0,
-                title: item.title || item.name || `Item ${item.id || 'Unknown'}`,
-                filterId: item.filterId || 0,
-            }));
-        }
-        
-        // If we can't find a valid structure, return empty array
-        console.error('Unexpected API response format:', data);
-        return [];
+        // Map each item consistently
+        return items.map((item: ApiResponseItem) => ({
+            id: item.filterId || item.id || 0, // Prioritize filterId if it exists
+            title: item.title || item.name || `Item ${item.filterId || item.id || 'Unknown'}`
+        }));
     };
 
     useEffect(() => {
@@ -308,18 +289,23 @@ const ProfileRegistration = (props: Props) => {
         }));
     };
     
-    const handleFilterSelect = (selectedFilter: { id?: string | number, title: string }) => {                
-        const filterId = typeof selectedFilter.id === 'number' 
-            ? selectedFilter.id 
-            : typeof selectedFilter.id === 'string' 
-                ? parseInt(selectedFilter.id, 10) 
-                : 0;
-                
+    const handleFilterSelect = (selectedFilter: { id?: string | number, title: string }) => {
+        // Ensure we have a valid numeric ID
+        const filterId = Number(selectedFilter.id) || 0;
+        
+        if (isNaN(filterId)) {
+            console.error('Invalid filter ID:', selectedFilter.id);
+            return;
+        }
+        
         setProfileData(prev => ({
             ...prev,
             filterId: filterId,
             filterTitle: selectedFilter.title
         }));
+        
+        // Log to verify the ID is being set correctly
+        console.log('Set filterId to:', filterId);
     };
     
     const validate = () => {

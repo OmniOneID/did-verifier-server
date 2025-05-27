@@ -55,9 +55,8 @@ public interface TransactionService {
      * Saves a sub-transaction in the system.
      *
      * @param subTransaction Sub-transaction data to save.
-     * @return Saved sub-transaction.
      */
-    SubTransaction saveSubTransaction(SubTransaction subTransaction);
+    void saveSubTransaction(SubTransaction subTransaction);
 
     /**
      * Finds the last sub-transaction for a given transaction ID.

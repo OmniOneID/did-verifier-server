@@ -50,6 +50,8 @@ public class VpOffer extends BaseEntity implements Serializable {
     private String payload;
     @Column(name = "passcode", nullable = true, length = 64)
     private String passcode;
+    @Column(name = "offer_type", nullable = false, length = 40)
+    private String offerType;
     @Column(name = "valid_until", nullable = true)
     private Instant validUntil;
     @Column(name = "vp_policy_id", nullable = false, length = 40)

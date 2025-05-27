@@ -16,13 +16,15 @@
 
 package org.omnione.did.base.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
+import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.wallet.enums.WalletEncryptType;
 import org.omnione.did.wallet.exception.WalletException;
 import org.omnione.did.wallet.key.WalletManagerFactory;
 import org.omnione.did.wallet.key.WalletManagerFactory.WalletManagerType;
 import org.omnione.did.wallet.key.WalletManagerInterface;
+import org.omnione.did.wallet.key.data.CryptoKeyPairInfo;
 
 import java.nio.charset.StandardCharsets;
 
@@ -35,21 +37,27 @@ import java.nio.charset.StandardCharsets;
 public class BaseWalletUtil {
 
     /**
-     * Connect to an existing file wallet with the given file path and password.
-     * The wallet manager is used to perform cryptographic operations using the wallet keys.
+     * Creates a new file-based wallet at the specified path with the given password.
+     * The wallet is encrypted using AES-256-CBC with PKCS5 padding.
      *
-     * @param walletFilePath Path to the wallet file
-     * @param password Password to unlock the wallet
-     * @return Wallet manager interface for the connected wallet
-     *
+     * @param walletFilePath Path to the wallet file.
+     * @param password Password to protect the wallet.
+     * @throws OpenDidException if the wallet creation fails.
      */
-    public static WalletManagerInterface connectFileWallet(String walletFilePath, String password) throws WalletException {
+    public static void createFileWallet(String walletFilePath, String password) {
+        try {
+            WalletManagerInterface walletManager = WalletManagerFactory.getWalletManager(WalletManagerFactory.WalletManagerType.FILE);
+            walletManager.create(walletFilePath, password.toCharArray(), WalletEncryptType.AES_256_CBC_PKCS5Padding);
+        } catch (WalletException e) {
+            String errCode = e.getErrorCode();
+            if (errCode.equals("SSDKWLT02030")) {
+                log.error("Wallet already exists: {}", e.getMessage());
+                throw new OpenDidException(ErrorCode.WALLET_ALREADY_EXISTS);
+            }
 
-        WalletManagerInterface walletManager = WalletManagerFactory.getWalletManager(WalletManagerType.FILE);
-        walletManager.connect(walletFilePath, password.toCharArray());
-
-        return walletManager;
-
+            log.error("Failed to create wallet: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.WALLET_CREATION_FAILED);
+        }
     }
 
     /**
@@ -73,36 +81,119 @@ public class BaseWalletUtil {
         }
     }
 
+    /**
+     * Connects to an existing file-based wallet using the specified path and password.
+     * The wallet manager returned can be used for cryptographic operations.
+     *
+     * @param walletFilePath Path to the wallet file.
+     * @param password Password to unlock the wallet.
+     * @return WalletManagerInterface instance for managing wallet operations.
+     * @throws OpenDidException if the wallet connection fails.
+     */
+    public static WalletManagerInterface connectFileWallet(String walletFilePath, String password) {
+        try {
+            WalletManagerInterface walletManager = WalletManagerFactory.getWalletManager(WalletManagerType.FILE);
+            walletManager.connect(walletFilePath, password.toCharArray());
+
+            return walletManager;
+        } catch (WalletException e) {
+            log.error("Failed to connect wallet: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.WALLET_CONNECTION_FAILED);
+        }
+    }
 
     /**
-     * Generate a compact signature for the given plain text using the key with the given key id.
-     * The plain text is first converted to a byte array using UTF-8 encoding.
+     * Generates a new key pair in the wallet with the specified key ID.
+     * The key pair is generated using the SECP256r1 algorithm.
      *
-     * @param walletManager Wallet manager interface for the connected wallet
-     * @param keyId Key ID of the key to use for signing
-     * @param plainText Plain text to sign
-     * @return Compact signature as a byte array
-     * @throws WalletException if the signature generation fails
+     * @param walletManager WalletManagerInterface instance for managing wallet operations.
+     * @param keyId Key ID for the new key pair.
+     * @throws OpenDidException if key pair generation fails.
      */
-    public static byte[] generateCompactSignature(WalletManagerInterface walletManager, String keyId, String plainText) throws WalletException {
+    public static void generateKeyPair(WalletManagerInterface walletManager, String keyId) {
+        try {
+            walletManager.generateRandomKey(keyId, CryptoKeyPairInfo.KeyAlgorithmType.SECP256r1);
+        } catch (WalletException e) {
+            if (e.getErrorCode().equals("SSDKWLT02005")) {
+                log.error("Key already exists: {}", e.getMessage());
+                throw new OpenDidException(ErrorCode.KEY_ALREADY_EXISTS);
+            }
+
+            log.error("Failed to generate random keys: {} ", e.getMessage());
+            throw new OpenDidException(ErrorCode.KEY_GENERATION_FAILED);
+        }
+    }
+
+    /**
+     * Generates a compact signature for the given plain text using the specified key ID in the wallet.
+     * The plain text is first converted to a byte array using UTF-8 encoding before signing.
+     *
+     * @param walletManager WalletManagerInterface instance for managing wallet operations.
+     * @param keyId Key ID of the key to use for signing.
+     * @param plainText Plain text to sign.
+     * @return Compact signature as a byte array.
+     */
+    public static byte[] generateCompactSignature(WalletManagerInterface walletManager, String keyId, String plainText) {
         return generateCompactSignature(walletManager, keyId, plainText.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
-     * Generate a compact signature for the given plain text using the key with the given key id.
-     * The plain text is first converted to a byte array using UTF-8 encoding.
+     * Generates a compact signature for the given data using the specified key ID in the wallet.
      *
-     * @param walletManager Wallet manager interface for the connected wallet
-     * @param keyId Key ID of the key to use for signing
-     * @param plainText Plain text to sign
-     * @return Compact signature as a byte array
-     * @throws OpenDidException if the signature generation fails
+     * @param walletManager WalletManagerInterface instance for managing wallet operations.
+     * @param keyId Key ID of the key to use for signing.
+     * @param plainText Data to sign as a byte array.
+     * @return Compact signature as a byte array.
+     * @throws OpenDidException if signature generation fails.
      */
-    public static byte[] generateCompactSignature(WalletManagerInterface walletManager, String keyId, byte[] plainText) throws WalletException {
-
+    public static byte[] generateCompactSignature(WalletManagerInterface walletManager, String keyId, byte[] plainText) {
+        try {
             return walletManager.generateCompactSignatureFromHash(keyId, BaseDigestUtil.generateHash(plainText));
-
+        } catch (WalletException e) {
+            log.error("Failed to generate compact signature: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.WALLET_SIGNATURE_GENERATION_FAILED);
+        }
     }
 
+    /**
+     * Creates a file-based wallet if not exists. Ignores if already exists.
+     */
+    public static void createFileWalletSafe(String walletFilePath, String password) {
+        try {
+            createFileWallet(walletFilePath, password);
+        } catch (OpenDidException e) {
+            if (e.getErrorCode() == ErrorCode.WALLET_ALREADY_EXISTS) {
+                log.info("Wallet already exists at {}.", walletFilePath);
+            } else {
+                throw e;
+            }
+        }
+    }
 
+    /**
+     * Generates a key pair if not already present.
+     */
+    public static void generateKeyPairSafe(WalletManagerInterface walletManager, String keyId) {
+        try {
+            generateKeyPair(walletManager, keyId);
+        } catch (OpenDidException e) {
+            if (e.getErrorCode() == ErrorCode.KEY_ALREADY_EXISTS) {
+                log.info("Key already exists: {}", keyId);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Creates wallet if needed, connects it, and generates default key set safely.
+     */
+    public static WalletManagerInterface initializeWalletWithKeys(String walletFilePath, String password, String... keyIds) {
+        createFileWalletSafe(walletFilePath, password);
+        WalletManagerInterface walletManager = connectFileWallet(walletFilePath, password);
+        for (String keyId : keyIds) {
+            generateKeyPairSafe(walletManager, keyId);
+        }
+        return walletManager;
+    }
 }

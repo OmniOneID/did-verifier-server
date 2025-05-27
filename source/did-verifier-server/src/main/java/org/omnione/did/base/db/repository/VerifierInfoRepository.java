@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface VerifierInfoRepository extends JpaRepository<VerifierInfo, Long> {
     Optional<VerifierInfo> findFirstBy();
+    Optional<VerifierInfo> findTop1ByOrderByIdAsc();
 }

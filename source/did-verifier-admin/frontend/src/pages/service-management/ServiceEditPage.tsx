@@ -4,11 +4,11 @@ import { Box, Button, FormControl, FormHelperText, IconButton, InputLabel, MenuI
 import { useDialogs } from '@toolpad/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getService, putService } from '../../../apis/vp-payload-api';
-import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { ipRegex, urlRegex } from '../../../utils/regex';
+import { getService, putService } from '../../apis/vp-payload-api';
+import CustomConfirmDialog from '../../components/dialog/CustomConfirmDialog';
+import CustomDialog from '../../components/dialog/CustomDialog';
+import FullscreenLoader from '../../components/loading/FullscreenLoader';
+import { ipRegex, urlRegex } from '../../utils/regex';
 
 type Props = {}
 
@@ -17,6 +17,8 @@ interface ServiceFormData {
   locked?: boolean;
   device: string;
   mode: string;
+  offerType: string; 
+  policyCount: number;
   validSeconds: number;
   endpoints: string[];
 }
@@ -26,6 +28,8 @@ interface ErrorState {
   locked?: string;
   device?: string;
   mode?: string;
+  offerType?: string;
+  policyCount?: string;
   validSeconds?: string;
   endpoints?: string[];
   errorEndpointsMessage?: string;
@@ -44,6 +48,8 @@ const ServiceEditPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
+        offerType: '',
+        policyCount: 0,
         validSeconds: 180,
         endpoints: [],
     });
@@ -190,6 +196,7 @@ const ServiceEditPage = (props: Props) => {
           locked: formData.locked,
           device: formData.device,
           mode: formData.mode,
+          offerType: formData.offerType,
           endpoints: JSON.stringify(formData.endpoints),
           validSecond: formData.validSeconds
         }
@@ -238,7 +245,9 @@ const ServiceEditPage = (props: Props) => {
                 locked: data.locked,
                 device: data.device,
                 mode: data.mode,
-                validSeconds: data.validSecond || 180, // Use validSecond from API or default to 180
+                offerType: data.offerType,
+                policyCount: data.policyCount,
+                validSeconds: data.validSecond || 180,
                 endpoints: JSON.parse(data.endpoints),
               }
               setFormData(serviceData);
@@ -346,6 +355,22 @@ const ServiceEditPage = (props: Props) => {
                         <MenuItem value="Proxy">Proxy</MenuItem>
                     </Select>
                     {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
+                </FormControl>
+
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Verification Type</InputLabel>
+                    <Select
+                        value={formData.offerType}
+                        onChange={handleChange('offerType')}
+                        label="Verification Type"
+                        disabled={formData.policyCount > 0}
+                    >
+                        <MenuItem value="VerifyOffer">VP</MenuItem>
+                        <MenuItem value="VerifyProofOffer">ZKP</MenuItem>
+                    </Select>
+                    {formData.policyCount > 0 && (
+                        <FormHelperText>This field cannot be changed because policies exist.</FormHelperText>
+                    )}
                 </FormControl>
 
                 <TextField 

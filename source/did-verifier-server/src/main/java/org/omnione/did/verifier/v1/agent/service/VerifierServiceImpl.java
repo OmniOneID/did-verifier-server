@@ -17,14 +17,14 @@
 package org.omnione.did.verifier.v1.agent.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
+import org.omnione.did.ContractFactory;
 import org.omnione.did.base.datamodel.data.*;
 import org.omnione.did.base.datamodel.enums.*;
 import org.omnione.did.base.db.constant.SubTransactionStatus;
@@ -71,11 +71,24 @@ import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.dto.*;
 
+import org.omnione.did.verifier.v1.agent.service.sample.ZkpTestConstants;
 import org.omnione.did.verifier.v1.common.service.StorageService;
+
+import org.omnione.did.zkp.core.manager.ZkpCredentialManager;
+import org.omnione.did.zkp.core.manager.ZkpProofManager;
+import org.omnione.did.zkp.crypto.constant.ZkpCryptoConstants;
+import org.omnione.did.zkp.crypto.util.BigIntegerUtil;
+import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
+import org.omnione.did.zkp.datamodel.proof.Identifiers;
+import org.omnione.did.zkp.datamodel.proof.verifyparam.ProofVerifyParam;
+import org.omnione.did.zkp.datamodel.proofrequest.ProofRequest;
+import org.omnione.did.zkp.exception.ZkpException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.ECPrivateKey;
 import java.time.Instant;
@@ -109,8 +122,10 @@ public class VerifierServiceImpl implements VerifierService {
     private final PolicyProfileRepository policyProfileRepository;
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
-
     private final ObjectMapper objectMapper;
+    private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
+    private final ZkpProofRequestRepository zkpProofRequestRepository;
+    private final VpOfferRepository vpOfferRepository;
 
 
     /**
@@ -132,11 +147,12 @@ public class VerifierServiceImpl implements VerifierService {
             log.debug("\t transaction and sub-transaction creation");
             Transaction transaction = createAndSaveTransaction();
             createAndSaveSubTransaction(transaction.getId());
+
             String vpOfferId = UUID.randomUUID().toString();
-            updatePayload(payload, vpOfferId);
+            payload.setOfferId(vpOfferId);
 
             log.debug("\t Saving VP Offer");
-            SaveVpOffer(transaction.getId(), vpOfferId, requestOfferReqDto,
+            SaveVpOffer(transaction.getId(), vpOfferId,
                     verifyOfferResult,
                     JsonUtil.serializeToJson(payload), Instant.parse(payload.getValidUntil()));
 
@@ -174,7 +190,7 @@ public class VerifierServiceImpl implements VerifierService {
             Transaction transaction = findTransactionByRequestDto(requestProfileReqDto);
             VpOffer vpOffer = findVpOfferByTransaction(transaction);
 
-            log.debug("\t --> Retrieving VP Policy by policyId in VP Offer");
+            log.debug("\t --> Retrieving VerifyProfile by policyId in VP Offer");
             VerifyProfile verifyProfile = getVerifyProfileFromPolicy(vpOffer.getVpPolicyId());
 
 
@@ -294,6 +310,7 @@ public class VerifierServiceImpl implements VerifierService {
             vpSubmitRepository.save(VpSubmit.builder()
                     .transactionId(transaction.getId())
                     .vp(vpData)
+                    .holderDid(verifiablePresentation.getHolder())
                     .build());
             transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
             transactionService.saveSubTransaction(SubTransaction.builder()
@@ -343,6 +360,7 @@ public class VerifierServiceImpl implements VerifierService {
     @Override
     public ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto) {
         try {
+
             Transaction transaction = transactionService.findTransactionByOfferId(confirmVerifyReqDto.getOfferId());
             VpSubmit vpSubmit = vpSubmitRepository.findByTransactionId(transaction.getId());
             List<Claim> returnClaims = new ArrayList<>();
@@ -351,18 +369,44 @@ public class VerifierServiceImpl implements VerifierService {
                         .result(false)
                         .build();
             } else {
-                String vp = vpSubmit.getVp();
-                VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
-                verifiablePresentation.fromJson(vp);
-                List<VerifiableCredential> verifiableCredentials =  verifiablePresentation.getVerifiableCredential();
-                verifiableCredentials.forEach(vc -> {
-                    List<@Valid Claim> claims = vc.getCredentialSubject().getClaims();
-                    returnClaims.addAll(claims);
-                });
-                return ConfirmVerifyResDto.builder()
-                        .result(true)
-                        .claims(returnClaims)
-                        .build();
+                VpOffer vpOffer = vpOfferRepository.findByOfferId(confirmVerifyReqDto.getOfferId())
+                        .orElseThrow(() -> new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND));
+                OfferType offerType = OfferType.valueOf(vpOffer.getOfferType());
+                if(offerType.equals(OfferType.VerifyProofOffer)){
+                    Claim claim = new Claim();
+                    String zkpClaim = "{"
+                            + "\"caption\": \"ZKP Verification Result\","
+                            + "\"code\": \"ZkpTestResult's Codes\","
+                            + "\"format\": \"plain\","
+                            + "\"hideValue\": false,"
+                            + "\"type\": \"text\","
+                            + "\"value\": \"Successful\""
+                            + "}";
+
+                    claim.fromJson(zkpClaim);
+                    returnClaims.add(claim);
+
+                    return ConfirmVerifyResDto.builder()
+                            .result(true)
+                            .claims(returnClaims)
+                            .build();
+                } else if(offerType.equals(OfferType.VerifyOffer)){
+                    String vp = vpSubmit.getVp();
+                    VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
+                    verifiablePresentation.fromJson(vp);
+                    List<VerifiableCredential> verifiableCredentials =  verifiablePresentation.getVerifiableCredential();
+                    verifiableCredentials.forEach(vc -> {
+                        List<@Valid Claim> claims = vc.getCredentialSubject().getClaims();
+                        returnClaims.addAll(claims);
+                    });
+                    return ConfirmVerifyResDto.builder()
+                            .result(true)
+                            .claims(returnClaims)
+                            .build();
+                } else {
+                    throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
+                }
+
             }
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during ConfirmVerify: {}", e.getErrorCode().getMessage());
@@ -374,7 +418,227 @@ public class VerifierServiceImpl implements VerifierService {
 
     }
 
+    @Override
+    public ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto)  {
+        try {
 
+            log.info("=== Starting requestProofRequestProfile ===");
+            log.debug("\t --> ZkpProofRequestProfile - Retrieving transaction information");
+            Transaction transaction = findTransactionByRequestDto(requestProfileReqDto);
+            VpOffer vpOffer = findVpOfferByTransaction(transaction);
+
+            log.debug("\t --> Retrieving ProofRequestProfile by policyId in VP Offer");
+            ProofRequestProfile proofRequestProfile = getProofRequestProfileFromPolicy(vpOffer.getVpPolicyId());
+
+            ReqE2e reqE2e = proofRequestProfile.getProfile().getReqE2e();
+            String generateNonce = generateNonce();
+            KeyPairInterface keyPair = generateEcKeyPair(reqE2e.getCurve());
+            generateReqE2e(reqE2e, generateNonce, keyPair);
+            proofRequestProfile.setId(UUID.randomUUID().toString());
+            proofRequestProfile.getProfile().setReqE2e(reqE2e);
+            String encodedSessionKey = encodedSessionKey((ECPrivateKey) keyPair.getPrivateKey());
+
+            log.debug("\t --> ZkpProofRequestProfile - Retrieving verifier DID Document");
+            VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+            DidDocument verifierDidDoc = didDocService.getDidDocument(verifierInfo.getDid());
+            log.debug("\t --> ZkpProofRequestProfile - Generating Verify Profile Proof");
+
+            proofRequestProfile.setProof(generatePreProof(verifierDidDoc));
+            proofRequestProfile.setProof(generateZkpProof(proofRequestProfile));
+
+            ZkpVpProfileSave(proofRequestProfile, transaction.getId());
+            SubTransaction lastSubTransaction = transactionService.findLastSubTransaction(transaction.getId());
+
+            transactionService.saveSubTransaction(SubTransaction.builder()
+                    .transactionId(transaction.getId())
+                    .step(lastSubTransaction.getStep() + 1)
+                    .type(SubTransactionType.REQUEST_PROFILE)
+                    .status(SubTransactionStatus.COMPLETED)
+                    .build());
+
+            e2EQueryService.save(E2e.builder()
+                    .transactionId(transaction.getId())
+                    .curve(reqE2e.getCurve())
+                    .cipher(reqE2e.getCipher())
+                    .padding(reqE2e.getPadding())
+                    .nonce(reqE2e.getNonce())
+                    .sessionKey(encodedSessionKey)
+                    .build());
+
+            log.debug("\t --> Generating Proof");
+            return ProofRequestResDto.builder()
+                    .proofRequestProfile(proofRequestProfile)
+                    .txId(transaction.getTxId())
+                    .build();
+
+
+        } catch (OpenDidException e){
+            log.error("OpenDidException occurred during RequestingProoofRequestProfile: {}", e.getErrorCode().getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception occurred during RequestingProfile: {}", e.getMessage(), e);
+            throw new OpenDidException(ErrorCode.FAILED_TO_REQUEST_PROOF_REQUEST_PROFILE);
+        }
+    }
+
+    @Override
+    public RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto) {
+
+        log.info("=== Starting requestVerifyProof ===");
+        log.debug("\t --> Retrieving transaction information and last sub-transaction");
+        Transaction transaction = transactionService.findTransactionByTxId(requestVerifyProofReqDto.getTxId());
+        SubTransaction lastSubTransaction = transactionService.findLastSubTransaction(transaction.getId());
+        validateTransaction(transaction, lastSubTransaction);
+
+        log.debug("\t --> Retrieving VP Profile and verifying AuthType");
+        ProofRequestProfile findProofRequestProfile = findProofProfile(requestVerifyProofReqDto.getTxId());
+
+        log.debug("\t --> if AccE2e proof exists, verify it");
+        if(Objects.nonNull(requestVerifyProofReqDto.getAccE2e().getProof())){
+            verifyAccE2eProof(requestVerifyProofReqDto.getAccE2e());
+        }
+        org.omnione.did.zkp.datamodel.proof.Proof proof = decryptProof(requestVerifyProofReqDto);
+
+        BigInteger proofNonce = new BigInteger(requestVerifyProofReqDto.getNonce());
+
+        List<ProofVerifyParam> proofVerifyParams = getProofVerifyParams(proof.getIdentifiers());
+
+        VerifyProof(proof, proofNonce, findProofRequestProfile.getProfile().getProofRequest(), proofVerifyParams);
+
+
+        vpSubmitRepository.save(VpSubmit.builder()
+                .transactionId(transaction.getId())
+                .vp("Zkp Proof")
+                .holderDid("Zkp VP Holder")
+                .build());
+        transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
+        transactionService.saveSubTransaction(SubTransaction.builder()
+                .transactionId(transaction.getId())
+                .step(lastSubTransaction.getStep() + 1)
+                .type(SubTransactionType.REQUEST_VERIFY)
+                .status(SubTransactionStatus.COMPLETED)
+                .build());
+
+        log.debug("*** Finished requestProofVerify ***");
+        return RequestVerifyResDto.builder()
+                .txId(requestVerifyProofReqDto.getTxId())
+                .build();
+    }
+
+    private LinkedList<ProofVerifyParam> getProofVerifyParams(List<Identifiers> identifiers) {
+
+        LinkedList<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
+        for (Identifiers id : identifiers) {
+            org.omnione.did.zkp.datamodel.schema.CredentialSchema zkpCredSchema = storageService.getZKPCredential(id.getSchemaId());
+            CredentialDefinition zkpCredentialDefinition = storageService.getZKPCredentialDefinition(id.getCredDefId());
+            ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
+                    .setSchema(zkpCredSchema)
+                    .setCredentialDefinition(zkpCredentialDefinition)
+                    .build();
+            proofVerifyParams.add(proofVerifyParam);
+        }
+        return proofVerifyParams;
+    }
+
+
+
+    private void VerifyProof(org.omnione.did.zkp.datamodel.proof.Proof proof, BigInteger proofNonce, ProofRequest proofRequest, List<ProofVerifyParam> proofVerifyParams)  {
+        ZkpProofManager zkpProofManager = new ZkpProofManager();
+        try {
+            zkpProofManager.verifyProof(proof, proofNonce, proofRequest, proofVerifyParams);
+        } catch (ZkpException e) {
+            log.error("ZkpException occurred during VerifyProof: {}", e.getErrorCode());
+            log.error("ZkpException occurred during VerifyProof: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.FAILED_TO_VERIFY_PROOF);
+        }
+
+    }
+
+    private org.omnione.did.zkp.datamodel.proof.Proof decryptProof(RequestVerifyProofReqDto requestVerifyProofReqDto) {
+        Transaction transaction = transactionService.findTransactionByTxId(requestVerifyProofReqDto.getTxId());
+        E2e e2e = e2EQueryService.findByTransactionId(transaction.getId());
+        SymmetricCipherType e2eCipher =  SymmetricCipherType.fromDisplayName(e2e.getCipher());
+        SymmetricPaddingType e2ePadding = SymmetricPaddingType.fromDisplayName(e2e.getPadding());
+
+        byte[] decodeEncProof = BaseMultibaseUtil.decode(requestVerifyProofReqDto.getEncProof());
+        byte[] decodeIv = BaseMultibaseUtil.decode(requestVerifyProofReqDto.getAccE2e().getIv());
+        byte[] sharedSecretKey = generateSharedSecretKey(requestVerifyProofReqDto.getAccE2e(), e2e);
+        byte[] mergeSharedSecretAndNonce = mergeSharedSecretAndNonce(sharedSecretKey, e2e.getNonce(), e2eCipher);
+        byte[] decryptedData = decrypt(decodeEncProof, mergeSharedSecretAndNonce, decodeIv, e2eCipher, e2ePadding);
+        String decodeProofStr = new String(decryptedData, StandardCharsets.UTF_8);
+        return new Gson().fromJson(decodeProofStr, org.omnione.did.zkp.datamodel.proof.Proof.class);
+    }
+
+    private ReqE2e setReqE2e(ZkpProofRequest zkpProofRequest) {
+        ReqE2e reqE2e = new ReqE2e();
+
+        reqE2e.setCurve(zkpProofRequest.getCurve().toString());
+        reqE2e.setCipher(zkpProofRequest.getCipher().toString());
+        reqE2e.setPadding(zkpProofRequest.getPadding().toString());
+        return reqE2e;
+    }
+
+    private ProofRequestProfile getProofRequestProfileFromPolicy(String vpPolicyId) throws IOException {
+        Policy policy = policyRepository.findByPolicyId(vpPolicyId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_NOT_FOUND));
+
+        String zkpProfileId = policy.getPolicyProfileId();
+
+        ZkpPolicyProfile zkpPolicyProfile = zkpPolicyProfileRepository.findByProfileId(zkpProfileId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.ZKP_POLICY_PROFILE_NOT_FOUND));
+        String jsonZkpProfile = objectMapper.writeValueAsString(zkpPolicyProfile);
+        ProofRequestProfile proofRequestProfile = objectMapper.readValue(jsonZkpProfile, ProofRequestProfile.class);
+        setInnerProfile(proofRequestProfile, zkpPolicyProfile.getZkpProofRequestId());
+
+
+        return proofRequestProfile;
+
+    }
+
+    private void setInnerProfile(ProofRequestProfile proofRequestProfile, Long zkpProofRequestId) {
+        ZkpProofRequest zkpProofRequest = zkpProofRequestRepository.findById(zkpProofRequestId)
+                .orElseThrow(() -> new OpenDidException(ErrorCode.ZKP_PROOF_REQUEST_NOT_FOUND));
+        ReqE2e reqE2e = setReqE2e(zkpProofRequest);
+        ProofRequest proofRequest = new ProofRequest();
+        BigInteger verifierNonce = new BigIntegerUtil().createRandomBigInteger(ZkpCryptoConstants.LARGE_NONCE);
+
+        GsonWrapper gson = new GsonWrapper();
+
+        if (zkpProofRequest.getRequestedAttributes() != null && !zkpProofRequest.getRequestedAttributes().isEmpty()) {
+            String requestedAttributesJson = zkpProofRequest.getRequestedAttributes();
+            ProofRequest tempProofReq = gson.fromJson("{\"requestedAttributes\":" + requestedAttributesJson + "}", ProofRequest.class);
+            proofRequest.setRequestedAttributes(tempProofReq.getRequestedAttributes());
+        }
+
+        if (zkpProofRequest.getRequestedPredicates() != null && !zkpProofRequest.getRequestedPredicates().isEmpty()) {
+            String requestedPredicatesJson = zkpProofRequest.getRequestedPredicates();
+            ProofRequest tempProofReq = gson.fromJson("{\"requestedPredicates\":" + requestedPredicatesJson + "}", ProofRequest.class);
+            proofRequest.setRequestedPredicates(tempProofReq.getRequestedPredicates());
+        }
+
+        proofRequest.setNonce(verifierNonce);
+        proofRequest.setName(zkpProofRequest.getName());
+        proofRequest.setVersion(zkpProofRequest.getVersion());
+
+        ZkpInnerVerifyProfile innerVerifyProfile = new ZkpInnerVerifyProfile();
+        ProviderDetail providerDetail = new ProviderDetail();
+        VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+        providerDetail.setCertVcRef(verifierInfo.getCertificateUrl());
+        providerDetail.setDid(verifierInfo.getDid());
+        providerDetail.setRef(verifierInfo.getServerUrl());
+        providerDetail.setName(verifierInfo.getName());
+        innerVerifyProfile.setVerifier(providerDetail);
+        innerVerifyProfile.setProofRequest(proofRequest);
+        innerVerifyProfile.setReqE2e(reqE2e);
+
+        proofRequestProfile.setProfile(innerVerifyProfile);
+
+        log.debug("ProofRequest: {}", proofRequestProfile.toJson());
+    }
+
+
+
+    ////ZKP TEST END /////
     /**
      * Validates the AuthType of a VerifiablePresentation against the VerifyProfile.
      * This ensures that the authentication method used in the VP matches the requirements set in the profile.
@@ -430,6 +694,24 @@ public class VerifierServiceImpl implements VerifierService {
         }
     }
 
+    private ProofRequestProfile findProofProfile(String txId) {
+        try {
+            Transaction transaction = transactionService.findTransactionByTxId(txId);
+            if (transaction == null) {
+                throw new OpenDidException(ErrorCode.TRANSACTION_NOT_FOUND);
+            }
+            // Retrieve the ProofProfile from the database
+            VpProfile vpProfile = vpProfileRepository.findByTransactionId(transaction.getId())
+                    .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PROFILE_NOT_FOUND));
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(vpProfile.getVpProfile(), ProofRequestProfile.class);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse VP profile for txId: {}", txId, e);
+            throw new OpenDidException(ErrorCode.VP_PROFILE_PARSE_ERROR);
+        }
+    }
+
     /**
      * Retrieves and validates the policy for a VP Offer request.
      *
@@ -438,7 +720,7 @@ public class VerifierServiceImpl implements VerifierService {
      * @throws OpenDidException If the policy is not found
      */
     private VerifyOfferResult getPolicyAndValidate(RequestOfferReqDto requestOfferReqDto) throws JsonProcessingException {
-
+        //분기 타입
         Optional<Policy> policy = policyRepository.findByPolicyId(requestOfferReqDto.getPolicyId());
         if (policy.isEmpty()) {
             log.error("Policy not found for payloadId: {}", requestOfferReqDto.getPolicyId());
@@ -492,12 +774,11 @@ public class VerifierServiceImpl implements VerifierService {
      *
      * @param transactionId      The ID of the associated transaction
      * @param vpOfferId          The ID of the VP Offer
-     * @param requestOfferReqDto The request data for VP Offer
      * @param verifyOfferResult  The result of the offer verification
      * @param extractedPayload   The extracted payload
      * @param validUntil         The expiration time of the offer
      */
-    private void SaveVpOffer(Long transactionId, String vpOfferId, RequestOfferReqDto requestOfferReqDto,
+    private void SaveVpOffer(Long transactionId, String vpOfferId,
                              VerifyOfferResult verifyOfferResult, String extractedPayload, Instant validUntil) {
         vpOfferQueryService.insertVpOffer(VpOffer.builder()
                 .transactionId(transactionId)
@@ -505,6 +786,7 @@ public class VerifierServiceImpl implements VerifierService {
                 .device(verifyOfferResult.getOfferPayload().getDevice())
                 .service(verifyOfferResult.getOfferPayload().getService())
                 .vpPolicyId(verifyOfferResult.getVpPolicyId())
+                .offerType(verifyOfferResult.getOfferPayload().getType().toString())
                 .payload(extractedPayload)
                 .validUntil(validUntil)
                 .build());
@@ -554,6 +836,7 @@ public class VerifierServiceImpl implements VerifierService {
         byte[] mergeSharedSecretAndNonce = mergeSharedSecretAndNonce(sharedSecretKey, verifierNonce, e2eCipher);
         byte[] decryptedData = decrypt(decodeEncVp, mergeSharedSecretAndNonce, decodeIv, e2eCipher, e2ePadding);
         String decodeVP = new String(decryptedData, StandardCharsets.UTF_8);
+        log.info("Decoded VP: {}", decodeVP);
         VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
         verifiablePresentation.fromJson(decodeVP);
         return verifiablePresentation;
@@ -613,6 +896,27 @@ public class VerifierServiceImpl implements VerifierService {
             vpProfileRepository.save(vpProfile);
         } catch (JsonProcessingException e) {
             throw new OpenDidException(ErrorCode.VERIFY_PROFILE_PARSE_ERROR);
+        }
+    }
+
+    /**
+     * Saves a VP Profile.
+     *
+     * @param proofRequestProfile The VerifyProfile to save
+     * @param txId The ID of the associated transaction
+     * @throws OpenDidException If saving fails
+     */
+    private void ZkpVpProfileSave(ProofRequestProfile proofRequestProfile, Long txId)  {
+        VpProfile vpProfile = new VpProfile();
+        vpProfile.setProfileId(proofRequestProfile.getId());
+        vpProfile.setTransactionId(txId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String verifyProfileToJson = objectMapper.writeValueAsString(proofRequestProfile);
+            vpProfile.setVpProfile(verifyProfileToJson);
+            vpProfileRepository.save(vpProfile);
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.PROOF_REQUEST_PROFILE_PARSE_ERROR);
         }
     }
 
@@ -747,22 +1051,6 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     /**
-     * Extracts the payload from a policy.
-     *
-     * @param policy The policy to extract from
-     * @param offerId The ID of the offer
-     * @return String The extracted payload
-     */
-    private String extractPayload(JsonNode policy, String offerId) {
-        ObjectNode objectNode = (ObjectNode) policy;
-        objectNode.remove("profile");
-        objectNode.remove("policyId");
-        objectNode.put("offerId", offerId);
-        objectNode.put("type", OfferType.VERIFY_OFFER.toString());
-        return objectNode.toString();
-    }
-
-    /**
      * Converts a policy payload to a VerifyOfferPayload.
      *
      * @param payload The policy payload
@@ -781,6 +1069,7 @@ public class VerifierServiceImpl implements VerifierService {
                 .endpoints(endpoints)
                 .locked(payload.get().isLocked())
                 .validUntil(validUntil.toString())
+                .type(payload.get().getOfferType())
                 .build();
 
     }
@@ -801,6 +1090,30 @@ public class VerifierServiceImpl implements VerifierService {
             proof.setCreated(verifyProfile.getProof().getCreated());
             proof.setProofPurpose(verifyProfile.getProof().getProofPurpose());
             proof.setVerificationMethod(verifyProfile.getProof().getVerificationMethod());
+            proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
+            return proof;
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
+
+    }
+
+    /**
+     * Generates a proof for a ProofRequestProfile.
+     *
+     * @param proofRequestProfile The ProofRequestProfile to generate a proof for
+     * @return Proof The generated proof
+     * @throws OpenDidException If JSON processing fails
+     */
+    private Proof generateZkpProof(ProofRequestProfile proofRequestProfile)  {
+        try {
+            String serializedAndSortedProfile = serializeAndSort(proofRequestProfile);
+            byte[] signatureBytes = walletService.generateCompactSignature("assert", serializedAndSortedProfile);
+            Proof proof = new Proof();
+            proof.setType(proofRequestProfile.getProof().getType());
+            proof.setCreated(proofRequestProfile.getProof().getCreated());
+            proof.setProofPurpose(proofRequestProfile.getProof().getProofPurpose());
+            proof.setVerificationMethod(proofRequestProfile.getProof().getVerificationMethod());
             proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
             return proof;
         } catch (JsonProcessingException e) {
@@ -894,18 +1207,6 @@ public class VerifierServiceImpl implements VerifierService {
         EccCurveType eccCurveType = EccCurveType.fromValue(curve);
         return (EcKeyPair) BaseCryptoUtil.generateKeyPair(eccCurveType);
     }
-    /**
-     * Updates the payload of a VP Offer.
-     * This method is used to set offer ID for the VP Offer.
-     *
-     * @param payload The payload to update
-     * @param vpOfferId The ID of the VP Offer
-     */
-    private void updatePayload(VerifyOfferPayload payload, String vpOfferId) {
-        payload.setOfferId(vpOfferId);
-        payload.setType(OfferType.VERIFY_OFFER);
-        log.debug("Updated payload: {}", payload);
-    }
 
     private void setVpFilter(VerifyProfile verifyProfile, Long filterId) throws IOException {
         Optional<VpFilter> byFilterId = vpFilterRepository.findByFilterId(filterId);
@@ -922,7 +1223,7 @@ public class VerifierServiceImpl implements VerifierService {
 
     }
 
-    private void setVpProcess(VerifyProfile verifyProfile, Long processId) throws JsonProcessingException {
+    private void setVpProcess(VerifyProfile verifyProfile, Long processId)  {
         Optional<VpProcess> vpProcessOptional = vpProcessRepository.findById(processId);
         if (vpProcessOptional.isEmpty()) {
             throw new OpenDidException(ErrorCode.VP_PROCESS_NOT_FOUND);
@@ -952,6 +1253,8 @@ public class VerifierServiceImpl implements VerifierService {
         log.debug("verifyProcess: {}", verifyProcess.toJson());
         verifyProfile.getProfile().setProcess(verifyProcess);
     }
+
+
 
 
 }

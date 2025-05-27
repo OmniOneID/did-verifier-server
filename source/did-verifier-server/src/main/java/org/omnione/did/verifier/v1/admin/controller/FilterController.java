@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
+import org.omnione.did.verifier.v1.admin.dto.VcSchemaListResDto;
 import org.omnione.did.verifier.v1.admin.service.FilterService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,5 +63,11 @@ public class FilterController {
     @GetMapping(UrlConstant.Verifier.GET_POPUP_FILTER_LIST)
     public List<FilterDTO> getFilterList(@PathVariable String searchValue) {
         return filterService.getFilterList(searchValue);
+    }
+
+    @Operation(summary = "Get VC Schemas", description = "Get a list of VC schemas.")
+    @GetMapping(UrlConstant.Verifier.GET_POPUP_VC_SCHEMAS)
+    public VcSchemaListResDto getVcSchemas() {
+        return filterService.getVcSchemas();
     }
 }

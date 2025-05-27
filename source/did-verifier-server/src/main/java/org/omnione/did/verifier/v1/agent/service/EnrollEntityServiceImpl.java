@@ -25,17 +25,21 @@ import org.omnione.did.base.datamodel.data.DidAuth;
 import org.omnione.did.base.datamodel.data.EcdhReqData;
 import org.omnione.did.base.datamodel.enums.EccCurveType;
 import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
+import org.omnione.did.base.db.constant.VerifierStatus;
 import org.omnione.did.base.db.domain.CertificateVc;
+import org.omnione.did.base.db.domain.VerifierInfo;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.util.*;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.crypto.exception.CryptoException;
 import org.omnione.did.crypto.keypair.EcKeyPair;
+import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.did.Proof;
 import org.omnione.did.data.model.enums.did.ProofPurpose;
 import org.omnione.did.data.model.enums.did.ProofType;
 import org.omnione.did.data.model.vc.VerifiableCredential;
+import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.api.EnrollFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.*;
 import org.omnione.did.verifier.v1.agent.dto.EnrollEntityResDto;
@@ -57,7 +61,8 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
     private final EnrollFeign enrollFeign;
     private final FileWalletService walletManagerInterface;
     private final CertificateVcQueryService certificateVcQueryService;
-
+    private final VerifierInfoQueryService verifierInfoQueryService;
+    private final DidDocService didDocService;
 
     /**
      * Enrolls an entity through a multistep process:
@@ -75,6 +80,8 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
     public EnrollEntityResDto enrollEntity() {
 
         log.debug("=== Starting Enroll Entity ===");
+        VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
+        DidDocument verifierDidDoc = didDocService.getDidDocument(verifierInfo.getDid());
 
         log.debug("\t--> 1. propose Enroll Entity");
         ProposeEnrollEntityApiResDto proposeResponse = proposeEnrollEntity();
@@ -102,6 +109,12 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
 
         log.debug("\t--> 4. confirm Enroll Entity");
         ConfirmEnrollEntityApiResDto confirmResponse = confirmEnrollEntity(txId, vc.getId());
+
+        log.debug("\t--> 5. VerifierInfo Status Update");
+
+        verifierInfo.setStatus(VerifierStatus.ACTIVATE);
+        verifierInfoQueryService.save(verifierInfo);
+
 
         log.debug("\t\t--> save VC to DB");
         certificateVcQueryService.save(CertificateVc.builder()

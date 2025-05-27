@@ -34,9 +34,7 @@ public class VpSubmitQueryService {
     }
     public VpSubmitDTO convertVpSubmitDTO(VpSubmit vpSubmit) {
 
-        VerifiablePresentation verifiablePresentation = new VerifiablePresentation();
-        verifiablePresentation.fromJson(vpSubmit.getVp());
-        String holderDID = verifiablePresentation.getHolder();
+        String holderDID = vpSubmit.getHolderDid();
 
         String transactionStatus = transactionRepository.findById(vpSubmit.getTransactionId())
                 .map(transaction -> transaction.getStatus().toString())

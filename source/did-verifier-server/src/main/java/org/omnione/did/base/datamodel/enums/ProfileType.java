@@ -25,7 +25,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ProfileType {
     ISSUE_PROFILE("IssueProfile"),
-    VERIFY_PROFILE("VerifyProfile");
+    VERIFY_PROFILE("VerifyProfile"),
+    PROOF_REQUEST_PROFILE("ProofRequestProfile");
 
     private final String displayName;
 

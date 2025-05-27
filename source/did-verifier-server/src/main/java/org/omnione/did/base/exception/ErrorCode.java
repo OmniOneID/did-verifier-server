@@ -34,6 +34,8 @@ public enum ErrorCode {
     GENERATE_HASH_FAILED("SSRVVRF00104", "Failed to generate hash.", 500),
     ENCODING_FAILED("SSRVVRF00105", "Failed to encode data.", 500),
     DECODING_FAILED("SSRVVRF00106", "Failed to decode data : incorrect encoding", 400),
+    SIGNATURE_GENERATION_FAILED("SSRVVRF00107", "Failed to generate signature.", 500),
+    URL_PING_ERROR("SSRVVRF00108", "Failed to ping the URL.", 400),
 
     // VP Related Errors (200-299)
     VP_OFFER_NOT_FOUND("SSRVVRF00200", "VP_OFFER is not found.", 400),
@@ -52,6 +54,8 @@ public enum ErrorCode {
     VP_POLICY_PROFILE_IN_USE("SSRVVRF00213", "POLICY_PROFILE is in use by one or more policies",400 ),
     VP_FILTER_IN_USE("SSRVVRF00214", "VP_FILTER is in use by one or more profile",400 ),
     VP_PROCESS_IN_USE("SSRVVRF00215", "VP_PROCESS is in use by one or more profile.", 400),
+    VC_SCHEMA_NOT_FOUND("SSRVVRF00216", "VC_SCHEMA not found",500 ),
+
 
     // Transaction Errors (300-399)
     TRANSACTION_NOT_FOUND("SSRVVRF00300", "Transaction not found.", 400),
@@ -80,14 +84,28 @@ public enum ErrorCode {
     WALLET_SIGNATURE_GENERATION_FAILED("SSRVVRF00501", "Failed to generate wallet signature.", 500),
     PUBLIC_KEY_COMPRESS_FAILED("SSRVVRF00502", "Failed to compress public key.", 500),
     FAILED_TO_GET_FILE_WALLET_MANAGER("SSRVVRF00503", "Failed to get File Wallet Manager.", 500),
+    WALLET_ALREADY_EXISTS("SSRVVRF00504", "Failed to create wallet: wallet already exists.", 500),
+    INVALID_WALLET_FILE_PATH("SSRVVRF00505", "Failed to create wallet: invalid wallet file path.", 500),
+    KEY_ALREADY_EXISTS("SSRVVRF00506", "Failed to generate keys: key already exists.", 500),
+    FAILED_TO_LOAD_KEY_ELEMENT("SSRVVRF00507", "Failed to load key element.", 500),
+    WALLET_CREATION_FAILED("SSRVVRF00508", "Failed to create wallet.", 500),
 
     // DID Related Errors (600-699)
     DID_DOCUMENT_RETRIEVAL_FAILED("SSRVVRF00600", "Failed to retrieve DID Document.", 500),
     FAILED_TO_FIND_DID_DOC("SSRVVRF00601", "Failed to find DID document.", 500),
+    INVALID_DID_DOCUMENT("SSRVVRF00602", "Invalid DID Document.", 400),
+    VERIFIER_ALREADY_REGISTERED("SSRVVRF00603", "Verifier is already registered.", 400),
+    VERIFIER_DID_DOCUMENT_ALREADY_REGISTERED("SSRVVRF00604", "Failed to register Verifier DID Document: document is already registered.", 400),
+    DIDDOC_GENERATION_FAILED("SSRVVRF00605", "Failed to generate DID document.", 500),
+    FAILED_TO_REGISTER_VERIFIER_DID_DOCUMENT("SSRVVRF00606", "Failed to register Verifier DID Document.", 500),
+    VERIFIER_DID_DOCUMENT_NOT_FOUND("SSRVVRF00607", "Failed to find Verifier DID Document: o registration request has been made.", 400),
+    VERIFIER_DID_DOCUMENT_ALREADY_REQUESTED("SSRVVRF00608", "Failed to register Verifier DID Document: document is already requested.", 400),
+    INVALID_CERTIFICATE_VC_JSON_FORMAT("SSRVVRF00609", "Failed to process certificate VC: invalid JSON format.", 500),
 
     // E2E Related Errors (700-799)
     E2E_NOT_FOUND("SSRVVRF00700", "E2E is not found.", 400),
     ACC_E2E_ERROR("SSRVVRF00701", "E2E is invalid.", 400),
+    KEY_GENERATION_FAILED("SSRVVRF00702", "Failed to generate key.", 500),
 
     // Certificate VC Errors (800~899)
     CERTIFICATE_DATA_NOT_FOUND("SSRVVRF00800", "Certificate VC data not found.", 500),
@@ -99,20 +117,28 @@ public enum ErrorCode {
     FAILED_TO_REQUEST_VERIFY("SSRVVRF00903", "Failed to process the 'request-verify' API request.", 500),
     FAILED_TO_REQUEST_CERTIFICATE_VC("SSRVVRF00904", "Failed to process the 'get-certificate-vc' API request.", 500),
     FAILED_TO_ISSUE_CERTIFICATE_VC("SSRVVRF00905", "Failed to process the 'issue-certificate-vc' API request.", 500),
-
+    FAILED_TO_REQUEST_PROOF_REQUEST_PROFILE("SSRVVRF00906", "Failed to process the 'request-proof-request-profile' API request.", 500),
 
     // Verifier Errors (1000~1099)
     VERIFIER_NOT_FOUND("SSRVVRF01000", "Failed to find verifier: verifier is not registered.", 500),
 
     // Admin Errors (1100~1199)
     ADMIN_INFO_NOT_FOUND("SSRVVRF01100", "Failed to find admin: admin is not registered.", 400),
-    ADMIN_ALREADY_EXISTS("SSRVVRF01101", "Failed to register admin: admin is already registered.", 400);
+    ADMIN_ALREADY_EXISTS("SSRVVRF01101", "Failed to register admin: admin is already registered.", 400),
+    TAS_COMMUNICATION_ERROR("SSRVVRF01102", "Failed to communicate with tas: unknown error occurred.", 500),
+    TAS_UNKNOWN_RESPONSE("SSRVVRF01103", "Failed to process response: received unknown data from the tas.", 500),
 
-
-
-
-
-
+    //ZKP Errors (1200~1299)
+    PROOF_REQUEST_PROFILE_NOT_FOUND("SSRVVRF01201", "Failed to find Proof request profile : request proof profile not found" , 400),
+    ZKP_POLICY_PROFILE_NOT_FOUND("SSRVVRF01202", "Failed to find ZKP policy profile : request proof profile not found" , 400),
+    PROOF_REQUEST_PROFILE_PARSE_ERROR("SSRVVRF01203", "Failed to parse proof request profile : request proof profile parse error" , 500),
+    ZKP_PROOF_REQUEST_NOT_FOUND("SSRVVRF01204", "Failed to find ZKP proof request : request proof profile not found" , 400),
+    FAILED_TO_VERIFY_PROOF("SSRVVRF01205", "Failed to verify proof : proof verify failed" , 500),
+    BLOCKCHAIN_GET_ZKP_CREDENTIAL_FAILED("SSRVVRF01206", "Failed to retrieve ZKP credential on the blockchain.", 500),
+    BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500),
+    CREDENTIAL_SCHEMA_NOT_FOUND("SSRVVRF01208", "Failed to find credential schema : credential schema not found" , 400),
+    PROOF_REQUEST_NOT_FOUND("SSRVVRF01209", "Failed to find proof request : proof request not found" , 400),
+    ;
 
     private final String code;
     private final String message;

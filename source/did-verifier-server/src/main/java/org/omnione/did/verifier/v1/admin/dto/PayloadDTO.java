@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+import org.omnione.did.base.datamodel.enums.OfferType;
 import org.omnione.did.base.db.constant.ProfileMode;
 import org.omnione.did.base.db.domain.Payload;
 
@@ -34,6 +35,8 @@ public class PayloadDTO {
     private Integer validSecond;
     private Instant createdAt;
     private Instant updatedAt;
+    private OfferType offerType;
+    private long policyCount;
 
     public PayloadDTO Builder() {
         return PayloadDTO.builder()
@@ -47,6 +50,8 @@ public class PayloadDTO {
                 .validSecond(this.validSecond)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
+                .offerType(this.offerType)
+                .policyCount(this.policyCount)
                 .build();
     }
 
@@ -74,6 +79,26 @@ public class PayloadDTO {
                 .validSecond(payload.getValidSecond())
                 .createdAt(payload.getCreatedAt())
                 .updatedAt(payload.getUpdatedAt())
+                .offerType(payload.getOfferType())
+                .build();
+    }
+
+    public static PayloadDTO fromPayload(Payload payload, long policyCount) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return PayloadDTO.builder()
+                .id(payload.getId())
+                .payloadId(payload.getPayloadId())
+                .service(payload.getService())
+                .device(payload.getDevice())
+                .locked(payload.isLocked())
+                .mode(payload.getMode())
+                .endpoints(payload.getEndpoints())
+                .validSecond(payload.getValidSecond())
+                .createdAt(payload.getCreatedAt())
+                .updatedAt(payload.getUpdatedAt())
+                .offerType(payload.getOfferType())
+                .policyCount(policyCount)
                 .build();
     }
 

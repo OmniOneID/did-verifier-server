@@ -28,7 +28,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class VerifierApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         SpringApplication.run(VerifierApplication.class, args);
     }
 

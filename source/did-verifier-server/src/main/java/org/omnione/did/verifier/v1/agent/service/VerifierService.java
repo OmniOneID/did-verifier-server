@@ -15,7 +15,11 @@
  */
 
 package org.omnione.did.verifier.v1.agent.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.omnione.did.verifier.v1.agent.dto.*;
+
+
+import java.util.HashMap;
 
 
 /**
@@ -54,4 +58,10 @@ public interface VerifierService {
      * @return Confirmation response.
      */
     ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto);
+
+    ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto);
+
+    RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto);
+
+
 }

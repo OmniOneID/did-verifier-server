@@ -4,11 +4,11 @@ import { Box, Button, FormControl, FormHelperText, IconButton, InputLabel, MenuI
 import { useDialogs } from '@toolpad/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { postService } from "../../../apis/vp-payload-api";
-import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
-import CustomDialog from '../../../components/dialog/CustomDialog';
-import FullscreenLoader from '../../../components/loading/FullscreenLoader';
-import { ipRegex, urlRegex } from '../../../utils/regex';
+import { postService } from "../../apis/vp-payload-api";
+import CustomConfirmDialog from '../../components/dialog/CustomConfirmDialog';
+import CustomDialog from '../../components/dialog/CustomDialog';
+import FullscreenLoader from '../../components/loading/FullscreenLoader';
+import { ipRegex, urlRegex } from '../../utils/regex';
 
 type Props = {}
 
@@ -17,6 +17,7 @@ interface ServiceFormData {
     locked?: boolean;
     device: string;
     mode: string;
+    offerType: string;
     validSeconds: number;
     endpoints: string[];
 }
@@ -26,6 +27,7 @@ interface ErrorState {
     locked?: string;
     device?: string;
     mode?: string;
+    offerType?: string;
     validSeconds?: string;
     endpoints?: string[];
     errorEndpointsMessage?: string;
@@ -41,6 +43,7 @@ const ServiceRegistrationPage = (props: Props) => {
         locked: undefined,
         device: '',
         mode: '',
+        offerType: '',
         validSeconds: 180,
         endpoints: [],
     });
@@ -89,6 +92,7 @@ const ServiceRegistrationPage = (props: Props) => {
             locked: undefined, 
             device: '', 
             mode: '', 
+            offerType: '',
             validSeconds: 180, 
             endpoints: [] 
         });
@@ -112,7 +116,8 @@ const ServiceRegistrationPage = (props: Props) => {
                 device: formData.device,
                 mode: formData.mode,
                 endpoints: JSON.stringify(formData.endpoints),
-                validSecond: formData.validSeconds
+                validSecond: formData.validSeconds,
+                offerType: formData.offerType,
             }
 
             await postService(requestObject).then((response) => {
@@ -143,6 +148,7 @@ const ServiceRegistrationPage = (props: Props) => {
         tempErrors.locked = validateLocked(formData.locked);
         tempErrors.device = validateDevice(formData.device);
         tempErrors.mode = validateMode(formData.mode);
+        tempErrors.offerType = validateOfferType(formData.offerType);
         tempErrors.validSeconds = validateValidSeconds(formData.validSeconds);
 
         if (formData.endpoints.length === 0) {
@@ -208,6 +214,11 @@ const ServiceRegistrationPage = (props: Props) => {
         else if (!urlRegex.test(item) && !ipRegex.test(item)) itemErrors.endpoint = "Invalid endpoint format.";
     
         return itemErrors;
+    };
+
+    const validateOfferType = (offerType?: string): string | undefined => {
+        if (!offerType) return 'Please select an offer type.';
+        return undefined;
     };
 
     useEffect(() => {
@@ -301,6 +312,19 @@ const ServiceRegistrationPage = (props: Props) => {
                             <MenuItem value="Proxy">Proxy</MenuItem>
                         </Select>
                         {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal" error={!!errors.offerType}>
+                        <InputLabel>Verification Type *</InputLabel>
+                        <Select 
+                            value={formData.offerType} 
+                            onChange={handleChange('offerType')}
+                            label="Verification Type"
+                        >
+                            <MenuItem value="VerifyOffer">VP</MenuItem>
+                            <MenuItem value="VerifyProofOffer">ZKP</MenuItem>
+                        </Select>
+                        {errors.offerType && <FormHelperText>{errors.offerType}</FormHelperText>}
                     </FormControl>
 
                     <TextField 

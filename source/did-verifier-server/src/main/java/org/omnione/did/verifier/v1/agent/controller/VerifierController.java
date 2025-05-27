@@ -23,7 +23,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
+
+import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 
 /**
@@ -84,6 +88,24 @@ public class VerifierController {
     public ConfirmVerifyResDto confirmVerify(@RequestBody @Valid ConfirmVerifyReqDto confirmVerifyReqDto) {
         return verifierService.confirmVerify(confirmVerifyReqDto);
     }
+    /**
+     * Requests a ProofProfile for Zkp Credential.
+     *
+     * @param requestProfileReqDto The request data for ProofProfile
+     * @return String The response containing the requested ProofProfile
+     */
+    @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
+    @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
+    public String requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
+        return GsonWrapper.getGson().toJson(verifierService.requestProofRequestProfile(requestProfileReqDto));
+    }
+
+    @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY_PROOF)
+    @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
+    public RequestVerifyResDto requestVerifyProof(@RequestBody @Valid RequestVerifyProofReqDto requestVerifyProofReqDto) {
+        return verifierService.requestVerifyProof(requestVerifyProofReqDto);
+    }
+
 
 }
 

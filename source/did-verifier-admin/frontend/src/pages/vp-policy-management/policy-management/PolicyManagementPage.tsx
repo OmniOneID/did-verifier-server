@@ -34,9 +34,10 @@ const PolicyManagementPage = (props: Props) => {
     pageSize: 10,
   });
 
-  const selectedRowData = useMemo(() => {
-    return rows.find(row => row.id === selectedRow) || null;
-  }, [rows, selectedRow]);
+  const selectedRowData = useMemo(
+    () => Array.isArray(rows) ? rows.find(row => row.id === selectedRow) || null : null,
+    [rows, selectedRow]
+  );
   
   const handleDelete = async () => {
     const id = selectedRowData?.id as number;
@@ -74,7 +75,7 @@ const PolicyManagementPage = (props: Props) => {
     setLoading(true);
     fetchPolicies(paginationModel.page, paginationModel.pageSize, null, null)
       .then((response) => {
-        setRows(response.data);
+        setRows(response.data.content);
         setTotalRows(response.data.totalElements);
       })
       .catch((error) => {

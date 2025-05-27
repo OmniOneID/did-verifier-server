@@ -24,10 +24,13 @@ import org.omnione.did.base.datamodel.enums.PresentMode;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
+
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashMap;
 
 /**
  * Verifier service implementation for handling Verifiable Presentations (VPs) and user verification
@@ -92,4 +95,15 @@ public class VerifierServiceSample implements VerifierService {
         }
 
     }
+
+    @Override
+    public ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto) {
+        return null;
+    }
+
+    @Override
+    public RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto) {
+        return null;
+    }
+
 }

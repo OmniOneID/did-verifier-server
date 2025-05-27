@@ -19,16 +19,12 @@ package org.omnione.did.verifier.v1.admin.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.omnione.did.base.constants.UrlConstant;
-import org.omnione.did.verifier.v1.admin.dto.GetVerifierInfoReqDto;
-import org.omnione.did.verifier.v1.admin.dto.SendCertificateVcReqDto;
-import org.omnione.did.verifier.v1.admin.dto.SendEntityInfoReqDto;
+import org.omnione.did.verifier.v1.admin.dto.*;
 import org.omnione.did.verifier.v1.admin.service.VerifierManagementService;
 import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -50,5 +46,30 @@ public class VerifierManagementController {
     @RequestMapping(value = "/entity-info", method = RequestMethod.POST)
     public EmptyResDto updateEntityInfo(@RequestBody SendEntityInfoReqDto sendEntityInfoReqDto) {
         return verifierManagementService.updateEntityInfo(sendEntityInfoReqDto);
+    }
+
+    @RequestMapping(value = "/register-verifier-info", method = RequestMethod.POST)
+    public VerifierInfoResDto registerVerifierInfo(@RequestBody RegisterVerifierInfoReqDto registerVerifierInfoReqDto) {
+        return verifierManagementService.registerVerifierInfo(registerVerifierInfoReqDto);
+    }
+
+    @RequestMapping(value = "/generate-did-auto", method = RequestMethod.POST)
+    public Map<String, Object> generateVerifierDidDocumentAuto() {
+        return verifierManagementService.registerVerifierDidDocumentAuto();
+    }
+
+    @RequestMapping(value = "/register-did", method = RequestMethod.POST)
+    public EmptyResDto requestRegisterDid(@RequestBody RequestRegisterDidReqDto requestRegisterDidReqDto) {
+        return verifierManagementService.requestRegisterDid(requestRegisterDidReqDto);
+    }
+
+    @GetMapping(value = "/request-status")
+    public RequestEntityStatusResDto requestEntityStatus() {
+        return verifierManagementService.requestEntityStatus();
+    }
+
+    @PostMapping(value = "/request-enroll-entity")
+    public Map<String, Object> requestEnrollEntity() {
+        return verifierManagementService.enrollEntity();
     }
 }
