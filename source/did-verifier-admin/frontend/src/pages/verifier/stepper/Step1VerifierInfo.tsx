@@ -178,7 +178,7 @@ const Step1VerifierInfo: React.FC<Props> = ({ step, onRegister, setIsLoading }) 
             border: `1px solid ${theme.palette.divider}`,
           })}
         >
-          http://{'{IP}'}:8094/cas
+          http://{'{IP}'}:8092/verifier
         </Box>
         <Typography variant="body1" sx={{ mt: 1 }}>
           <strong>Note:</strong> The Verifier server and Admin Console currently use the same base URL,
