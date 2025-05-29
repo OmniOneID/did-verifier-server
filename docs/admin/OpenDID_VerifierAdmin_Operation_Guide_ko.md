@@ -18,8 +18,8 @@ puppeteer:
 Open DID Verifier Admin Operation Guide
 ==
 
-- Date: 2025-03-31
-- Version: v1.0.1
+- Date: 2025-05-30
+- Version: v2.0.0
 
 개정 이력
 ==
@@ -27,38 +27,45 @@ Open DID Verifier Admin Operation Guide
 | ------ | ---------- | -------------------------- |
 | v1.0.0 | 2025-03-31 | 최초 작성                  |
 | v1.0.1 | 2025-04-25 | `3.1. Verifier Registration` 장 추가 |
+| v2.0.0 | 2025-05-30 | ZKP 검증관련 메뉴 추가 및 기능 변경 반영 |
 
 목차
 ==
-
 - [개정 이력](#개정-이력)
 - [1. 소개](#1-소개)
-  - [1.1. 개요](#11-개요)
-  - [1.2. Admin Console 정의](#12-admin-console-정의)
+ - [1.1. 개요](#11-개요)
+ - [1.2. Admin Console 정의](#12-admin-console-정의)
 - [2. 기본 메뉴얼](#2-기본-메뉴얼)
-  - [2.1. 로그인](#21-로그인)
-  - [2.2. 메인 화면 구성](#22-메인-화면-구성)
-  - [2.3. 메뉴 구성](#23-메뉴-구성)
-  - [2.4. 비밀번호 변경 관리](#24-비밀번호-변경-관리)
+ - [2.1. 로그인](#21-로그인)
+ - [2.2. 메인 화면 구성](#22-메인-화면-구성)
+ - [2.3. 메뉴 구성](#23-메뉴-구성)
+ - [2.4. 비밀번호 변경 관리](#24-비밀번호-변경-관리)
 - [3. 기능별 상세 메뉴얼](#3-기능별-상세-메뉴얼)
-  - [3.1. Verifier Management](#31-verifier-management)
-    - [3.1.1. Verifier 등록](#311-verifier-등록)
-    - [3.1.2. 등록된 Verifier 관리](#312-등록된-verifier-관리)
-  - [3.2. VP Policy Management](#32-vp-policy-management)
-    - [3.2.1. Service Management](#321-service-management)
-      - [3.2.1.1 Service Register](#3211-service-register)
-    - [3.2.2. Filter Management](#322-filter-management)
-      - [3.2.2.1 Filter Register](#3221-filter-register)
-    - [3.2.3. Process Management](#323-process-management)
-      - [3.2.2.1 Process Register](#3231-process-register)
-    - [3.2.4. Profile Management](#324-profile-management)
-    - [3.2.5. Policy Management](#325-policy-management)
-  - [3.3. VP History Page](#33-vp-history-page)
-  - [3.4. Admin Management](#34-admin-management)
-    - [3.4.1 Admin 목록 조회](#341-admin-목록-조회)
-    - [3.4.2 Admin 등록](#342-admin-등록)
-
-# 1. 소개
+ - [3.1. Verifier Management](#31-verifier-management)
+   - [3.1.1. Verifier 등록](#311-verifier-등록)
+   - [3.1.2. 등록된 Verifier 관리](#312-등록된-verifier-관리)
+ - [3.2. VP Policy Management](#32-vp-policy-management)
+   - [3.2.1. Service Management](#321-service-management)
+     - [3.2.1.1 Service Register](#3211-service-register)
+   - [3.2.2. Filter Management](#322-filter-management)
+     - [3.2.2.1 Filter Register](#3221-filter-register)
+   - [3.2.3. Process Management](#323-process-management)
+     - [3.2.3.1 Process Register](#3231-process-register)
+   - [3.2.4. Profile Management](#324-profile-management)
+     - [3.2.4.1 Profile Register](#3241-profile-register)
+   - [3.2.5. Policy Management](#325-policy-management)
+     - [3.2.5.1 Policy Register](#3251-policy-register)
+ - [3.3. ZKP Policy Management](#33-zkp-policy-management)
+   - [3.3.1. Proof Request Configuration](#331-proof-request-configuration)
+     - [3.3.1.1 Proof Request Register](#3311-proof-request-register)
+   - [3.3.2. ZKP Profile Management](#332-zkp-profile-management)
+     - [3.3.2.1 ZKP Profile Register](#3321-zkp-profile-register)
+   - [3.3.3. ZKP Policy Management](#333-zkp-policy-management)
+     - [3.3.3.1 ZKP Policy Register](#3331-zkp-policy-register)
+ - [3.4. VP History Page](#34-vp-history-page)
+ - [3.5. Admin Management](#35-admin-management)
+   - [3.5.1 Admin 목록 조회](#351-admin-목록-조회)
+   - [3.5.2 Admin 등록](#352-admin-등록)
 
 ## 1.1. 개요
 
@@ -70,18 +77,23 @@ OpenDID의 전체 설치에 대한 가이드는 [Open DID Installation Guide]를
 
 ## 1.2. Admin Console 정의
 
-Verifier Admin Console은 Open DID 시스템에서 Verifier 서버를 관리하기 위한 웹 기반 관리 도구입니다. 이 도구를 통해 관리자는 Verifiable Presentation(VP) 검증 정책을 설정하고, 검증 요청 및 결과를 모니터링하며, 시스템 설정을 관리할 수 있습니다.
+Verifier Admin Console은 Open DID 시스템에서 Verifier 서버를 관리하기 위한 웹 기반 관리 도구입니다. 이 도구를 통해 관리자는 Verifiable Presentation(VP), ZKP Credential 검증 정책을 설정하고, 검증 요청 및 결과를 모니터링하며, 시스템 설정을 관리할 수 있습니다.
 
 Admin Console은 다음과 같은 주요 기능을 제공합니다:
 
 - **Verifier 기본 정보 관리**
   - Verifier 서버 등록 및 상태 확인
-- **VP 정책 항목 관리**
+- **Service(Payload) 기본 정보 관리**
   - Service(payload) 등록 및 항목 구성
+- **VP 정책 항목 관리**
   - Profile Filter 등록 및 관리
   - Profile Process 등록 및 관리
   - VP Profile 설정
   - VP 정책(Policy) 설정
+- **ZKP 정책 항목 관리**
+  - Proof Request 등록 및 관리
+  - ZKP Profile 등록 및 관리
+  - ZKP 정책(Policy) 설정
 - **VP 이력**
   - VP 검증 이력 확인
 - **관리자 계정 관리**
@@ -149,14 +161,11 @@ Verifier 등록이 완료되면 전체 관리 기능이 활성화되며, 사이�
 | 번호 | 기능 명칭 | 기능 설명 |
 |------|-----------|-----------|
 | 1 | **Verifier Management** | 서비스의 검증자 관리를 할 수 있는 메뉴입니다. 검증자 관련 설정 및 관리 작업을 이곳에서 진행할 수 있습니다. |
-| 2 | **VP Policy Management** | VP 정책을 관리하는 상위 메뉴입니다. 이 항목을 클릭하면 하위 메뉴가 표시됩니다. |
-| 3 | **Service Management** | VP 정책에 사용될 서비스 정보를 설정하는 메뉴입니다. |
-| 4 | **Filter Management** | VP 검증을 위한 필터 조건을 설정하는 메뉴입니다. |
-| 5 | **Process Management** | VP 처리 과정에 대한 설정을 관리하는 메뉴입니다. |
-| 6 | **Profile Management** | VP 프로파일 정보를 관리하는 메뉴입니다. |
-| 7 | **Policy Management** | 전체 VP 정책을 통합 관리하는 메뉴입니다. |
-| 8 | **VP History Page** | VP(Verifiable Presentations) 히스토리 페이지로 이동하는 메뉴입니다. 과거 VP에 대한 기록을 확인할 수 있습니다. |
-| 9 | **Admin Management** | 관리자 관련 설정을 관리하는 메뉴입니다. 관리자의 계정 및 권한을 조정할 수 있습니다. |
+| 2 | **Service Configuration** | VP 정책에 사용될 서비스 정보를 설정하는 메뉴입니다. |
+| 3 | **VP Policy Management** | VP 정책을 관리하는 상위 메뉴입니다. 이 항목을 클릭하면 하위 메뉴가 표시됩니다. |
+| 4 | **ZKP Policy Management** | ZKP 정책을 관리하는 상위 메뉴입니다. 이 항목을 클릭하면 하위 메뉴가 표시됩니다. |
+| 5 | **VP History Page** | VP 이력 페이지로 이동하는 메뉴입니다. 과거 VP에 대한 기록을 확인할 수 있습니다. |
+| 6 | **Admin Management** | 관리자 관련 설정을 관리하는 메뉴입니다. 관리자의 계정 및 권한을 조정할 수 있습니다. |
 
 <br/>
 
@@ -184,12 +193,9 @@ Verifier 등록이 완료되면 전체 관리 기능이 활성화되며, 사이�
 
 Verifier Management는 Verifier 서버의 등록 및 상태 관리를 위한 기능입니다.  
 
-
-Verifier 서버는 Open DID 시스템에서 사용자의 VC(Verifiable Credential)에서 제출된 VP(Verifiable Presentation)을 검증하는 역할을 수행합니다.    
+Verifier 서버는 Open DID 시스템에서 사용자의 VC(Verifiable Credential)에서 제출된 VP(Verifiable Presentation), ZKP Proof를 검증하는 역할을 수행합니다.    
 
 Verifier 등록은 최초 1회만 수행되며, 이후에는 관리 화면에서 등록된 상태를 확인할 수 있습니다.
-
-<br/>
 
 ### 3.1.1. Verifier 등록
 
@@ -197,9 +203,6 @@ Verifier 서버가 아직 Open DID 시스템에 등록되지 않은 초기 상�
 Verifier Admin Console 좌측 메뉴에 `Verifier Registration` 항목만 표시됩니다.  
 
 Verifier 등록은 총 3단계의 스텝을 통해 순차적으로 진행됩니다.
-
-
-<br/>
 
 **Step 1 - Enter Verifier Info**
 
@@ -210,7 +213,7 @@ Verifier 정보를 입력하는 단계입니다.
 | 항목              | 설명                                                                 |
 | ----------------- | -------------------------------------------------------------------- |
 | **Name**          | Verifier 서버의 이름을 입력합니다. 예: `verifier`                              |
-| **CA URL**        | CA 서버의 호출 URL을 입력합니다. `http://<IP>:8094/verifier` 형식 사용   |
+| **Verifier URL**        | Verifier 서버의 호출 URL을 입력합니다. `http://<IP>:8094/verifier` 형식 사용   |
 | **Test Connection 버튼** | 입력한 URL로 실제 연결이 가능한지 확인합니다.                 |
 | **NEXT 버튼**     | 다음 단계로 이동합니다.                                              |
 
@@ -223,13 +226,13 @@ Verifier 정보를 입력하는 단계입니다.
 
 ▶ **Step 2-1: Generate DID Document**
 
-CA의 DID Document를 생성합니다.  
+Verifier서버의 DID Document를 생성합니다.  
 
 <img src="./images/generate-did.png" width="600"/>
 
 | 항목               | 설명                                                               |
 | ------------------ | ------------------------------------------------------------------ |
-| **GENERATE 버튼**  | CA 서버의 DID Document를 생성합니다. 생성 후 하단 영역에 결과 표시 |
+| **GENERATE 버튼**  | Verifier 서버의 DID Document를 생성합니다. 생성 후 하단 영역에 결과 표시 |
 | **요청 상태 표시** | 요청 성공 시 초록색 메시지로 확인 가능합니다.                      |
 
 DID Document가 성공적으로 생성되면, **Step 2-2 영역이 화면에 자동으로 표시됩니다.**
@@ -316,7 +319,7 @@ VP Policy Management는 VP(Verifiable Presentation) 정책을 관리하기 위�
 Service Management 메뉴에서는 VP 정책에 사용될 서비스 정보를 등록, 수정, 삭제할 수 있습니다.</br>
 > **참고**: 메뉴의 모든 Management의 페이지 구성/기능은 동일합니다. 이곳에서 상세히 설명하고 이후에는 구성차이점에 대해서만 설명합니다.
 
-<img src="./images/service_management.jpg" width="800"/>
+<img src="./images/service_configuration.jpg" width="800"/>
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
@@ -353,7 +356,7 @@ Service Management 메뉴에서는 VP 정책에 사용될 서비스 정보를 �
 
 서비스 등록 페이지에서는 새로운 서비스를 등록하기 위한 정보를 입력할 수 있습니다. 아래 스크린샷은 샘플 데이터가 이미 입력된 상태를 보여줍니다. 입력이 반드시 필요한 항목은 별표(*)로 표시해 두었습니다.
 
-<img src="./images/service_registration.jpg" width="800"/>
+<img src="./images/service_registration.jpg" width="500"/>
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
@@ -361,11 +364,12 @@ Service Management 메뉴에서는 VP 정책에 사용될 서비스 정보를 �
 | 2 | Lock Status | 서비스의 잠금 상태를 선택합니다. 드롭다운 메뉴에서 "Locked" 또는 "Unlocked"를 선택할 수 있습니다. |
 | 3 | Device | 서비스가 지원하는 기기 유형을 입력합니다. 예시로 "PC"가 입력되어 있습니다. |
 | 4 | Submission Mode | 제출 모드를 선택합니다. 드롭다운 메뉴에서 "Direct" 또는 "Indirect"를 선택할 수 있습니다. |
-| 5 | Valid Seconds | VP 요청의 유효 시간(초)을 입력합니다. 예시로 "180"이 입력되어 있습니다. |
-| 6 | Endpoints | 서비스 엔드포인트를 관리하는 섹션입니다. "ADD ENDPOINT" 버튼을 클릭하여 여러 개의 URL을 추가할 수 있습니다. 각 엔드포인트는 유효한 URL 형식이어야 합니다. 입력된 엔드포인트를 삭제하려면 해당 행 오른쪽의 휴지통 아이콘을 클릭하세요. |
-| 7 | 버튼 영역 | - REGISTER: 입력한 정보로 서비스를 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(서비스 목록)로 돌아갑니다. |
+| 5 | Submission Mode | 제출 모드를 선택합니다. 드롭다운 메뉴에서 "Direct" 또는 "Indirect"를 선택할 수 있습니다. |
+| 6 | Verification Type | 검증 타입을 선택합니다. ZKP(ZKP 검증), VP(일반 VP) 값을 선택할수 있습니다. |
+| 7 | Endpoints | 서비스 엔드포인트를 관리하는 섹션입니다. "ADD ENDPOINT" 버튼을 클릭하여 여러 개의 URL을 추가할 수 있습니다. 각 엔드포인트는 유효한 URL 형식이어야 합니다. 입력된 엔드포인트를 삭제하려면 해당 행 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 8 | 버튼 영역 | - REGISTER: 입력한 정보로 서비스를 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(서비스 목록)로 돌아갑니다. |
 
-> **경고**: 이미 Policy에 등록된 서비스는 삭제할 수 없습니다. 삭제하려면 먼저 연결된 Policy에 해당 서비스를 제거해야 합니다.
+> **경고**: 이미 Policy에 등록된 서비스는 삭제할 수 없습니다. 삭제하려면 먼저 연결된 Policy에 해당 서비스를 제거해야 합니다. 서비스 목록에 count 의 숫자로 미리 확인가능합니다.
 
 ### 3.2.2. Filter Management
 
@@ -417,7 +421,7 @@ Process Management 화면은 다음과 같은 주요 기능을 제공합니다:
 
 프로세스 등록 페이지에서는 새로운 프로세스를 등록하기 위한 정보를 입력할 수 있습니다. 이 페이지는 프로세스 수정 시에도 동일한 양식으로 사용됩니다.
 
-<img src="./images/process_registration.jpg" width="800"/>
+<img src="./images/process_registration.jpg" width="600"/>
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
@@ -431,7 +435,7 @@ Process Management 화면은 다음과 같은 주요 기능을 제공합니다:
 
 Profile Management 메뉴에서는 VP 프로파일 정보를 관리할 수 있습니다. 이 화면에서는 프로파일 목록을 확인하고, 등록, 수정, 삭제 작업을 수행할 수 있습니다.
 
-<img src="./images/profile_management.png" width="800"/>
+<img src="./images/profile_management.jpg" width="800"/>
 
 Profile Management 화면은 다음과 같은 주요 기능을 제공합니다:
 - REGISTER: 새로운 프로파일을 등록합니다.
@@ -446,7 +450,7 @@ Profile Management 화면은 다음과 같은 주요 기능을 제공합니다:
 
 프로파일 등록 및 수정 페이지에서는 VP 프로파일에 대한 상세 정보를 입력할 수 있습니다. 
 
-<img src="./images/profile_register.png" width="800"/>
+<img src="./images/profile_register.jpg" width="800"/>
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
@@ -494,17 +498,120 @@ Policy Management 화면은 다음과 같은 주요 기능을 제공합니다:
 정책 등록 시 필요한 주요 구성 요소는 다음과 같습니다:
 - Policy Title: 정책의 고유 이름
 - Profile: VP 검증을 위한 프로파일 정보
-- Payload Service: VP 요청 시 사용될 서비스 정보
+- Payload Service: 검증 요청 시 사용될 서비스 정보
 
 > **참고**: 정책이 성공적으로 등록되면, 해당 정책을 기반으로 한 VP 검증 요청이 가능해집니다. 정책은 VP 검증 프로세스의 핵심 요소이므로 신중하게 구성해야 합니다.
 
 <br/>
 
-### 3.3. VP History Page
+## 3.3. ZKP Policy Management
+
+ZKP Policy Management는 ZKP(Zero-Knowledge Proof) 정책을 관리하기 위한 메뉴입니다. 여러 하위 메뉴로 구성되어 있으며, 각 메뉴는 ZKP 정책의 특정 측면을 관리합니다.
+
+### 3.3.1. Proof Request Configuration
+
+Proof Request Configuration 메뉴에서는 ZKP 검증 시 사용할 증명 요청 정보를 등록, 수정, 삭제할 수 있습니다.
+
+<img src="./images/proof_request_configuration.jpg" width="800"/>
+
+Proof Request Configuration 화면은 다음과 같은 주요 기능을 제공합니다:
+- REGISTER: 새로운 증명 요청을 등록합니다.
+- UPDATE: 선택한 증명 요청을 수정합니다(항목을 선택해야 활성화).
+- DELETE: 선택한 증명 요청을 삭제합니다(항목을 선택해야 활성화).
+
+증명 요청 목록 테이블에는 Name, Version, Profile Count, Registered At, Updated At 등의 정보가 표시되며, 페이지네이션 기능을 통해 여러 페이지의 데이터를 탐색할 수 있습니다.
+
+#### 3.3.1.1 Proof Request Register
+
+증명 요청 등록 페이지에서는 새로운 증명 요청을 등록하기 위한 정보를 입력할 수 있습니다. 이 페이지는 증명 요청 수정 시에도 동일한 양식으로 사용됩니다.
+
+<img src="./images/proof_request_registration.jpg" width="800"/>
+
+| 번호 | 항목 | 설명 |
+|------|------|------|
+| 1 | Name | 증명 요청의 이름을 입력하는 필드입니다. 예시로 "zkpProofRequest"가 입력되어 있습니다. |
+| 2 | Version | 증명 요청의 버전을 입력합니다. 예시로 "1.0"이 입력되어 있습니다. |
+| 3 | Curve | 사용할 타원 곡선 알고리즘을 선택합니다. 드롭다운 메뉴에서 "SECP-256-R1" 등의 옵션을 선택할 수 있습니다. |
+| 4 | Cipher | 암호화 알고리즘을 선택합니다. 드롭다운 메뉴에서 "AES-256-CBC" 등의 옵션을 선택할 수 있습니다. |
+| 5 | Padding | 패딩 방식을 선택합니다. 드롭다운 메뉴에서 "PKCS5" 등의 옵션을 선택할 수 있습니다. |
+| 6 | Requested Attributes | 요청할 속성을 관리하는 섹션입니다. "ADD ATTRIBUTE" 버튼을 클릭하여 팝업에서 스키마를 선택하여 속성을 추가할 수 있습니다. 각 속성은 Attribute Name과 Credential Definition으로 구성됩니다. 입력된 속성을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 7 | Requested Predicates | 요청할 조건부를 관리하는 섹션입니다. "ADD ATTRIBUTE" 버튼을 클릭하여 팝업에서 스키마를 선택하여 속성을 추가할 수 있습니다. 각 조건부는 Attribute Name, Predicate Type, Predicate Value, Credential Definition으로 구성됩니다. 입력된 조건부를 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 8 | 버튼 영역 | - UPDATE: 입력한 정보로 증명 요청을 수정합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(증명 요청 목록)로 돌아갑니다. |
+
+ > **참고**: ZKP 검증에 사용되는 데이터 정보의 자세한 내용은 데이터 스펙 Data Specification 문서를 참고바랍니다.
+
+### 3.3.2. ZKP Profile Management
+
+ZKP Profile Management 메뉴에서는 ZKP 프로파일 정보를 관리할 수 있습니다. 이 화면에서는 프로파일 목록을 확인하고, 등록, 수정, 삭제 작업을 수행할 수 있습니다.
+
+<img src="./images/zkp_profile_management.jpg" width="800"/>
+
+ZKP Profile Management 화면은 다음과 같은 주요 기능을 제공합니다:
+- REGISTER: 새로운 ZKP 프로파일을 등록합니다.
+- UPDATE: 선택한 ZKP 프로파일을 수정합니다(항목을 선택해야 활성화).
+- DELETE: 선택한 ZKP 프로파일을 삭제합니다(항목을 선택해야 활성화).
+
+ZKP 프로파일 목록 테이블에는 Profile ID, Profile Title, Profile Description, Used in Policies, Registered At, Updated At 등의 정보가 표시되며, 페이지네이션 기능을 통해 여러 페이지의 데이터를 탐색할 수 있습니다.
+
+> **경고**: 이미 ZKP Policy Management에 등록된 프로파일은 삭제할 수 없습니다. 삭제하려면 먼저 연결된 Policy에서 해당 프로파일을 제거해야 합니다.
+
+#### 3.3.2.1 ZKP Profile Register
+
+ZKP 프로파일 등록 페이지에서는 새로운 ZKP 프로파일을 등록하기 위한 정보를 입력할 수 있습니다. 이 페이지는 프로파일 수정 시에도 동일한 양식으로 사용됩니다.
+
+<img src="./images/zkp_profile_registration.jpg" width="600"/>
+
+| 번호 | 항목 | 설명 |
+|------|------|------|
+| 1 | Title | ZKP 프로파일의 제목을 입력하는 필드입니다. 예시로 "ZKPTestProfile"이 입력되어 있습니다. |
+| 2 | Description | ZKP 프로파일에 대한 설명을 입력하는 필드입니다. 예시로 "Test for ZKP Proof Verification"이 입력되어 있습니다. |
+| 3 | Encoding | 프로파일에서 사용하는 인코딩 방식을 선택합니다. 드롭다운 메뉴에서 "UTF-8" 등의 옵션을 선택할 수 있습니다. |
+| 4 | Language | 프로파일 언어를 선택합니다. 드롭다운 메뉴에서 "English" 등의 옵션을 선택할 수 있습니다. |
+| 5 | Proof Request | 프로파일에 연결할 Proof Request를 선택합니다. 드롭다운 메뉴에서 "zkpProofRequest" 등 등록된 증명 요청을 선택할 수 있습니다. |
+| 6 | 버튼 영역 | - REGISTER: 입력한 정보로 ZKP 프로파일을 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(ZKP 프로파일 목록)로 돌아갑니다. |
+
+### 3.3.3. ZKP Policy Management
+
+ZKP Policy Management 메뉴에서는 전체 ZKP 정책을 통합 관리할 수 있습니다. 이 화면에서는 정책 목록을 확인하고, 등록, 수정, 삭제 작업을 수행할 수 있습니다.
+
+<img src="./images/zkp_policy_management.jpg" width="800"/>
+
+ZKP Policy Management 화면은 다음과 같은 주요 기능을 제공합니다:
+- REGISTER: 새로운 ZKP 정책을 등록합니다.
+- UPDATE: 선택한 ZKP 정책을 수정합니다(항목을 선택해야 활성화).
+- DELETE: 선택한 ZKP 정책을 삭제합니다(항목을 선택해야 활성화).
+
+ZKP 정책 목록 테이블에는 Policy Title, Payload Service, Profile Title, Created At 등의 정보가 표시되며, 페이지네이션 기능을 통해 여러 페이지의 데이터를 탐색할 수 있습니다.
+
+ZKP 정책은 ZKP 검증을 위한 중요한 요소로, ZKP Profile과 Service를 연결하여 전체 ZKP 검증 프로세스를 정의합니다.
+
+#### 3.3.3.1 ZKP Policy Register
+
+ZKP 정책 등록 페이지에서는 새로운 ZKP 정책을 등록하기 위한 정보를 입력할 수 있습니다. 이 페이지는 정책 수정 시에도 동일한 양식으로 사용됩니다.
+
+<img src="./images/zkp_policy_registration.jpg" width="800"/>
+
+ZKP 정책 등록 화면은 다음과 같은 항목으로 구성됩니다:
+
+| 번호 | 항목 | 설명 |
+|------|------|------|
+| 1 | Policy Title | ZKP 정책의 제목을 입력하는 필드입니다. 예시로 "ZKPPolicy"가 입력되어 있습니다. |
+| 2 | Profile Information | 정책에 연결할 ZKP 프로파일 정보를 선택합니다. "SEARCH" 버튼을 클릭하면 ZKP 프로파일 검색 팝업이 표시되며, 검색 후 선택한 프로파일이 이 필드에 자동으로 입력됩니다. |
+| 3 | Payload Information | 정책에 사용할 서비스 정보를 선택합니다. "SEARCH" 버튼을 클릭하면 서비스 검색 팝업이 표시되며, 검색 후 선택한 서비스가 이 필드에 자동으로 입력됩니다. |
+| 4 | 버튼 영역 | - SAVE: 입력한 정보로 ZKP 정책을 저장합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(ZKP 정책 목록)로 돌아갑니다. |
+
+ZKP 정책 등록 시 필요한 주요 구성 요소는 다음과 같습니다:
+- Policy Title: ZKP 정책의 고유 이름
+- Profile: ZKP 검증을 위한 프로파일 정보
+- Payload Service: ZKP 요청 시 사용될 서비스 정보
+
+<br/>
+
+### 3.4. VP History Page
 
 VP History Page 메뉴에서는 사용자들이 제출한 VP(Verifiable Presentation)에 대한 이력을 조회할 수 있습니다. 이 화면에서는 각 VP 제출 건의 상태와 세부 정보를 확인할 수 있습니다.
 
-<img src="./images/vp_history.png" width="800"/>
+<img src="./images/vp_history.jpg" width="800"/>
 
 VP History Page는 다음과 같은 주요 기능과 정보를 제공합니다:
 
@@ -514,7 +621,7 @@ VP History Page는 다음과 같은 주요 기능과 정보를 제공합니다:
 | 2 | Transaction Status 필터 | 드롭다운 메뉴를 통해 특정 상태(Completed, Pending, All Status 등)의 VP 제출 건만 필터링할 수 있습니다. |
 | 3 | 목록 헤더 | Transaction Status, Holder DID, Created At 등 VP 제출 정보의 헤더입니다. |
 | 4 | 상태 표시 | VP 제출 건의 상태를 색상으로 구분합니다. 완료된 건은 녹색 배경의 'Completed', 처리 중인 건은 노란색 배경의 'Pending'으로 표시됩니다. |
-| 5 | 상세 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. |
+| 5 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. |
 | 6 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 예시에서는 총 13건 중 1-10건이 표시되고 있습니다. |
 
 VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습니다:
@@ -522,7 +629,7 @@ VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습
 - 특정 사용자(Holder DID)의 VP 제출 이력 조회
 
 
-## 3.4. Admin Management
+## 3.5. Admin Management
 
 `Admin Management` 메뉴는 Verifier Admin Console에 접근할 수 있는 관리자 계정을 관리하는 기능입니다.  
 
@@ -541,7 +648,7 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 <br/>
 
-## 3.4.1 Admin 목록 조회
+## 3.5.1 Admin 목록 조회
 
 
 `Admin Management` 메뉴에 진입하면 등록된 관리자 계정들의 목록이 테이블 형태로 표시됩니다.
@@ -561,7 +668,7 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 <br/>
 
-## 3.4.2. Admin 등록
+## 3.5.2. Admin 등록
 
 `Admin Management` 화면에서 **REGISTER** 버튼을 클릭하면, 아래와 같은 등록 화면으로 이동합니다.
 
@@ -580,4 +687,4 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
