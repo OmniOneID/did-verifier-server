@@ -40,4 +40,12 @@ public interface VpProfileRepository extends JpaRepository<VpProfile, Long> {
      * @return An Optional containing the VpProfile if found, or an empty Optional if not found.
      */
     Optional<VpProfile> findByTransactionId(Long transactionId);
+
+    /**
+     * Finds the most recent VpProfile entity by its associated transaction ID, ordered by creation date.
+     *
+     * @param transactionId The ID of the transaction to search for.
+     * @return An Optional containing the most recent VpProfile if found, or an empty Optional if not found.
+     */
+    Optional<VpProfile> findTop1ByTransactionIdOrderByCreatedAtDesc(Long transactionId);
 }

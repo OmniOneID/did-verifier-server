@@ -683,7 +683,7 @@ public class VerifierServiceImpl implements VerifierService {
             if (transaction == null) {
                 throw new OpenDidException(ErrorCode.TRANSACTION_NOT_FOUND);
             }
-            VpProfile vpProfile = vpProfileRepository.findByTransactionId(transaction.getId())
+            VpProfile vpProfile = vpProfileRepository.findTop1ByTransactionIdOrderByCreatedAtDesc(transaction.getId())
                     .orElseThrow(() -> new OpenDidException(ErrorCode.VP_PROFILE_NOT_FOUND));
 
             ObjectMapper objectMapper = new ObjectMapper();
