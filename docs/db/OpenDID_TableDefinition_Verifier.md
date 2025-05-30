@@ -17,7 +17,7 @@
   - [2.8. Policy](#28-policy)
   - [2.9. Payload](#29-payload)
   - [2.10. Filter](#210-filter)
-  - [2.11. Policy Profile](#211-policy_profile)
+  - [2.11. Policy Profile](#211-policy-profile)
   - [2.12. Process](#212-process)
   - [2.13. Verifier](#213-verifier)
   - [2.14. Admin](#214-admin)

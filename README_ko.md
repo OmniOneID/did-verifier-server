@@ -21,16 +21,20 @@ did-verifier-server
 ├── SECURITY.md
 ├── docs
 │   └── admin
+│       ├── OpenDID_VerifierAdmin_Operation_Guide.md
 │       └── OpenDID_VerifierAdmin_Operation_Guide_ko.md
 │   └── api
+│       ├── Verifier_API.md  
 │       └── Verifier_API_ko.md
 │   └── errorCode
-│       └── Verifier_ErrorCode.md
-│   └── installation
-│       └── OpenDID_VerifierServer_Installation_Guide.md
-│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
+│       ├── Verifier_ErrorCode.md
+│       └── Verifier_ErrorCode_ko.md
 │   └── db
-│       └── OpenDID_TableDefinition_Verifier.md
+│       ├── OpenDID_TableDefinition_Verifier.md
+│       └── OpenDID_TableDefinition_Verifier_ko.md
+│   └── installation
+│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
+│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
 └── source
     └── did-verifier-admin
         ├── frontend
