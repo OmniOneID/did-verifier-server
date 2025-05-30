@@ -39,6 +39,7 @@ import org.omnione.did.base.util.BaseCoreDidUtil;
 import org.omnione.did.base.util.BaseCryptoUtil;
 import org.omnione.did.base.util.BaseDigestUtil;
 import org.omnione.did.base.util.BaseMultibaseUtil;
+import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.DateTimeUtil;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.common.util.JsonUtil;
@@ -870,7 +871,7 @@ public class VerifierServiceImpl implements VerifierService {
             BaseCryptoUtil.verifySignature(publicKeyByKeyId.getPublicKeyMultibase(), proof.getProofValue(),
             BaseDigestUtil.generateHash(accE2eString.getBytes(StandardCharsets.UTF_8)), EccCurveType.SECP_256_R1);
 
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         } catch (Exception e) {
             throw new OpenDidException(ErrorCode.ACC_E2E_ERROR);
@@ -1092,7 +1093,7 @@ public class VerifierServiceImpl implements VerifierService {
             proof.setVerificationMethod(verifyProfile.getProof().getVerificationMethod());
             proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
             return proof;
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
 
@@ -1116,7 +1117,7 @@ public class VerifierServiceImpl implements VerifierService {
             proof.setVerificationMethod(proofRequestProfile.getProof().getVerificationMethod());
             proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
             return proof;
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
 

@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
 import org.omnione.did.base.datamodel.enums.PresentMode;
+import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.agent.service.VerifierService;
@@ -66,7 +67,7 @@ public class VerifierServiceSample implements VerifierService {
         RequestProfileResDto requestProfileResDto = null;
         try {
             requestProfileResDto = JsonUtil.deserializeFromJson(jsonStr, RequestProfileResDto.class);
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new RuntimeException(e);
         }
         requestProfileResDto.setTxId(txId);
@@ -90,7 +91,7 @@ public class VerifierServiceSample implements VerifierService {
 
         try {
             return JsonUtil.deserializeFromJson(JsonStr, ConfirmVerifyResDto.class);
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new RuntimeException(e);
         }
 
