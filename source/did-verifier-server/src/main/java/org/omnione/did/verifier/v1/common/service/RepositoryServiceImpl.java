@@ -16,6 +16,7 @@
 
 package org.omnione.did.verifier.v1.common.service;
 
+import com.google.gson.JsonSyntaxException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import org.omnione.did.verifier.v1.agent.api.RepositoryFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
+import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Primary
-@Profile("lls")
+@Profile("lss")
 public class RepositoryServiceImpl implements StorageService {
     private final RepositoryFeign repositoryFeign;
 
@@ -77,15 +79,44 @@ public class RepositoryServiceImpl implements StorageService {
 
     @Override
     public CredentialSchema getZKPCredential(String credentialSchemaId) {
-        return null;
+        String encodedCredentialSchema = repositoryFeign.getCredentialSchema(credentialSchemaId);
+        return decodeAndParseCredentialSchema(encodedCredentialSchema);
+    }
+
+    private CredentialSchema decodeAndParseCredentialSchema(String encodedCredentialSchema) {
+        try {
+            log.debug("\t--> Decoding Credential Schema");
+            byte[] decodedData = BaseMultibaseUtil.decode(encodedCredentialSchema);
+
+            return GsonWrapper.getGson().fromJson(new String(decodedData), CredentialSchema.class);
+        } catch (JsonSyntaxException e) {
+            log.error("\t--> Failed to decode or parse Credential Schema: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+        } catch (Exception e) {
+            log.error("\t--> Unexpected error while decoding Credential Schema: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+        }
     }
 
     @Override
     public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
-        return null;
+        String encodedCredentialDefinition = repositoryFeign.getCredentialDefinition(credentialDefinitionId);
+        return decodeAndParseCredentialDefinition(encodedCredentialDefinition);
     }
 
-    ;
+    private CredentialDefinition decodeAndParseCredentialDefinition(String encodedCredentialDefinition) {
+        try {
+            log.debug("\t--> Decoding Credential Definition");
+            byte[] decodedData = BaseMultibaseUtil.decode(encodedCredentialDefinition);
 
+            return GsonWrapper.getGson().fromJson(new String(decodedData), CredentialDefinition.class);
+        } catch (JsonSyntaxException e) {
+            log.error("\t--> Failed to decode Credential Definition: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+        } catch (Exception e) {
+            log.error("\t--> Unexpected error while decoding Credential Definition: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+        }
+    }
 
 }

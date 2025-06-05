@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * Feign client for the Storage server.
  * This class was temporarily used instead of the BlockChain service and is no longer in use.
  */
-@FeignClient(value = "Storage", url = "${lls.url:http://127.0.0.1:8098}" + UrlConstant.LLS.V1)
+@FeignClient(value = "Storage", url = "${lss.url:http://127.0.0.1:8098}" + UrlConstant.LSS.V1)
 public interface RepositoryFeign {
 
     /**
@@ -35,7 +35,7 @@ public interface RepositoryFeign {
      * @param did DID to get the document for.
      * @return Found DID document.
      */
-    @GetMapping(UrlConstant.LLS.DID)
+    @GetMapping(UrlConstant.LSS.DID)
     String getDid(@RequestParam(name = "did") String did);
 
 
@@ -45,6 +45,22 @@ public interface RepositoryFeign {
      * @param vcId Identifier of the Verifiable Credential.
      * @return Found VC metadata.
      */
-    @GetMapping(UrlConstant.LLS.VC_META)
+    @GetMapping(UrlConstant.LSS.VC_META)
     String getVcMetaData(@RequestParam(name = "vcId") String vcId);
+
+    /**
+     * Get a Credential Schema by schema-id
+     * @param credentialSchemaId the credential schema id
+     * @return the encoded Credential Schema
+     */
+    @GetMapping(UrlConstant.LSS.CREDENTIAL_SCHEMA)
+    String getCredentialSchema(@RequestParam String credentialSchemaId);
+
+    /**
+     * Get a Credential Definition by credential-definition-id
+     * @param credentialDefinitionId the credential definition id
+     * @return the encoded Credential Definition
+     */
+    @GetMapping(UrlConstant.LSS.CREDENTIAL_DEFINITION)
+    String getCredentialDefinition(@RequestParam String credentialDefinitionId);
 }
