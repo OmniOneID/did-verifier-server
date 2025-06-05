@@ -42,9 +42,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Primary
-@Profile("repository")
+@Profile("lls")
 public class RepositoryServiceImpl implements StorageService {
     private final RepositoryFeign repositoryFeign;
+
 
     /**
      * Finds a DID document by DID key URL.
@@ -56,14 +57,9 @@ public class RepositoryServiceImpl implements StorageService {
     @Override
     public DidDocument findDidDoc(String didKeyUrl) {
         try {
-            String did = DidUtil.extractDid(didKeyUrl);
+            String didDocument = repositoryFeign.getDid(didKeyUrl);
 
-            DidDocApiResDto didDocApiResDto = repositoryFeign.getDid(did);
-
-            byte[] decodedDidDoc = BaseMultibaseUtil.decode(didDocApiResDto.getDidDoc());
-
-            String didDocJson = new String(decodedDidDoc);
-            DidManager didManager = BaseCoreDidUtil.parseDidDoc(didDocJson);
+            DidManager didManager = BaseCoreDidUtil.parseDidDoc(didDocument);
 
             return didManager.getDocument();
         } catch (OpenDidException e) {
@@ -71,12 +67,13 @@ public class RepositoryServiceImpl implements StorageService {
             throw e;
         } catch (FeignException e) {
             log.error("Failed to find DID document.", e);
-            throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
+            throw new OpenDidException(ErrorCode.FAILED_TO_FIND_DID_DOC);
         } catch (Exception e) {
             log.error("Failed to find DID document.", e);
-            throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
+            throw new OpenDidException(ErrorCode.FAILED_TO_FIND_DID_DOC);
         }
     }
+
 
     @Override
     public CredentialSchema getZKPCredential(String credentialSchemaId) {

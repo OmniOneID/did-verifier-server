@@ -43,7 +43,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!repository")
+@Profile("!lls")
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BlockChainServiceImpl implements StorageService {
 
