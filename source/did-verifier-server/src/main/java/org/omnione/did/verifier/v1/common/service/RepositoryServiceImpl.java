@@ -79,44 +79,40 @@ public class RepositoryServiceImpl implements StorageService {
 
     @Override
     public CredentialSchema getZKPCredential(String credentialSchemaId) {
-        String encodedCredentialSchema = repositoryFeign.getCredentialSchema(credentialSchemaId);
-        return decodeAndParseCredentialSchema(encodedCredentialSchema);
+        String credentialSchemaJson = repositoryFeign.getCredentialSchema(credentialSchemaId);
+        return parseCredentialSchema(credentialSchemaJson);
     }
 
-    private CredentialSchema decodeAndParseCredentialSchema(String encodedCredentialSchema) {
+    private CredentialSchema parseCredentialSchema(String credentialSchemaJson) {
         try {
-            log.debug("\t--> Decoding Credential Schema");
-            byte[] decodedData = BaseMultibaseUtil.decode(encodedCredentialSchema);
+            log.debug("\t--> Parsing Credential Schema JSON");
 
-            return GsonWrapper.getGson().fromJson(new String(decodedData), CredentialSchema.class);
+            return GsonWrapper.getGson().fromJson(credentialSchemaJson, CredentialSchema.class);
         } catch (JsonSyntaxException e) {
             log.error("\t--> Failed to decode or parse Credential Schema: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         } catch (Exception e) {
-            log.error("\t--> Unexpected error while decoding Credential Schema: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+            log.error("\t--> Unexpected error while parsing Credential Schema: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
 
     @Override
     public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
-        String encodedCredentialDefinition = repositoryFeign.getCredentialDefinition(credentialDefinitionId);
-        return decodeAndParseCredentialDefinition(encodedCredentialDefinition);
+        String credentialDefinitionJson = repositoryFeign.getCredentialDefinition(credentialDefinitionId);
+        return parseCredentialDefinition(credentialDefinitionJson);
     }
 
-    private CredentialDefinition decodeAndParseCredentialDefinition(String encodedCredentialDefinition) {
+    private CredentialDefinition parseCredentialDefinition(String credentialDefinitionJson) {
         try {
-            log.debug("\t--> Decoding Credential Definition");
-            byte[] decodedData = BaseMultibaseUtil.decode(encodedCredentialDefinition);
-
-            return GsonWrapper.getGson().fromJson(new String(decodedData), CredentialDefinition.class);
+            log.debug("\t--> Parsing Credential Definition");
+            return GsonWrapper.getGson().fromJson(credentialDefinitionJson, CredentialDefinition.class);
         } catch (JsonSyntaxException e) {
-            log.error("\t--> Failed to decode Credential Definition: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+            log.error("\t--> Failed to parse Credential Definition: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         } catch (Exception e) {
-            log.error("\t--> Unexpected error while decoding Credential Definition: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.DECODING_FAILED);
+            log.error("\t--> Unexpected error while parsing Credential Definition: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
-
 }
