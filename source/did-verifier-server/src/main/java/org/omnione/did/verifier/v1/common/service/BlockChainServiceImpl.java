@@ -16,7 +16,6 @@
 
 package org.omnione.did.verifier.v1.common.service;
 
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.ContractApi;
@@ -28,13 +27,9 @@ import org.omnione.did.data.model.did.DidDocAndStatus;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
-import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.omnione.exception.BlockChainException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Service for managing DID Document operations, including registration and retrieval.
@@ -44,9 +39,8 @@ import org.springframework.web.context.WebApplicationContext;
 @RequiredArgsConstructor
 @Slf4j
 @Profile({"!lss & !sample"})
-@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BlockChainServiceImpl implements StorageService {
-
+    private final ContractApi contractApi;
     private final BlockchainProperty blockchainProperty;
 
     /**
@@ -69,7 +63,7 @@ public class BlockChainServiceImpl implements StorageService {
     @Override
     public DidDocument findDidDoc(String didKeyUrl) {
         try {
-            ContractApi contractApi = initBlockChain();
+
             DidDocAndStatus didDocAndStatus = (DidDocAndStatus) contractApi.getDidDoc(didKeyUrl);
             return didDocAndStatus.getDocument();
 
@@ -82,7 +76,7 @@ public class BlockChainServiceImpl implements StorageService {
     @Override
     public CredentialSchema getZKPCredential(String credentialSchemaId) {
         try {
-            ContractApi contractApi = initBlockChain();
+
             CredentialSchema credentialSchema = (CredentialSchema) contractApi.getZKPCredential(credentialSchemaId);
             return credentialSchema;
         } catch (BlockChainException e) {
@@ -94,7 +88,7 @@ public class BlockChainServiceImpl implements StorageService {
     @Override
     public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
         try {
-            ContractApi contractApi = initBlockChain();
+
             CredentialDefinition credentialDefinition = (CredentialDefinition) contractApi.getZKPCredentialDefinition(credentialDefinitionId);
             return credentialDefinition;
         } catch (BlockChainException e) {
