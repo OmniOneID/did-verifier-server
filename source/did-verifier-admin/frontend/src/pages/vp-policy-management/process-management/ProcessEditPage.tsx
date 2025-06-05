@@ -22,19 +22,19 @@ const authtypeMapping: { [key: string]: string } = {
 
 const eccCurveMapping: { [key: string]: string } = {
     "Secp256r1": "Secp256r1",
-    "Secp256k1": "Secp256k1",    
+    // "Secp256k1": "Secp256k1",    
 };
 
 const cipherMapping: { [key: string]: string } = {
-    "AES-128-CBC": "AES-128-CBC",
+    // "AES-128-CBC": "AES-128-CBC",
     "AES-256-CBC": "AES-256-CBC",
-    "AES-128-ECB": "AES-128-ECB",
-    "AES-256-ECB": "AES-256-ECB",    
+    // "AES-128-ECB": "AES-128-ECB",
+    // "AES-256-ECB": "AES-256-ECB",    
 };
 
 const paddingMapping: { [key: string]: string } = {
     "PKCS5": "PKCS5",
-    "NOPAD": "NOPAD",    
+    // "NOPAD": "NOPAD",    
 };
 
 interface ProcessFormData {
