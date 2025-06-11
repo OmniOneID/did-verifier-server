@@ -303,9 +303,24 @@ const ProcessEditPage = (props: Props) => {
                     onChange={handleAuthTypeChange}
                     label="Auth Type"
                 >
-                    {Object.entries(authtypeMapping).map(([key, value]) => (
-                        <MenuItem key={key} value={key}>{value}</MenuItem>
-                    ))}
+                    {Object.entries(authtypeMapping).map(([key, value]) => {
+                        const isSelectable = key === '6';
+                        return (
+                            <MenuItem 
+                                key={key} 
+                                value={key}
+                                disabled={!isSelectable}
+                                sx={{
+                                    color: isSelectable ? 'black' : '#9e9e9e',
+                                    '&.Mui-disabled': {
+                                        color: '#9e9e9e'
+                                    }
+                                }}
+                            >
+                                {value}
+                            </MenuItem>
+                        );
+                    })}
                 </Select>
                 {errors.authType && <FormHelperText>{errors.authType}</FormHelperText>}
             </FormControl>

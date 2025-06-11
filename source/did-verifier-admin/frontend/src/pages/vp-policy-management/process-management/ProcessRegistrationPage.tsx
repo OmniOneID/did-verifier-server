@@ -71,7 +71,7 @@ const ProcessRegistrationPage = (props: Props) => {
             cipher: 'AES-256-CBC',
             padding: 'PKCS5',            
         },
-        authType: 0,
+        authType: 6,
         endpoints: [],
         createdAt: '',
     });
@@ -112,7 +112,7 @@ const ProcessRegistrationPage = (props: Props) => {
                 cipher: 'AES-256-CBC',
                 padding: 'PKCS5',           
             },
-            authType: 0,
+            authType: 6,
             endpoints: [],
             createdAt: '',
         });
@@ -204,7 +204,7 @@ const ProcessRegistrationPage = (props: Props) => {
             if (typeof value === 'object' && value !== null) {
                 return Object.values(value).some(v => v !== '');
             }
-            return value !== '' && value !== undefined && value !== 0;
+            return value !== '' && value !== undefined && value !== 6;
         });
         setIsButtonDisabled(!isModified);
     }, [formData]);
@@ -257,9 +257,24 @@ const ProcessRegistrationPage = (props: Props) => {
                             onChange={handleAuthTypeChange}
                             label="Auth Type"
                         >
-                            {Object.entries(authtypeMapping).map(([key, value]) => (
-                                <MenuItem key={key} value={key}>{value}</MenuItem>
-                            ))}
+                            {Object.entries(authtypeMapping).map(([key, value]) => {
+                                const isSelectable = key === '6';
+                                return (
+                                    <MenuItem 
+                                        key={key} 
+                                        value={key}
+                                        disabled={!isSelectable}
+                                        sx={{
+                                            color: isSelectable ? 'black' : '#9e9e9e',
+                                            '&.Mui-disabled': {
+                                                color: '#9e9e9e'
+                                            }
+                                        }}
+                                    >
+                                        {value}
+                                    </MenuItem>
+                                );
+                            })}
                         </Select>
                         {errors.authType && <FormHelperText>{errors.authType}</FormHelperText>}
                     </FormControl>
