@@ -1,10 +1,9 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
   Box, 
   Button, 
-  Checkbox,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,8 +25,7 @@ import {
   TableRow, 
   TextField, 
   Typography, 
-  styled,
-  CircularProgress
+  styled
 } from '@mui/material';
 import { useDialogs } from '@toolpad/core';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -36,6 +34,7 @@ import { getVcSchemes, postFilter } from '../../../apis/vp-filter-api';
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
+import DeleteIcon from "@mui/icons-material/Delete";
 
 type Props = {}
 
@@ -120,30 +119,25 @@ const FilterRegistrationPage = (props: Props) => {
         requiredClaims: [],
         allowedIssuers: [],
         displayClaims: [],
-        presentAll: false,
+        presentAll: true,
         schemaId: ''
     });
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingClaims, setIsLoadingClaims] = useState(false);
     const [isLoadingSchemas, setIsLoadingSchemas] = useState(false);
     const [errors, setErrors] = useState<ErrorState>({});
 
     // For the allowed issuers input
     const [newAllowedIssuer, setNewAllowedIssuer] = useState('');
 
-    // For the claims selector dialog
-    const [claimDialogOpen, setClaimDialogOpen] = useState(false);
+    // For the schema selector dialog
     const [schemaDialogOpen, setSchemaDialogOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
     const [schemaSearchTerm, setSchemaSearchTerm] = useState('');
     
     // Store the entire VC schema data
     const [vcSchemaData, setVcSchemaData] = useState<VcSchema[]>([]);
     const [selectedSchema, setSelectedSchema] = useState<VcSchema | null>(null);
-    const [availableClaims, setAvailableClaims] = useState<string[]>([]);
-    const [selectedClaims, setSelectedClaims] = useState<{ [key: string]: boolean }>({});
 
     // Fetch VC schemas
     const fetchVcSchemas = async () => {
@@ -207,11 +201,10 @@ const FilterRegistrationPage = (props: Props) => {
             requiredClaims: [],
             allowedIssuers: [],
             displayClaims: [],
-            presentAll: false,
+            presentAll: true,
             schemaId: ''
         });
         setNewAllowedIssuer('');
-        setSelectedClaims({});
         setSelectedSchema(null);
     };
 
@@ -227,81 +220,24 @@ const FilterRegistrationPage = (props: Props) => {
     // Handle schema selection
     const handleSchemaSelect = (schema: VcSchema) => {
         setSelectedSchema(schema);
+        
+        // Extract all claims from the selected schema
+        const allClaims = extractClaimsFromSchema(schema);
+        
         setFormData(prev => ({
             ...prev,
             id: schema.schemaId,
-            schemaId: schema.schemaId
+            schemaId: schema.schemaId,
+            // Automatically populate both required and display claims with all available claims
+            requiredClaims: allClaims,
+            displayClaims: allClaims
         }));
         setSchemaDialogOpen(false);
-    };
-
-    // Open the claims selector dialog
-    const handleOpenClaimsDialog = async () => {
-        if (!selectedSchema) {
-            await dialogs.open(CustomDialog, {
-                title: 'Notification',
-                message: 'Please select a VC schema first.',
-                isModal: true,
-            });
-            return;
-        }
-        
-        setIsLoadingClaims(true);
-        // Extract claims from the selected schema
-        const claims = extractClaimsFromSchema(selectedSchema);
-        setAvailableClaims(claims);
-        
-        // Reset selected claims each time the dialog opens
-        setSelectedClaims({});
-        setIsLoadingClaims(false);
-        setClaimDialogOpen(true);
-    };
-
-    // Handle search in the claims dialog
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
     };
 
     // Handle search in the schema dialog
     const handleSchemaSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSchemaSearchTerm(e.target.value);
-    };
-
-    // Handle claim selection/deselection
-    const handleClaimToggle = (claim: string) => {
-        setSelectedClaims(prev => ({
-            ...prev,
-            [claim]: !prev[claim]
-        }));
-    };
-
-    // Confirm claim selections
-    const handleConfirmClaimSelection = () => {
-        const selectedClaimValues = availableClaims
-            .filter(claim => selectedClaims[claim])
-            .map(claim => claim);
-        
-        // Update requiredClaims
-        setFormData(prev => ({
-            ...prev,
-            requiredClaims: selectedClaimValues,
-            // Also update displayClaims with the same values
-            displayClaims: selectedClaimValues
-        }));
-        setClaimDialogOpen(false);
-    };
-
-    const handleRemoveRequiredClaim = (index: number) => {
-        const newRequiredClaims = [...formData.requiredClaims];
-        const removedClaim = newRequiredClaims[index];
-        newRequiredClaims.splice(index, 1);
-        
-        // 필요값을 삭제하면 노출값에서도 함께 삭제합니다
-        setFormData((prev) => ({ 
-            ...prev, 
-            requiredClaims: newRequiredClaims,
-            displayClaims: prev.displayClaims.filter(claim => claim !== removedClaim)
-        }));
     };
 
     const handleAddAllowedIssuer = () => {
@@ -317,20 +253,6 @@ const FilterRegistrationPage = (props: Props) => {
         const newAllowedIssuers = [...formData.allowedIssuers];
         newAllowedIssuers.splice(index, 1);
         setFormData((prev) => ({ ...prev, allowedIssuers: newAllowedIssuers }));
-    };
-
-    const handleRemoveDisplayClaim = (index: number) => {
-        const newDisplayClaims = [...formData.displayClaims];
-        newDisplayClaims.splice(index, 1);
-        
-        // 노출값만 삭제하고 필요값은 그대로 유지합니다
-        setFormData((prev) => {
-            return {
-                ...prev, 
-                displayClaims: newDisplayClaims
-                // requiredClaims는 변경하지 않음
-            };
-        });
     };
 
     const validate = () => {
@@ -400,15 +322,6 @@ const FilterRegistrationPage = (props: Props) => {
         });
         setIsButtonDisabled(!isModified);
     }, [formData]);
-
-    // Filter claims based on search term
-    const filteredClaims = useMemo(() => {
-        return searchTerm.trim() === '' 
-            ? availableClaims 
-            : availableClaims.filter(claim => 
-                claim.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-    }, [availableClaims, searchTerm]);
 
     // Filter schemas based on search term
     const filteredSchemas = useMemo(() => {
@@ -525,83 +438,6 @@ const FilterRegistrationPage = (props: Props) => {
                 </DialogActions>
             </Dialog>
 
-            {/* Claims Selector Dialog */}
-            <Dialog 
-                open={claimDialogOpen} 
-                onClose={() => setClaimDialogOpen(false)} 
-                maxWidth="md" 
-                fullWidth
-            >
-                <DialogTitle>Select Required Claims</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ mb: 2, mt: 1, display: 'flex' }}>
-                        <TextField 
-                            fullWidth
-                            label="Search Claims"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            variant="outlined"
-                            size="small"
-                        />
-                        <IconButton sx={{ ml: 1 }}>
-                            <SearchIcon />
-                        </IconButton>
-                    </Box>
-                    <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-                        <Table stickyHeader>
-                            <TableHead>
-                                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                                    <TableCell padding="checkbox" width="10%">Select</TableCell>
-                                    <TableCell>Claim Name</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {isLoadingClaims ? (
-                                    <TableRow>
-                                        <TableCell colSpan={2} align="center" sx={{ py: 3 }}>
-                                            <CircularProgress size={32} />
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                Loading claims...
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredClaims.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={2} align="center">
-                                            <Typography variant="body1">No claims found</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    filteredClaims.map(claim => (
-                                        <TableRow key={claim}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox 
-                                                    checked={!!selectedClaims[claim]} 
-                                                    onChange={() => handleClaimToggle(claim)}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{claim}</TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setClaimDialogOpen(false)} variant="outlined">
-                        Cancel
-                    </Button>
-                    <Button 
-                        onClick={handleConfirmClaimSelection} 
-                        variant="contained" 
-                        color="primary"
-                    >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
             <Typography variant="h4">Filter Management</Typography>
             <StyledContainer>
                 <StyledTitle>Filter Registration</StyledTitle>
@@ -656,39 +492,39 @@ const FilterRegistrationPage = (props: Props) => {
                         {errors.type && <FormHelperText>{errors.type}</FormHelperText>}
                     </FormControl>
 
+                    <FormControl fullWidth margin="normal" error={!!errors.presentAll}>
+                        <InputLabel>Present All</InputLabel>
+                        <Select 
+                            value="true"
+                            label="Present All"
+                            disabled
+                        >
+                            <MenuItem value="true">true</MenuItem>
+                        </Select>
+                        {errors.presentAll && <FormHelperText>{errors.presentAll}</FormHelperText>}
+                    </FormControl>
+
                     {/* Required Claims Section - New Implementation */}
                     <Typography variant="h6" sx={{ mt: 3 }}>Required Claims</Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Please enter claims through VC schema search.
+                        Claims are automatically loaded when you select a VC schema.
                     </Typography>
                     {errors.errorRequiredClaimsMessage && (
                         <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
                             {errors.errorRequiredClaimsMessage}
                         </Typography>
                     )}
-                    <Box sx={{ display: 'flex', mb: 2 }}>
-                        <Button 
-                            fullWidth
-                            variant="contained" 
-                            startIcon={<AddCircleOutlineIcon />}
-                            onClick={handleOpenClaimsDialog}
-                            disabled={isLoadingClaims || !selectedSchema}
-                        >
-                            {isLoadingClaims ? 'Loading Claims...' : 'Add Required Claims'}
-                        </Button>
-                    </Box>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Required Claim</TableCell>
-                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.requiredClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={2} align="center">
+                                        <TableCell align="center">
                                             <Typography variant="body2">No required claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -696,11 +532,6 @@ const FilterRegistrationPage = (props: Props) => {
                                     formData.requiredClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
-                                            <TableCell>
-                                                <IconButton onClick={() => handleRemoveRequiredClaim(index)} sx={{ color: '#FF8400' }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )}
@@ -715,13 +546,12 @@ const FilterRegistrationPage = (props: Props) => {
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Display Claim</TableCell>
-                                    <TableCell>Delete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.displayClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={2} align="center">
+                                        <TableCell align="center">
                                             <Typography variant="body2">No display claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -729,11 +559,6 @@ const FilterRegistrationPage = (props: Props) => {
                                     formData.displayClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
-                                            <TableCell>
-                                                <IconButton onClick={() => handleRemoveDisplayClaim(index)} sx={{ color: '#FF8400' }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )}
@@ -795,22 +620,6 @@ const FilterRegistrationPage = (props: Props) => {
                             </TableBody>
                         </Table>
                     </TableContainer>            
-
-                    <FormControl fullWidth margin="normal" error={!!errors.presentAll}>
-                        <InputLabel>Present All</InputLabel>
-                        <Select 
-                            value={formData.presentAll ? "true" : "false"} 
-                            onChange={(event) => setFormData((prev) => ({ 
-                                ...prev, 
-                                presentAll: event.target.value === "true" 
-                            }))}
-                            label="Present All"
-                        >
-                            <MenuItem value="true">true</MenuItem>
-                            <MenuItem value="false">false</MenuItem>
-                        </Select>
-                        {errors.presentAll && <FormHelperText>{errors.presentAll}</FormHelperText>}
-                    </FormControl>
 
                     <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
                         <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Register</Button>
