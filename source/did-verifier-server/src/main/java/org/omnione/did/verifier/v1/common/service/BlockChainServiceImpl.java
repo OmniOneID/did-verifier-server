@@ -25,6 +25,7 @@ import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.BlockchainProperty;
 import org.omnione.did.data.model.did.DidDocAndStatus;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
 import org.omnione.exception.BlockChainException;
@@ -97,4 +98,15 @@ public class BlockChainServiceImpl implements StorageService {
         }
 
     }
+
+    @Override
+    public VcMeta getVcMeta(String vcId) {
+        try {
+            return (VcMeta) contractApi.getVcMetadata(vcId);
+        } catch (BlockChainException e) {
+            log.error("Failed to get VC Metadata: " + e.getMessage());
+            throw new OpenDidException(ErrorCode.BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED);
+        }
+    }
+
 }

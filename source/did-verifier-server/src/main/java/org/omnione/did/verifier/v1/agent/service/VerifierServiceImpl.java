@@ -24,7 +24,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
-import org.omnione.did.ContractFactory;
 import org.omnione.did.base.datamodel.data.*;
 import org.omnione.did.base.datamodel.enums.*;
 import org.omnione.did.base.db.constant.SubTransactionStatus;
@@ -56,6 +55,7 @@ import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.did.Proof;
 import org.omnione.did.data.model.did.VerificationMethod;
 import org.omnione.did.data.model.enums.did.ProofType;
+import org.omnione.did.data.model.enums.vc.VcStatus;
 import org.omnione.did.data.model.profile.Filter;
 import org.omnione.did.data.model.profile.Process;
 import org.omnione.did.data.model.profile.ReqE2e;
@@ -66,16 +66,14 @@ import org.omnione.did.data.model.provider.ProviderDetail;
 import org.omnione.did.data.model.util.json.GsonWrapper;
 import org.omnione.did.data.model.vc.Claim;
 import org.omnione.did.data.model.vc.CredentialSchema;
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.data.model.vc.VerifiableCredential;
 import org.omnione.did.data.model.vp.VerifiablePresentation;
 import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.dto.*;
-
-import org.omnione.did.verifier.v1.agent.service.sample.ZkpTestConstants;
+import org.omnione.did.verifier.v1.common.service.BlockChainServiceImpl;
 import org.omnione.did.verifier.v1.common.service.StorageService;
-
-import org.omnione.did.zkp.core.manager.ZkpCredentialManager;
 import org.omnione.did.zkp.core.manager.ZkpProofManager;
 import org.omnione.did.zkp.crypto.constant.ZkpCryptoConstants;
 import org.omnione.did.zkp.crypto.util.BigIntegerUtil;
@@ -127,6 +125,7 @@ public class VerifierServiceImpl implements VerifierService {
     private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
     private final ZkpProofRequestRepository zkpProofRequestRepository;
     private final VpOfferRepository vpOfferRepository;
+    private final BlockChainServiceImpl blockChainServiceImpl;
 
 
     /**
@@ -302,6 +301,9 @@ public class VerifierServiceImpl implements VerifierService {
 
             log.debug("\t --> Validating Nonce");
             nonceValid(verifiablePresentation.getVerifierNonce(), serverNonce);
+            String vcId = verifiablePresentation.getVerifiableCredential().getFirst().getId();
+            log.debug("\t --> Validating VC Status vcId: {}", vcId);
+            vcStatusCheck(vcId);
 
             log.debug("\t --> Verifying VP");
             VerifyVp(verifiablePresentation, findProfile.getProfile().getFilter());
@@ -327,10 +329,21 @@ public class VerifierServiceImpl implements VerifierService {
                     .build();
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during requestVerify: {}", e.getErrorCode().getMessage());
+            handleTxFailure(requestVerifyReqDto.getTxId(), e);
             throw e;
         } catch (Exception e) {
             log.error("Exception occurred during requestingVerify: {}", e.getMessage(), e);
+            handleTxFailure(requestVerifyReqDto.getTxId(), e);
             throw new OpenDidException(ErrorCode.FAILED_TO_REQUEST_VERIFY);
+        }
+    }
+
+    private void vcStatusCheck(String vcId) {
+        VcMeta vcMeta = blockChainServiceImpl.getVcMeta(vcId);
+        String status = vcMeta.getStatus();
+        if (VcStatus.REVOKED.name().equals(status) || VcStatus.INACTIVE.name().equals(status)) {
+            log.error("VC with ID {} Status is not Valid", vcId);
+            throw new OpenDidException(ErrorCode.VC_STAUS_NOT_VALID);
         }
     }
 
@@ -475,55 +488,68 @@ public class VerifierServiceImpl implements VerifierService {
 
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during RequestingProoofRequestProfile: {}", e.getErrorCode().getMessage());
+            handleTxFailure(requestProfileReqDto.getTxId(), e);
             throw e;
         } catch (Exception e) {
             log.error("Exception occurred during RequestingProfile: {}", e.getMessage(), e);
+            handleTxFailure(requestProfileReqDto.getTxId(), e);
             throw new OpenDidException(ErrorCode.FAILED_TO_REQUEST_PROOF_REQUEST_PROFILE);
         }
     }
 
     @Override
     public RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto) {
+        try {
+            log.info("=== Starting requestVerifyProof ===");
+            log.debug("\t --> Retrieving transaction information and last sub-transaction");
+            Transaction transaction = transactionService.findTransactionByTxId(requestVerifyProofReqDto.getTxId());
+            SubTransaction lastSubTransaction = transactionService.findLastSubTransaction(transaction.getId());
+            validateTransaction(transaction, lastSubTransaction);
 
-        log.info("=== Starting requestVerifyProof ===");
-        log.debug("\t --> Retrieving transaction information and last sub-transaction");
-        Transaction transaction = transactionService.findTransactionByTxId(requestVerifyProofReqDto.getTxId());
-        SubTransaction lastSubTransaction = transactionService.findLastSubTransaction(transaction.getId());
-        validateTransaction(transaction, lastSubTransaction);
+            log.debug("\t --> Retrieving VP Profile and verifying AuthType");
+            ProofRequestProfile findProofRequestProfile = findProofProfile(requestVerifyProofReqDto.getTxId());
 
-        log.debug("\t --> Retrieving VP Profile and verifying AuthType");
-        ProofRequestProfile findProofRequestProfile = findProofProfile(requestVerifyProofReqDto.getTxId());
+            log.debug("\t --> if AccE2e proof exists, verify it");
+            if(Objects.nonNull(requestVerifyProofReqDto.getAccE2e().getProof())){
+                verifyAccE2eProof(requestVerifyProofReqDto.getAccE2e());
+            }
+            org.omnione.did.zkp.datamodel.proof.Proof proof = decryptProof(requestVerifyProofReqDto);
 
-        log.debug("\t --> if AccE2e proof exists, verify it");
-        if(Objects.nonNull(requestVerifyProofReqDto.getAccE2e().getProof())){
-            verifyAccE2eProof(requestVerifyProofReqDto.getAccE2e());
+
+            BigInteger proofNonce = new BigInteger(requestVerifyProofReqDto.getNonce());
+
+            List<ProofVerifyParam> proofVerifyParams = getProofVerifyParams(proof.getIdentifiers());
+
+            VerifyProof(proof, proofNonce, findProofRequestProfile.getProfile().getProofRequest(), proofVerifyParams);
+
+
+            vpSubmitRepository.save(VpSubmit.builder()
+                    .transactionId(transaction.getId())
+                    .vp("Zkp Proof")
+                    .holderDid("Zkp VP Holder")
+                    .build());
+            transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
+            transactionService.saveSubTransaction(SubTransaction.builder()
+                    .transactionId(transaction.getId())
+                    .step(lastSubTransaction.getStep() + 1)
+                    .type(SubTransactionType.REQUEST_VERIFY)
+                    .status(SubTransactionStatus.COMPLETED)
+                    .build());
+
+            log.debug("*** Finished requestProofVerify ***");
+            return RequestVerifyResDto.builder()
+                    .txId(requestVerifyProofReqDto.getTxId())
+                    .build();
+        } catch (OpenDidException e) {
+            log.error("OpenDidException occurred during RequestingVerifyProof: {}", e.getErrorCode().getMessage());
+            handleTxFailure(requestVerifyProofReqDto.getTxId(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception occurred during RequestingVerifyProof: {}", e.getMessage(), e);
+            handleTxFailure(requestVerifyProofReqDto.getTxId(), e);
+            throw new OpenDidException(ErrorCode.FAILED_TO_VERIFY_PROOF);
         }
-        org.omnione.did.zkp.datamodel.proof.Proof proof = decryptProof(requestVerifyProofReqDto);
 
-        BigInteger proofNonce = new BigInteger(requestVerifyProofReqDto.getNonce());
-
-        List<ProofVerifyParam> proofVerifyParams = getProofVerifyParams(proof.getIdentifiers());
-
-        VerifyProof(proof, proofNonce, findProofRequestProfile.getProfile().getProofRequest(), proofVerifyParams);
-
-
-        vpSubmitRepository.save(VpSubmit.builder()
-                .transactionId(transaction.getId())
-                .vp("Zkp Proof")
-                .holderDid("Zkp VP Holder")
-                .build());
-        transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
-        transactionService.saveSubTransaction(SubTransaction.builder()
-                .transactionId(transaction.getId())
-                .step(lastSubTransaction.getStep() + 1)
-                .type(SubTransactionType.REQUEST_VERIFY)
-                .status(SubTransactionStatus.COMPLETED)
-                .build());
-
-        log.debug("*** Finished requestProofVerify ***");
-        return RequestVerifyResDto.builder()
-                .txId(requestVerifyProofReqDto.getTxId())
-                .build();
     }
 
     private LinkedList<ProofVerifyParam> getProofVerifyParams(List<Identifiers> identifiers) {
@@ -637,9 +663,6 @@ public class VerifierServiceImpl implements VerifierService {
         log.debug("ProofRequest: {}", proofRequestProfile.toJson());
     }
 
-
-
-    ////ZKP TEST END /////
     /**
      * Validates the AuthType of a VerifiablePresentation against the VerifyProfile.
      * This ensures that the authentication method used in the VP matches the requirements set in the profile.
@@ -1253,6 +1276,14 @@ public class VerifierServiceImpl implements VerifierService {
 
         log.debug("verifyProcess: {}", verifyProcess.toJson());
         verifyProfile.getProfile().setProcess(verifyProcess);
+    }
+
+    private void handleTxFailure(String txId, Exception e) {
+        try {
+            transactionService.updateErrorTransactionStatus(txId, TransactionStatus.FAILED);
+        } catch (Exception ex) {
+            log.warn("Failed to update transaction status: {}", txId, ex);
+        }
     }
 
 

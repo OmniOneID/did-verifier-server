@@ -2,6 +2,7 @@ package org.omnione.did.verifier.v1.common.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,11 @@ public class MockStorageServiceImpl implements StorageService {
 
     @Override
     public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
+        return null;
+    }
+
+    @Override
+    public VcMeta getVcMeta(String vcId) {
         return null;
     }
 }

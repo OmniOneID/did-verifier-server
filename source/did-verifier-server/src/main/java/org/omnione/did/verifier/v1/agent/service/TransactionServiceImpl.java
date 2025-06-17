@@ -29,6 +29,7 @@ import org.omnione.did.base.db.repository.VpOfferRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -140,5 +141,19 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(transactionStatus);
 
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateErrorTransactionStatus(String txId, TransactionStatus transactionStatus) {
+        Optional<Transaction> optionalTransaction = transactionRepository.findByTxId(txId);
+        if (optionalTransaction.isEmpty()) {
+            throw new OpenDidException(ErrorCode.TRANSACTION_NOT_FOUND);
+        }
+        Transaction transaction = optionalTransaction.get();
+        transaction.setStatus(transactionStatus);
+
+        transactionRepository.save(transaction);
+
     }
 }

@@ -28,6 +28,7 @@ import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.verifier.v1.agent.api.RepositoryFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
@@ -47,7 +48,6 @@ import org.springframework.stereotype.Service;
 @Profile("lss")
 public class RepositoryServiceImpl implements StorageService {
     private final RepositoryFeign repositoryFeign;
-
 
     /**
      * Finds a DID document by DID key URL.
@@ -101,6 +101,12 @@ public class RepositoryServiceImpl implements StorageService {
     public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
         String credentialDefinitionJson = repositoryFeign.getCredentialDefinition(credentialDefinitionId);
         return parseCredentialDefinition(credentialDefinitionJson);
+    }
+
+    //@TODO: Implement this method to retrieve the VcMeta from the repository
+    @Override
+    public VcMeta getVcMeta(String vcId) {
+        return null;
     }
 
     private CredentialDefinition parseCredentialDefinition(String credentialDefinitionJson) {

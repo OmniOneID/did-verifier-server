@@ -138,7 +138,7 @@ public enum ErrorCode {
     BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500),
     CREDENTIAL_SCHEMA_NOT_FOUND("SSRVVRF01208", "Failed to find credential schema : credential schema not found" , 400),
     PROOF_REQUEST_NOT_FOUND("SSRVVRF01209", "Failed to find proof request : proof request not found" , 400),
-    ;
+    VC_STAUS_NOT_VALID("SSRVVRF01210", "VC Status id not valid" , 400);
 
     private final String code;
     private final String message;

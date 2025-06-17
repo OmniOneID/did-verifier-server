@@ -80,4 +80,12 @@ public interface TransactionService {
      * @param transactionStatus New transaction status.
      */
     void updateTransactionStatus(Long id, TransactionStatus transactionStatus);
+
+    /**
+     * Updates the status of a transaction.
+     *
+     * @param txId Transaction ID.
+     * @param transactionStatus New transaction status.
+     */
+    void updateErrorTransactionStatus(String txId, TransactionStatus transactionStatus);
 }
