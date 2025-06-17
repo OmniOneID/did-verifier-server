@@ -24,6 +24,8 @@ Open DID Verifier Server Installation Guide
 Table of Contents
 ==
 
+- [Open DID Verifier Server Installation Guide](#open-did-verifier-server-installation-guide)
+- [Table of Contents](#table-of-contents)
 - [1. Introduction](#1-introduction)
   - [1.1. Overview](#11-overview)
   - [1.2. Verifier Server Definition](#12-verifier-server-definition)
@@ -38,7 +40,17 @@ Table of Contents
 - [4. Server Running Methods](#4-server-running-methods)
   - [4.1. Running with IDE (Gradle and React Project Execution)](#41-running-with-ide-gradle-and-react-project-execution)
     - [4.1.1. Running Backend (Spring Boot) in IntelliJ IDEA](#411-running-backend-spring-boot-in-intellij-idea)
+      - [1. Install IntelliJ IDEA](#1-install-intellij-idea)
+      - [2. Open Project](#2-open-project)
+      - [3. Gradle Build](#3-gradle-build)
+      - [4. Run Server](#4-run-server)
+      - [5. Database Installation](#5-database-installation)
+      - [6. Server Configuration](#6-server-configuration)
     - [4.1.2. Running Frontend (React) in VS Code](#412-running-frontend-react-in-vs-code)
+      - [1. Install VS Code](#1-install-vs-code)
+      - [2. Open Project](#2-open-project-1)
+      - [3. Install Dependencies](#3-install-dependencies)
+      - [4. Run Development Server](#4-run-development-server)
   - [4.2. Running with Console Commands](#42-running-with-console-commands)
     - [4.2.1. Gradle Build Commands](#421-gradle-build-commands)
   - [4.3. Running with Docker](#43-running-with-docker)
@@ -55,9 +67,11 @@ Table of Contents
   - [5.4. application-logging.yml](#54-application-loggingyml)
     - [5.4.1. Logging Configuration](#541-logging-configuration)
   - [5.5. application-spring-docs.yml](#55-application-spring-docsyml)
-  - [5.6. application-wallet.yml](#56-application-walletyml)    
+  - [5.6. application-wallet.yml](#56-application-walletyml)
   - [5.7. blockchain.properties](#57-blockchainproperties)
     - [5.7.1. Blockchain Integration Configuration](#571-blockchain-integration-configuration)
+      - [EVM Network Configuration](#evm-network-configuration)
+      - [EVM Contract Configuration](#evm-contract-configuration)
 - [6. Profile Configuration and Usage](#6-profile-configuration-and-usage)
   - [6.1. Profile Overview (`sample`, `dev`)](#61-profile-overview-sample-dev)
     - [6.1.1. `sample` Profile](#611-sample-profile)
@@ -66,13 +80,17 @@ Table of Contents
     - [6.2.1. When Running Server with IDE](#621-when-running-server-with-ide)
     - [6.2.2. When Running Server with Console Commands](#622-when-running-server-with-console-commands)
     - [6.2.3. When Running Server with Docker](#623-when-running-server-with-docker)
-- [7. Building and Running with Docker](#7-building-and-running-with-docker)
-  - [7.1. Docker Image Build Method (`Dockerfile` based)](#71-docker-image-build-method-dockerfile-based)
-  - [7.2. Docker Image Execution](#72-docker-image-execution)
-  - [7.3. Running with Docker Compose](#73-running-with-docker-compose)
-    - [7.3.1. `docker-compose.yml` File Description](#731-docker-composeyml-file-description)
-    - [7.3.2. Container Execution and Management](#732-container-execution-and-management)
-    - [7.3.3. Server Configuration Method](#733-server-configuration-method)
+- [7. Running After Building with Docker](#7-running-after-building-with-docker)
+  - [7.1. Docker Image Build Method (Based on `Dockerfile`)](#71-docker-image-build-method-based-on-dockerfile)
+    - [7.1.1. Build Docker image](#711-build-docker-image)
+  - [7.2. Running with Docker Compose](#72-running-with-docker-compose)
+    - [7.2.1. Preparing Directories and Configuration Files](#721-preparing-directories-and-configuration-files)
+      - [1. Create docker-compose directory and config directory](#1-create-docker-compose-directory-and-config-directory)
+      - [2. Copy configuration files (yml) to config directory](#2-copy-configuration-files-yml-to-config-directory)
+      - [3. Modify blockchain.properties file](#3-modify-blockchainproperties-file)
+      - [4. Modify application-database.yml file](#4-modify-application-databaseyml-file)
+    - [7.2.2. Create `docker-compose.yml` file](#722-create-docker-composeyml-file)
+    - [7.2.3. Run Container](#723-run-container)
 - [8. Installing Docker PostgreSQL](#8-installing-docker-postgresql)
   - [8.1. PostgreSQL Installation using Docker Compose](#81-postgresql-installation-using-docker-compose)
   - [8.2. PostgreSQL Container Execution](#82-postgresql-container-execution)
@@ -698,59 +716,86 @@ This section explains how to change profiles for each running method.
 
 You can flexibly change profile-specific configurations according to each method and easily apply configurations suitable for your project environment.
 
-# 7. Building and Running with Docker
+# 7. Running After Building with Docker
 
-## 7.1. Docker Image Build Method (`Dockerfile` based)
+## 7.1. Docker Image Build Method (Based on `Dockerfile`)
 
+### 7.1.1. Build Docker image
 Build the Docker image with the following command:
 
 ```bash
-docker build -t did-verifier-server .
+cd {source_directory}
+docker build -t did-verifier-server -f did-verifier-server/Dockerfile .
 ```
 
-## 7.2. Docker Image Execution
+<br/>
 
-Run the built image:
+## 7.2. Running with Docker Compose
 
+### 7.2.1. Preparing Directories and Configuration Files
+
+#### 1. Create docker-compose directory and config directory
 ```bash
-docker run -d -p 8092:8092 did-verifier-server
+mkdir -p {docker_compose_directory}/config
 ```
 
-## 7.3. Running with Docker Compose
+#### 2. Copy configuration files (yml) to config directory
+```bash
+cp {application_yml_directory}/* {docker_compose_directory}/config/
+cp {blockchain_properties_path} {docker_compose_directory}/config/
+```
 
-### 7.3.1. `docker-compose.yml` File Description
+#### 3. Modify blockchain.properties file
+```yml
+evm.network.url=http://host.docker.internal:8545
+... (omitted)
+```
 
+> **host.docker.internal** is a special address that points to the host machine from within a Docker container.  
+> Since localhost inside a container refers to the container itself, you must use host.docker.internal to access services (PostgreSQL, blockchain) running on the host.
+
+#### 4. Modify application-database.yml file
+```yml
+spring:
+ ... (omitted)
+ datasource:
+   driver-class-name: org.postgresql.Driver
+   url: jdbc:postgresql://host.docker.internal:5430/verifier
+   username: omn
+   password: omn
+ ... (omitted)
+```
+
+### 7.2.2. Create `docker-compose.yml` file
 You can easily manage multiple containers using the `docker-compose.yml` file.
 
-```yaml
+```yml
 version: '3'
 services:
-  app:
-    image: did-verifier-server
-    ports:
-      - "8092:8092"
-    volumes:
-      - ${your-config-dir}:/app/config
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
+ app:
+   image: did-verifier-server
+   ports:
+     - "8092:8092"
+   volumes:
+     - {config_directory}:/app/config
+   environment:
+     - SPRING_PROFILES_ACTIVE=dev
+   extra_hosts:
+     - "host.docker.internal:host-gateway"
 ```
 
-### 7.3.2. Container Execution and Management
+> - In the example above, the `config_directory` is mounted to `/app/config` inside the container to share configuration files.
+>   - Configuration files located in `config_directory` take priority over default configuration files.
+>   - For detailed configuration instructions, please refer to [5. Configuration Guide](#5-configuration-guide).
 
-Run containers using Docker Compose with the following command:
 
+### 7.2.3. Run Container
 ```bash
+cd {docker_compose_directory}
 docker-compose up -d
 ```
 
-### 7.3.3. Server Configuration Method
-
-In the above example, the `${your-config-dir}` directory is mounted to `/app/config` within the container to share configuration files.
-
-- If additional configuration is needed, you can change settings by adding separate property files to the mounted folder.
-  - For example, add an `application.yml` file to `${your-config-dir}` and write the settings you want to change in this file.
-  - The `application.yml` file located in `${your-config-dir}` takes precedence over the default configuration file.
-- For detailed configuration methods, please refer to [5. Configuration Guide](#5-configuration-guide).
+<br/>
 
 # 8. Installing Docker PostgreSQL
 
