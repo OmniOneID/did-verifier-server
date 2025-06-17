@@ -609,7 +609,7 @@ ZKP 정책 등록 시 필요한 주요 구성 요소는 다음과 같습니다:
 
 ### 3.4. VP History Page
 
-VP History Page 메뉴에서는 사용자들이 제출한 VP(Verifiable Presentation)에 대한 이력을 조회할 수 있습니다. 이 화면에서는 각 VP 제출 건의 상태와 세부 정보를 확인할 수 있습니다.
+VP History Page 메뉴에서는 사용자들이 제출한 VP(Verifiable Presentation)에 대한 이력을 조회할 수 있습니다. 이 화면에서는 각 VP 제출 시도의 상태와 세부 정보를 확인할 수 있으며, 성공한 제출뿐만 아니라 실패하거나 진행 중인 요청도 모두 추적할 수 있습니다.
 
 <img src="./images/vp_history.jpg" width="800"/>
 
@@ -618,15 +618,17 @@ VP History Page는 다음과 같은 주요 기능과 정보를 제공합니다:
 | 번호 | 항목 | 설명 |
 |------|------|------|
 | 1 | VP Submit List | VP 제출 목록 제목입니다. |
-| 2 | Transaction Status 필터 | 드롭다운 메뉴를 통해 특정 상태(Completed, Pending, All Status 등)의 VP 제출 건만 필터링할 수 있습니다. |
-| 3 | 목록 헤더 | Transaction Status, Holder DID, Created At 등 VP 제출 정보의 헤더입니다. |
-| 4 | 상태 표시 | VP 제출 건의 상태를 색상으로 구분합니다. 완료된 건은 녹색 배경의 'Completed', 처리 중인 건은 노란색 배경의 'Pending'으로 표시됩니다. |
-| 5 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. |
-| 6 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 예시에서는 총 13건 중 1-10건이 표시되고 있습니다. |
+| 2 | Transaction Status 필터 | 드롭다운 메뉴를 통해 특정 상태(All, Completed, Pending, Failed)의 VP 제출 건만 필터링할 수 있습니다. |
+| 3 | 목록 헤더 | Transaction Status, Transaction ID, Holder DID, Created At 등 VP 제출 정보의 헤더입니다. |
+| 4 | 상태 표시 | VP 제출 건의 상태를 색상으로 구분합니다. 완료된 건은 녹색 배경의 'Completed', 처리 중인 건은 노란색 배경의 'Pending', 실패한 건은 빨간색 배경의 'Failed'로 표시됩니다. |
+| 5 | Transaction ID | 각 VP 제출 시도의 고유 트랜잭션 식별자가 표시됩니다. 이를 통해 모든 상태의 요청을 추적할 수 있습니다. |
+| 6 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. Pending이나 Failed 상태의 경우 "N/A"로 표시됩니다. |
+| 7 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 예시에서는 총 87건 중 1-10건이 표시되고 있습니다. |
 
 VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습니다:
-- 특정 상태(Completed, Pending)의 VP 제출 현황 파악
+- 특정 상태(Completed, Pending, Failed)의 VP 제출 현황 파악
 - 특정 사용자(Holder DID)의 VP 제출 이력 조회
+- 실패한 요청의 Transaction ID를 통한 문제 추적 및 디버깅
 
 
 ## 3.5. Admin Management

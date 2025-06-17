@@ -35,16 +35,24 @@ public class VpSubmitQueryService {
     public VpSubmitDTO convertVpSubmitDTO(VpSubmit vpSubmit) {
 
         String holderDID = vpSubmit.getHolderDid();
+        
+        // If holderDid is null, it means this is a failed/pending transaction
+        if (holderDID == null) {
+            holderDID = "N/A"; // or could be "Not Available" or "-"
+        }
 
-        String transactionStatus = transactionRepository.findById(vpSubmit.getTransactionId())
-                .map(transaction -> transaction.getStatus().toString())
+        org.omnione.did.base.db.domain.Transaction transaction = transactionRepository.findById(vpSubmit.getTransactionId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.TRANSACTION_NOT_FOUND));
+
+        String transactionStatus = transaction.getStatus().toString();
+        String txId = transaction.getTxId(); // 실제 트랜잭션 ID 가져오기
 
         return VpSubmitDTO.builder()
                 .id(vpSubmit.getId())
-                .vp(vpSubmit.getVp())
+                .vp(vpSubmit.getVp()) // This can be null for failed/pending transactions
                 .holderDID(holderDID)
                 .transactionId(vpSubmit.getTransactionId())
+                .txId(txId) // 실제 트랜잭션 ID 추가
                 .transactionStatus(transactionStatus)
                 .createdAt(VpSubmitDTO.formatInstant(vpSubmit.getCreatedAt(),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))

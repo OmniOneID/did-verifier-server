@@ -603,7 +603,7 @@ The main components required for ZKP policy registration are as follows:
 
 ## 3.4. VP History Page
 
-In the VP History Page menu, you can view the history of VP (Verifiable Presentation) submitted by users. This screen allows you to check the status and detailed information of each VP submission.
+In the VP History Page menu, you can view the history of VP (Verifiable Presentation) submitted by users. This screen allows you to check the status and detailed information of each VP submission attempt, tracking not only successful submissions but also failed or pending requests.
 
 <img src="./images/vp_history.jpg" width="800"/>
 
@@ -612,15 +612,17 @@ VP History Page provides the following key features and information:
 | No. | Item | Description |
 |-----|------|-------------|
 | 1 | VP Submit List | Title of VP submission list. |
-| 2 | Transaction Status Filter | Through dropdown menu, you can filter only VP submissions of specific status (Completed, Pending, All Status, etc.). |
-| 3 | List Header | Header of VP submission information such as Transaction Status, Holder DID, Created At. |
-| 4 | Status Display | Distinguishes VP submission status by color. Completed items are displayed as 'Completed' with green background, and pending items are displayed as 'Pending' with yellow background. |
-| 5 | DID Information | Displays Holder DID (DID of user who submitted VP) and submission time (Created At) for each VP submission. For ZKP, this value is entered as an arbitrary value of "ZKP holder DID". |
-| 6 | Pagination | You can select the number of rows to display per page and navigate between pages. In the example, 1-10 out of 13 total items are displayed. |
+| 2 | Transaction Status Filter | Through dropdown menu, you can filter only VP submissions of specific status (All, Completed, Pending, Failed). |
+| 3 | List Header | Header of VP submission information such as Transaction Status, Transaction ID, Holder DID, Created At. |
+| 4 | Status Display | Distinguishes VP submission status by color. Completed items are displayed as 'Completed' with green background, pending items are displayed as 'Pending' with yellow background, and failed items are displayed as 'Failed' with red background. |
+| 5 | Transaction ID | Displays the unique transaction identifier for each VP submission attempt. This allows tracking of all status requests. |
+| 6 | DID Information | Displays Holder DID (DID of user who submitted VP) and submission time (Created At) for each VP submission. For ZKP, this value is entered as an arbitrary value of "ZKP holder DID". For Pending or Failed status, it is displayed as "N/A". |
+| 7 | Pagination | You can select the number of rows to display per page and navigate between pages. In the example, 1-10 out of 87 total items are displayed. |
 
 Through VP history, administrators can perform the following tasks:
-- Understand VP submission status of specific status (Completed, Pending)
+- Understand VP submission status of specific status (Completed, Pending, Failed)
 - View VP submission history of specific users (Holder DID)
+- Track and debug failed requests through Transaction ID
 
 ## 3.5. Admin Management
 

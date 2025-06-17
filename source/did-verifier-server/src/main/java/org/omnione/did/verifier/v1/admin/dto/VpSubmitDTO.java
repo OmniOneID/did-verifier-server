@@ -20,6 +20,7 @@ public class VpSubmitDTO {
     private String vp;
     private String holderDID;
     private Long transactionId;
+    private String txId;
     private String transactionStatus;
     private String createdAt;
 
