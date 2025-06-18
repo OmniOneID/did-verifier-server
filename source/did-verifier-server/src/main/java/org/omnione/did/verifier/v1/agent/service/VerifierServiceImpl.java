@@ -125,7 +125,6 @@ public class VerifierServiceImpl implements VerifierService {
     private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
     private final ZkpProofRequestRepository zkpProofRequestRepository;
     private final VpOfferRepository vpOfferRepository;
-    private final BlockChainServiceImpl blockChainServiceImpl;
 
 
     /**
@@ -339,7 +338,7 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     private void vcStatusCheck(String vcId) {
-        VcMeta vcMeta = blockChainServiceImpl.getVcMeta(vcId);
+        VcMeta vcMeta = storageService.getVcMeta(vcId);
         String status = vcMeta.getStatus();
         if (VcStatus.REVOKED.name().equals(status) || VcStatus.INACTIVE.name().equals(status)) {
             log.error("VC with ID {} Status is not Valid", vcId);
