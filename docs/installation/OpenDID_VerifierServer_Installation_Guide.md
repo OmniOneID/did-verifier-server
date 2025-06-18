@@ -228,7 +228,7 @@ did-verifier-server
         ├── libs
             └── did-sdk-common-2.0.0.jar
             └── did-blockchain-sdk-server-2.0.0.jar
-            └── did-core-sdk-server-2.0.0..jar
+            └── did-core-sdk-server-2.0.0.jar
             └── did-crypto-sdk-server-2.0.0.jar
             └── did-datamodel-server-2.0.0.jar
             └── did-wallet-sdk-server-2.0.0.jar
@@ -317,7 +317,7 @@ IntelliJ IDEA is an IDE widely used for Java development and is well compatible 
 #### 6. Server Configuration
 
 - Configuration file location: `src/main/resources/config`  
-- Example: DB connection information, ports, email settings, etc.  
+- Example: DB connection information, ports settings, etc.  
 - For detailed configuration methods, refer to [5. Configuration Guide](#5-configuration-guide)
 
 ---
@@ -460,7 +460,7 @@ The Verifier service communicates with the TAS server. Set the address value of 
 
 - `tas.url`:  
   - URL of the TAS (Trust Anchor Service) service. Can be used for authentication or trust verification.
-  - Example: `http://localhost:8090/contextpath/tas`
+  - Example: `http://localhost:8090/tas`
 
 <br/>
 

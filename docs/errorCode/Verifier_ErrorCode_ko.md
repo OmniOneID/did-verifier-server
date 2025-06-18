@@ -192,6 +192,7 @@ public class ErrorResponse {
 | Error Code   | Error Message                                  | HTTP Status | Action Required                                |
 |--------------|------------------------------------------------|-------------|------------------------------------------------|
 | SSRVVRF00800 | Certificate VC data not found.                 | 500         | 인증서 VC 데이터 존재 여부와 저장소를 확인하세요. |
+| SSRVVRF00801 | VC Status id not valid.                        | 400         | 발급받은 VC의 상태가 유효하지 않습니다. VC 상태를 확인하세요. |
 
 <br>
 
@@ -241,3 +242,4 @@ public class ErrorResponse {
 | SSRVVRF01207 | Failed to retrieve ZKP credential definition on the blockchain. | 500 | 블록체인 연결과 자격 증명 정의를 확인하세요. |
 | SSRVVRF01208 | Failed to find credential schema : credential schema not found | 400 | 자격 증명 스키마 존재 여부와 형식을 확인하세요.   |
 | SSRVVRF01209 | Failed to find proof request : proof request not found | 400         | 증명 요청 데이터와 구성을 확인하세요.    |
+    

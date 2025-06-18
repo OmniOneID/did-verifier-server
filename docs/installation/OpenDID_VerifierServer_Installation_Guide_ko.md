@@ -321,7 +321,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 IDE로, Gradle 기반 프로
 #### 6. 서버 설정
 
 - 설정 파일 위치: `src/main/resources/config`  
-- 예: DB 연결 정보, 포트, 이메일 설정 등  
+- 예: DB 연결 정보, 포트 설정 등  
 - 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 참고
 
 ---
@@ -466,7 +466,7 @@ Verifier 서비스는 TAS 서버와 통신을 합니다. 직접 구축한 TAS서
 
 - `tas.url`:  
   - TAS(Trust Anchor Service) 서비스의 URL입니다. 인증이나 신뢰 검증에 사용될 수 있습니다.
-  - 예시: `http://localhost:8090/contextpath/tas`
+  - 예시: `http://localhost:8090/tas`
 
 <br/>
 
