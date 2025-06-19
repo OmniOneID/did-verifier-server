@@ -12,8 +12,8 @@ import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 type Props = {}
 
 const authtypeMapping: { [key: string]: string } = {
-    0 : "인증 제한없음",
-    1 : "무인증",
+    0 : "FREE",
+    1 : "NO_AUTHENTICATION",
     2 : "PIN",
     4 : "BIO",
     6 : "PIN or BIO",

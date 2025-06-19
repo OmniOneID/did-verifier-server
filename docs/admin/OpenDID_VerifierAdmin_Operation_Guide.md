@@ -420,7 +420,7 @@ On the process registration page, you can enter information to register a new pr
 | No. | Item | Description |
 |-----|------|-------------|
 | 1 | Title | Field to enter the process title. |
-| 2 | Auth Type | Select authentication type. You can select options like "No authentication restriction", "PIN and BIO" from the dropdown menu. |
+| 2 | Auth Type | Select the authentication type. You can choose an option from the dropdown menu. (Only the currently implemented types, PIN or BIO, are available.) |
 | 3 | ReqE2e Information | Section for setting encryption-related information. This includes the following attributes:<br>- Curve: Elliptic curve algorithm to use (e.g., Secp256r1)<br>- Cipher: Encryption algorithm (e.g., AES-128-CBC)<br>- Padding: Padding method (e.g., PKCS5) |
 | 4 | Endpoints | Section for managing process endpoints. Click the "ADD" button to add multiple endpoint URLs. To delete entered endpoints, click the button in the "Delete" column of the corresponding row. |
 | 5 | Button Area | - REGISTER: Registers process with entered information.<br>- RESET: Initializes all input fields. In modification mode, reverts to existing input values.<br>- CANCEL: Cancels input and returns to previous page (process list). |
