@@ -28,6 +28,7 @@ import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.enums.vc.VcStatus;
 import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.verifier.v1.agent.api.RepositoryFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
@@ -70,9 +71,6 @@ public class RepositoryServiceImpl implements StorageService {
         } catch (FeignException e) {
             log.error("Failed to find DID document.", e);
             throw new OpenDidException(ErrorCode.FAILED_TO_FIND_DID_DOC);
-        } catch (Exception e) {
-            log.error("Failed to find DID document.", e);
-            throw new OpenDidException(ErrorCode.FAILED_TO_FIND_DID_DOC);
         }
     }
 
@@ -91,9 +89,6 @@ public class RepositoryServiceImpl implements StorageService {
         } catch (JsonSyntaxException e) {
             log.error("\t--> Failed to decode or parse Credential Schema: {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
-        } catch (Exception e) {
-            log.error("\t--> Unexpected error while parsing Credential Schema: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
 
@@ -103,10 +98,10 @@ public class RepositoryServiceImpl implements StorageService {
         return parseCredentialDefinition(credentialDefinitionJson);
     }
 
-    //@TODO: Implement this method to retrieve the VcMeta from the repository
     @Override
     public VcMeta getVcMeta(String vcId) {
-        return null;
+        String vcMetaData = repositoryFeign.getVcMetaData(vcId);
+        return GsonWrapper.getGson().fromJson(vcMetaData, VcMeta.class);
     }
 
     private CredentialDefinition parseCredentialDefinition(String credentialDefinitionJson) {
@@ -115,9 +110,6 @@ public class RepositoryServiceImpl implements StorageService {
             return GsonWrapper.getGson().fromJson(credentialDefinitionJson, CredentialDefinition.class);
         } catch (JsonSyntaxException e) {
             log.error("\t--> Failed to parse Credential Definition: {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
-        } catch (Exception e) {
-            log.error("\t--> Unexpected error while parsing Credential Definition: {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
