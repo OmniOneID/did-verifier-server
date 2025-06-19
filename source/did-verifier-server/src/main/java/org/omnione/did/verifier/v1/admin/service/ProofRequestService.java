@@ -89,7 +89,7 @@ public class ProofRequestService {
     public VerifyUniqueResDto verifyNameUnique(String name) {
         long count = zkpProofRequestQueryService.countByName(name);
         return VerifyUniqueResDto.builder()
-                .isUnique(count == 0)
+                .unique(count == 0)
                 .build();
     }
 
