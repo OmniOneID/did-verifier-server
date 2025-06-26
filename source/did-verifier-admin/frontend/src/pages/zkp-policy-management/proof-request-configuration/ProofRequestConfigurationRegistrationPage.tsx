@@ -432,7 +432,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                     setErrors(prev => ({ ...prev, curve: undefined }));
                   }}>
                   {curveTypes.map((curve) => (
-                      <MenuItem key={curve.value} value={curve.value}>
+                      <MenuItem 
+                        key={curve.value} 
+                        value={curve.value}
+                        disabled={curve.disabled}
+                        sx={{
+                          color: curve.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                          '&.Mui-disabled': {
+                            color: 'rgba(0, 0, 0, 0.38)'
+                          }
+                        }}
+                      >
                           {curve.label}
                       </MenuItem>
                   ))}
@@ -449,7 +459,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                   setErrors(prev => ({ ...prev, cipher: undefined }));
                 }}>
                 {cipherTypes.map((cipher) => (
-                    <MenuItem key={cipher.value} value={cipher.value}>
+                    <MenuItem 
+                      key={cipher.value} 
+                      value={cipher.value}
+                      disabled={cipher.disabled}
+                      sx={{
+                        color: cipher.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                        '&.Mui-disabled': {
+                          color: 'rgba(0, 0, 0, 0.38)'
+                        }
+                      }}
+                    >
                         {cipher.label}
                     </MenuItem>
                 ))}
@@ -466,7 +486,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                   setErrors(prev => ({ ...prev, padding: undefined }));
                 }}>
                 {paddingTypes.map((padding) => (
-                    <MenuItem key={padding.value} value={padding.value}>
+                    <MenuItem 
+                      key={padding.value} 
+                      value={padding.value}
+                      disabled={padding.disabled}
+                      sx={{
+                        color: padding.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                        '&.Mui-disabled': {
+                          color: 'rgba(0, 0, 0, 0.38)'
+                        }
+                      }}
+                    >
                         {padding.label}
                     </MenuItem>
                 ))}

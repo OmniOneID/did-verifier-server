@@ -20,22 +20,22 @@ const authtypeMapping: { [key: string]: string } = {
     32774 : "PIN and BIO",
 };
 
-const eccCurveMapping: { [key: string]: string } = {
-    "Secp256r1": "Secp256r1",
-    // "Secp256k1": "Secp256k1",    
-};
+const eccCurveOptions = [
+    { value: "Secp256r1", label: "Secp256r1", disabled: false },
+    { value: "Secp256k1", label: "Secp256k1", disabled: true }
+];
 
-const cipherMapping: { [key: string]: string } = {
-    // "AES-128-CBC": "AES-128-CBC",
-    "AES-256-CBC": "AES-256-CBC",
-    // "AES-128-ECB": "AES-128-ECB",
-    // "AES-256-ECB": "AES-256-ECB",    
-};
+const cipherOptions = [
+    { value: "AES-128-CBC", label: "AES-128-CBC", disabled: true },
+    { value: "AES-256-CBC", label: "AES-256-CBC", disabled: false },
+    { value: "AES-128-ECB", label: "AES-128-ECB", disabled: true },
+    { value: "AES-256-ECB", label: "AES-256-ECB", disabled: true }
+];
 
-const paddingMapping: { [key: string]: string } = {
-    "PKCS5": "PKCS5",
-    // "NOPAD": "NOPAD",    
-};
+const paddingOptions = [
+    { value: "PKCS5", label: "PKCS5", disabled: false },
+    { value: "NOPAD", label: "NOPAD", disabled: true }
+];
 
 interface ProcessFormData {
     id: number;
@@ -344,8 +344,20 @@ const ProcessEditPage = (props: Props) => {
                             value={formData.reqE2e?.curve || ''}
                             onChange={(e) => handleE2eChange('curve')(e as React.ChangeEvent<HTMLInputElement>)}
                             >
-                            {Object.entries(eccCurveMapping).map(([key, value]) => (
-                                <MenuItem key={key} value={key}>{value}</MenuItem>
+                            {eccCurveOptions.map((option) => (
+                                <MenuItem 
+                                    key={option.value} 
+                                    value={option.value}
+                                    disabled={option.disabled}
+                                    sx={{
+                                        color: option.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                                        '&.Mui-disabled': {
+                                            color: 'rgba(0, 0, 0, 0.38)'
+                                        }
+                                    }}
+                                >
+                                    {option.label}
+                                </MenuItem>
                             ))}
                             </Select>
                             {errors.reqE2eCurve && <FormHelperText>{errors.reqE2eCurve}</FormHelperText>}
@@ -360,8 +372,20 @@ const ProcessEditPage = (props: Props) => {
                             value={formData.reqE2e?.cipher || ''}
                             onChange={(e) => handleE2eChange('cipher')(e as React.ChangeEvent<HTMLInputElement>)}
                             >
-                            {Object.entries(cipherMapping).map(([key, value]) => (
-                                <MenuItem key={key} value={key}>{value}</MenuItem>
+                            {cipherOptions.map((option) => (
+                                <MenuItem 
+                                    key={option.value} 
+                                    value={option.value}
+                                    disabled={option.disabled}
+                                    sx={{
+                                        color: option.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                                        '&.Mui-disabled': {
+                                            color: 'rgba(0, 0, 0, 0.38)'
+                                        }
+                                    }}
+                                >
+                                    {option.label}
+                                </MenuItem>
                             ))}
                             </Select>
                             {errors.reqE2eCipher && <FormHelperText>{errors.reqE2eCipher}</FormHelperText>}
@@ -376,8 +400,20 @@ const ProcessEditPage = (props: Props) => {
                             value={formData.reqE2e?.padding || ''}
                             onChange={(e) => handleE2eChange('padding')(e as React.ChangeEvent<HTMLInputElement>)}
                             >
-                            {Object.entries(paddingMapping).map(([key, value]) => (
-                                <MenuItem key={key} value={key}>{value}</MenuItem>
+                            {paddingOptions.map((option) => (
+                                <MenuItem 
+                                    key={option.value} 
+                                    value={option.value}
+                                    disabled={option.disabled}
+                                    sx={{
+                                        color: option.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                                        '&.Mui-disabled': {
+                                            color: 'rgba(0, 0, 0, 0.38)'
+                                        }
+                                    }}
+                                >
+                                    {option.label}
+                                </MenuItem>
                             ))}
                             </Select>
                             {errors.reqE2ePadding && <FormHelperText>{errors.reqE2ePadding}</FormHelperText>}
