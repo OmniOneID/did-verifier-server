@@ -18,8 +18,18 @@ puppeteer:
 Verifier API
 ==
 
-- 일자: 2024-08-19
-- 버전: v1.0.0
+- 일자: 2025-05-30
+- 버전: v2.0.0
+
+## 개정 이력
+
+| 버전        | 일자       | 변경 내용                                                 |
+| ----------- | ---------- | --------------------------------------------------------- |
+| 1.0.0       | 2024-09-03 | 최초 작성                                                 |
+| 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] 요청 데이터 수정(policyId 추가, device, service, mode 삭제) |
+| 2.0.0       | 2025-05-30 | [5. P311 - ZKP Proof 제출 프로토콜] 추가                  |
+
+<!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
 목차
 ---
@@ -33,9 +43,12 @@ Verifier API
     - [4.2. Request Profile](#42-request-profile)
     - [4.3. Request Verify](#43-request-verify)
     - [4.4. Confirm Verify](#44-confirm-verify)
-  - [5. 단일 호출 API](#5-단일-호출-api)
-    - [5.1. Issue Certificate VC](#51-issue-certificate-vc)
-    - [5.2. Get Certificate Vc](#52-get-certificate-vc)
+  - [5. P311 - ZKP Proof 제출 프로토콜](#5-p311---zkp-proof-제출-프로토콜)
+    - [5.1. Request Proof Request Profile](#51-request-proof-request-profile)
+    - [5.2. Request Verify Proof](#52-request-verify-proof)
+  - [6. 단일 호출 API](#6-단일-호출-api)
+    - [6.1. Issue Certificate VC](#61-issue-certificate-vc)
+    - [6.2. Get Certificate Vc](#62-get-certificate-vc)
 
 
 ## 1. 개요
@@ -53,7 +66,7 @@ Verifier API
 - 프로토콜 (Protocol)
   - 특정 기능을 수행하기 위해 정해진 순서에 따라 호출해야 하는 `순차 API`의 집합이다. API 호출 순서를 엄격히 따라야 하며, 순서가 잘못될 경우 예상하지 못한 결과가 발생할 수 있다.
   - 프로토콜은 P로 시작하고, 3자리 숫자로 구성된다. 
-    - 예시: P310 - VP 제출 프로토콜
+    - 예시: P310 - VP 제출 프로토콜, P311 - ZKP Proof 제출 프로토콜
 - 순차 API (Sequential API)
   - 특정 기능(프로토콜)을 수행하기 위해 정해진 순서대로 호출하는 일련의 API를 말한다. 각 API는 순차적으로 호출되어야 하며, 순서가 잘못될 경우 제대로 동작하지 않을 수 있다.
   - 그러나 일부 프로토콜에서는 같은 호출 순서를 가진 API가 존재할 수 있으며, 이 경우 하나의 API를 선택하여 호출할 수 있다.
@@ -78,6 +91,12 @@ Verifier API
 | 2   | `request-profile`  | /api/v1/request-profile  | 제출 Profile 요청       | Y       |
 | 3   | `request-verify`   | /api/v1/request-verify   | VP 제출                 | Y       |
 | 4   | `confirm-verify`   | /api/v1/confirm-verify   | VP 제출 결과 확인       | N       |
+
+#### 3.1.2. P311 - ZKP Proof 제출 프로토콜
+| Seq | API                           | URL                                   | Description              | 표준API |
+| --- | ----------------------------- | ------------------------------------- | ------------------------ | ------- |
+| 1   | `request-proof-request-profile` | /api/v1/request-proof-request-profile | ZKP Proof 요청 Profile 요청 | Y       |
+| 2   | `request-verify-proof`        | /api/v1/request-verify-proof          | ZKP Proof 제출           | Y       |
 
 <div style="page-break-after: always; margin-top: 40px;"></div>
 
@@ -131,10 +150,8 @@ N/A
 ```c#
 def object RequestOfferQr: "Request Offer QR 요청문"
 {    
-    - messageId "id": "message id"
-    + PRESENT_MODE "mode": "VP 제출 모드" // 데이터 명세서 참고
-    + itemName "device": "응대장치 식별자"
-    + itemName "service": "서비스 식별자"
+    - messageId "id": "message id"       
+    + itemName "policyId": "VP 정책(Policy) 식별자"
 }
 ```
 
@@ -143,7 +160,7 @@ def object RequestOfferQr: "Request Offer QR 요청문"
 #### 4.1.2. Response
 
 **■ Process**
-1. mode, device, service로 VP Policy 조회
+1. policyId로 VP Policy 조회
 1. offerId 생성
 1. offer 유효시간 생성 (validUntil)
 1. Verify Offer Payload 생성
@@ -186,10 +203,8 @@ curl -v -X POST "http://${Host}:${Port}/verifier/api/v1/request-offer-qr" \
 
 ```json
 {
-   "id":"202303241738241234561234ABCD",
-   "mode":"Direct",
-   "device":"WEB",
-   "service":"login"
+  "id":"202303241738241234561234ABCD",
+  "policyId": "f1a2b3c4-d5e6-7890-1234-56789abcdef0"
 }
 ```
 
@@ -252,7 +267,6 @@ def object M310_RequestProfile: "Request Profile 요청문"
     //--- Common Part ---
     + messageId "id"  : "message id"
     - uuid      "txId": "transaction id"
-
     //--- Data Part ---
     + uuid "offerId" : "verify offer id"
 }
@@ -515,7 +529,7 @@ curl -v -X POST "http://${Host}:${Port}/verifier/api/v1/request-verify" \
 
 ```json
 {
-    {
+  {
     "accE2e": {
       "iv": "z2SXXDRzxTyKt8ua7Y96GPK",
       "proof": {
@@ -585,6 +599,7 @@ def object ConfirmVerify: "Confirm Verify 요청문"
 **■ Process**
 1. offerId로 VP 제출 정보 조회
 1. VP 제출 정보에서 클레임 정보 추출
+
 
 **■ Status 200 - Success**
 
@@ -666,7 +681,340 @@ Content-Type: application/json;charset=utf-8
 
 <div style="page-break-after: always; margin-top: 50px;"></div>
 
-## 5. 단일 호출 API
+## 5. P311 - ZKP Proof 제출 프로토콜
+
+| Seq. | API                          | Description              | 표준API |
+| :--: | ---------------------------- | ------------------------ | ------- |
+|  1   | request-proof-request-profile | ZKP Proof 요청 Profile 요청 | Y       |
+|  2   | request-verify-proof         | ZKP Proof 제출           | Y       |
+
+- ZKP Proof 제출 프로토콜은 영지식 증명(Zero-Knowledge Proof)을 활용한 VP 제출 방식이다.
+- 기존 VP 제출과 달리 실제 클레임 값을 노출하지 않고도 특정 조건을 만족함을 증명할 수 있다.
+
+### 5.1. Request Proof Request Profile
+
+ZKP Proof 요청에 필요한 Profile 정보를 요청한다.
+
+Verifier는 ZKP 검증에 필요한 증명 요구사항과 파라미터를 포함한 ProofRequestProfile을 제공한다.
+
+| Item          | Description                               | Remarks |
+| ------------- | ----------------------------------------- | ------- |
+| Method        | `POST`                                    |         |
+| Path          | `/api/v1/request-proof-request-profile`   |         |
+| Authorization | -                                         |         |
+
+#### 5.1.1. Request
+
+**■ Headers**
+
+| Header           | Value                            | Remarks |
+| ---------------- | -------------------------------- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` |         |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ Body**
+
+```c#
+def object M311_RequestProofRequestProfile: "Request Proof Request Profile 요청문"
+{
+    //--- Common Part ---
+    + messageId "id"  : "message id"
+    - uuid      "txId": "transaction id"
+    //--- Data Part ---
+    + uuid "offerId" : "verify offer id"    
+}
+```
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 5.1.2. Response
+
+**■ Process**
+
+1. (필요시)거래코드 확인
+1. `offerId` 유효성 확인
+1. `offerId` 를 통해 `proofType`확인후 ProofRequestProfile 생성하여 서명 첨부
+
+**■ Status 200 - Success**
+
+```c#
+def object _M311_RequestProofRequestProfile: "Request Proof Request Profile 응답문"
+{    
+    //--- Common Part ---
+    + uuid "txId": "transaction id"
+
+    //--- Data Part ---
+    + ProofRequestProfile "proofRequestProfile": "ZKP proof request profile"
+    //데이터 명세서 확인 필요
+}
+```
+
+**■ Status 400 - Client error**
+
+|     Code     | Description                           |
+| :----------: | ------------------------------------- |
+| SSRVVRF00200 | "VP_OFFER를 찾을 수 없습니다."        |
+| SSRVVRF00201 | "VP_POLICY를 찾을 수 없습니다."       |
+| SSRVVRF00300 | "트랜잭션을 찾을 수 없습니다."        |
+| SSRVVRF00301 | "트랜잭션 상태가 대기 중이 아닙니다." |
+| SSRVVRF00302 | "트랜잭션이 만료되었습니다."          |
+| SSRVVRF00303 | "하위 트랜잭션을 찾을 수 없습니다."   |
+| SSRVVRF00310 | "지원하지 않는 증명 유형입니다."      |
+
+**■ Status 500 - Server error**
+
+|     Code     | Description                                                       |
+| :----------: | ----------------------------------------------------------------- |
+| SSRVVRF00401 | "암호화 오류가 발생했습니다."                                     |
+| SSRVVRF00408 | "키 쌍 생성에 실패했습니다."                                      |
+| SSRVVRF00502 | "공개 키 압축에 실패했습니다."                                    |
+| SSRVVRF00600 | "DID 문서 검색에 실패했습니다."                                   |
+| SSRVVRF00910 | "'request-proof-request-profile' API 요청 처리에 실패했습니다."   |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 5.1.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/verifier/api/v1/request-proof-request-profile" \
+-H "Content-Type: application/json;charset=utf-8" \
+-d @"data.json"
+```
+
+```json
+//data.json
+{
+  "txId": "b38aa1e3-48fa-4f5f-be60-05042d9ec660",
+  "offerId": "3bf6a1a0-beca-4450-a01e-4e2166819504",
+  "id": "202303241738241234561234ABCD",
+}
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+{
+  "txId": "b38aa1e3-48fa-4f5f-be60-05042d9ec660",
+  "proofRequestProfile": {
+    "id": "c8302842-0d9b-4f95-9da8-5ae3bbf8dd70",
+    "type": "ProofRequestProfile",
+    "title": "연령 범위 증명 요청 프로파일",
+    "description": "만 18세 이상임을 ZKP로 증명하기 위한 프로파일입니다.",
+    "encoding": "UTF-8",
+    "language": "ko",
+    "profile": {
+      "verifier": {
+        "did": "did:omn:verifier",
+        "certVcRef": "http://127.0.0.130:8092/verifier/api/v1/certificate-vc",
+        "name": "verifier",
+        "description": "verifier",
+        "ref": "http://127.0.0.130:8092/swagger-ui/index.html#/"
+      },
+      "proofRequest": {
+        "name": "mdl",
+        "nonce": "1068995366822249097155600",
+        "requestedAttributes": {
+          "attributeReferent1": {
+            "name": "zkpsex",
+            "restrictions": [
+              {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:schemaname:1.0:Tag1"
+              }
+            ]
+          }
+        },
+        "requestedPredicates": {
+          "predicateReferent1": {
+            "name": "zkpbirth",
+            "pType": "LE",
+            "pValue": 20200103,
+            "restrictions": [
+              {
+                "credDefId": "did:omn:NcYxiDXkpYi6ov5FcYDi1e:3:CL:did:omn:NcYxiDXkpYi6ov5FcYDi1e:2:schemaname:1.0:Tag1"
+              }
+            ]
+          }
+        }
+      },
+        "reqE2e": {
+          "nonce": "mLXd8kMD3pb4WRAnchWudXA",
+          "curve": "Secp256r1",
+          "publicKey": "z26VWT8GTUxNdRAXUThK4rRPzAeWsXf7....",
+          "cipher": "AES-256-CBC",
+          "padding": "PKCS5"
+        },
+    },
+    "proof": {
+      "type": "Secp256r1Signature2018",
+      "created": "2024-10-25T17:42:09.060550Z",
+      "verificationMethod": "did:omn:verifier?versionId=1#assert",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "z3m8feWmLrhsYkym2PcfmpHe1sRkL5BQba4e...."
+    }
+  }
+}
+```
+
+<div style="page-break-after: always; margin-top: 40px;"></div>
+
+### 5.2. Request Verify Proof
+
+ZKP Proof를 수신하여 검증한다.
+
+| Item          | Description                      | Remarks |
+| ------------- | -------------------------------- | ------- |
+| Method        | `POST`                           |         |
+| Path          | `/api/v1/request-verify-proof`   |         |
+| Authorization | -                                |         |
+
+#### 5.2.1. Request
+
+**■ Headers**
+
+| Header           | Value                            | Remarks |
+| ---------------- | -------------------------------- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` |         |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ Body**
+
+```c#
+def object M311_RequestVerifyProof: "Request Verify Proof 요청문"
+{
+    //--- Common Part ---
+    + messageId "id"  : "message id"
+    - uuid      "txId": "transaction id"
+
+    //--- Data Part ---
+    + AccE2e    "accE2e": "E2E 수락정보"
+    + multibase "encProof" : "multibase(enc((Proof)proof))"    
+    + BigInterger  "nonce": "Proof Nonce"   
+}
+```
+
+- `~/accE2e`: reqE2e에 대응한 E2E 수락정보
+- `~/encProof: E2E 키로 암호화된 Proof`: 증명에 사용된 공개 입력값들
+- `~/nonce`: ProofRequestProfile에서 제공된 논스
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 5.2.2. Response
+
+ZKP Proof를 검증하고 증명 결과를 반환한다.
+
+**■ Process**
+
+1. 거래코드 확인
+1. `nonce` 일치여부 확인
+1. ZKP 증명 검증
+    - 회로 파라미터 확인
+    - 공개 입력값 검증
+    - 증명 유효성 확인
+1. 증명 결과 저장 (제출여부만)
+1. 서비스 제공 (검증 사업자의 서비스에 따름)
+
+**■ Status 200 - Success**
+
+```c#
+def object _M311_RequestVerifyProof: "Request Verify Proof 응답문"
+{    
+    //--- Common Part ---
+    + uuid "txId": "transaction id"
+    
+    //--- Data Part ---
+    + bool "verified": "증명 검증 결과"
+    - string "proofType": "증명 유형"
+    - object "verificationDetails": "검증 상세 정보"
+}
+```
+
+**■ Status 400 - Client error**
+
+|     Code     | Description                               |
+| :----------: | ----------------------------------------- |
+| SSRVVRF00300 | "트랜잭션을 찾을 수 없습니다."            |
+| SSRVVRF00301 | "트랜잭션 상태가 유효하지 않습니다."      |
+| SSRVVRF00302 | "트랜잭션이 만료되었습니다."              |
+| SSRVVRF00303 | "하위 트랜잭션을 찾을 수 없습니다."       |
+| SSRVVRF00304 | "하위 트랜잭션 상태가 유효하지 않습니다." |
+| SSRVVRF00402 | "유효하지 않은 nonce입니다."              |
+| SSRVVRF00311 | "유효하지 않은 ZKP 증명입니다."           |
+| SSRVVRF00312 | "공개 입력값이 유효하지 않습니다."        |
+
+**■ Status 500 - Server error**
+
+|     Code     | Description                                          |
+| :----------: | ---------------------------------------------------- |
+| SSRVVRF00101 | "JSON 파싱에 실패했습니다."                          |
+| SSRVVRF00105 | "해시 생성에 실패했습니다."                          |
+| SSRVVRF00106 | "데이터 인코딩에 실패했습니다."                      |
+| SSRVVRF00210 | "ZKP 증명 검증에 실패했습니다."                      |
+| SSRVVRF00911 | "'request-verify-proof' API 요청 처리에 실패했습니다." |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 5.2.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/verifier/api/v1/request-verify-proof" \
+-H "Content-Type: application/json;charset=utf-8" \
+-d @"data.json"
+```
+
+```json
+{
+  "accE2e": {
+    "iv": "zXnp5USMEwh9bkFYosG7jBS",
+    "proof": {
+      "created": "2025-05-26T10:39:01Z",
+      "proofPurpose": "keyAgreement",
+      "proofValue": "z3n6CBRfE3hJfmiLtLV9jDsPrGzMpbGy2HyufiTYJ4bs7rWmCytt1ZAtXiX24Veo14uNPLZisoi2bYqZ43BASRqVjb",
+      "type": "Secp256r1Signature2018",
+      "verificationMethod": "did:omn:AS8rQZnKx7atQH2boY3V8CVvCMo?versionId=1#keyagree"
+    },
+    "publicKey": "znRs8Um87H9iGoK1iuyums9pndSdLcxdhM8r8TNaDxv1A"
+  },
+  "encProof": "mnV+UxOXHVMK8fTakXpslk74k66rrJjM+PUvx2BS701f/", //encrypt Proof Data
+  "id": "202505261939035230006BFD300B",
+  "nonce": "134599285294987166794747",
+  "txId": "29db231a-4c25-4e6b-afcc-7a709b3c9638"
+}
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "txId": "a3333175-a799-4ae3-8f9c-5b9f4c0f579f"
+}
+```
+
+<div style="page-break-after: always; margin-top: 50px;"></div>
+
+## 6. 단일 호출 API
 
 단일 호출 API는 특정 기능을 수행하는 하나의 독립된 API이다.
 따라서 순서대로 호출해야 하는 API의 집단인 순차 API(aka, 프로토콜)이 아니므로 프로토콜 번호가 부여되지 않는다.
@@ -690,7 +1038,7 @@ Verifier Service가 제공하는 단일 호출 API 목록은 아래 표와 같�
     - 단일 API 호출 시 헤더에 인가앱 사업자 발행 토큰을 첨부
     - 인가앱 사업자가 토큰을 발행하고 검증해주는 기능 구현 필요
   
-### 5.1. Issue Certificate VC
+### 6.1. Issue Certificate VC
 
 가입증명서 발급을 요청한다.
 
@@ -703,7 +1051,7 @@ Verifier의 DID Document가 TAS 관리자를 통하여 저장소(예:블록체�
 | Path          | `/api/v1/certificate-vc` |         |
 | Authorization | -                        |         |
 
-#### 5.1.1. Request
+#### 6.1.1. Request
 
 **■ Path Parameters**
 
@@ -723,7 +1071,7 @@ def object IssueCertificateVc: "Issue Certificate VC 요청문"
 
 <div style="page-break-after: always; margin-top: 30px;"></div>
 
-#### 5.1.2. Response
+#### 6.1.2. Response
 
 **■ Process**
 1. TA P120 프로토콜의 API를 순서대로 호출
@@ -750,7 +1098,7 @@ N/A
 
 <div style="page-break-after: always; margin-top: 30px;"></div>
 
-#### 5.1.3. Example
+#### 6.1.3. Example
 
 **■ Request**
 
@@ -778,7 +1126,7 @@ Content-Type: application/json;charset=utf-8
 
 <div style="page-break-after: always; margin-top: 40px;"></div>
 
-### 5.2. Get Certificate Vc
+### 6.2. Get Certificate Vc
 
 가입증명서를 조회한다.
 
@@ -788,7 +1136,7 @@ Content-Type: application/json;charset=utf-8
 | Path          | `/api/v1/certificate-vc` |         |
 | Authorization | -                        |         |
 
-#### 5.2.1. Request
+#### 6.2.1. Request
 
 **■ HTTP Headers**
 
@@ -810,7 +1158,7 @@ N/A
 
 <div style="page-break-after: always; margin-top: 30px;"></div>
 
-#### 5.2.2. Response
+#### 6.2.2. Response
 
 **■ Process**
 1. 가입증명서 조회
@@ -837,7 +1185,7 @@ N/A
 
 <div style="page-break-after: always; margin-top: 30px;"></div>
 
-#### 5.2.3. Example
+#### 6.2.3. Example
 
 **■ Request**
 

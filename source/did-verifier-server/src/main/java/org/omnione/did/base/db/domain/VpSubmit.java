@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ public class VpSubmit extends BaseEntity implements Serializable {
     private Long id;
     @Column(name = "vp", nullable = false)
     private String vp;
+    @Column(name = "holder_did", nullable = false)
+    private String holderDid;
     @Column(name = "transaction_id", nullable = false)
     private Long transactionId;
 }

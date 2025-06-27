@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
 @Slf4j
+@EnableFeignClients
 public class VerifierApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         SpringApplication.run(VerifierApplication.class, args);
     }
 

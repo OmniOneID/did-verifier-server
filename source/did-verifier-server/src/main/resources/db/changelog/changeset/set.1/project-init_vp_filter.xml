@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="init-vp_filter" author="jhkim6557">
+        <createTable tableName="vp_filter">
+            <column name="filter_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="title" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="varchar(255)">
+                <constraints primaryKey="false" nullable="false" />
+            </column>
+            <column name="type" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_claims" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="allowed_issuers" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="display_claims" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="value" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="present_all" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="true" unique="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
 
 package org.omnione.did.base.db.repository;
 
+import org.omnione.did.base.datamodel.data.ProofRequestProfile;
+import org.omnione.did.base.db.domain.PolicyProfile;
 import org.omnione.did.base.db.domain.VpProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -37,4 +40,12 @@ public interface VpProfileRepository extends JpaRepository<VpProfile, Long> {
      * @return An Optional containing the VpProfile if found, or an empty Optional if not found.
      */
     Optional<VpProfile> findByTransactionId(Long transactionId);
+
+    /**
+     * Finds the most recent VpProfile entity by its associated transaction ID, ordered by creation date.
+     *
+     * @param transactionId The ID of the transaction to search for.
+     * @return An Optional containing the most recent VpProfile if found, or an empty Optional if not found.
+     */
+    Optional<VpProfile> findTop1ByTransactionIdOrderByCreatedAtDesc(Long transactionId);
 }

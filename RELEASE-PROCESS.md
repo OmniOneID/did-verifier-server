@@ -66,11 +66,12 @@ After QA approval, manage the complete version control of all modules in a separ
    
    - Example:
 
-   ## Release Note V1.0.1.0
+   ## Release Note V2.0.0
 
    | Repository         | Version         | Changelog                   | Release                    |
    | ------------------ | --------------- | --------------------------- | --------------------------- |
    | did-verifier-server| V1.0.1          | [Changelog](https://github.com/OmniOneID/did-verifier-server/blob/main/CHANGELOG.md) |
+   | did-verifier-server| V2.0.0          | [Changelog](https://github.com/OmniOneID/did-verifier-server/blob/main/CHANGELOG.md) |
    | ..                 | ..              | ..                           |
 
 <br>

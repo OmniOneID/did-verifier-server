@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+  <changeSet id="init-policy" author="jhkim6557">
+    <createTable tableName="policy">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+
+      <column name="policy_id" type="varchar(40)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+
+      <column name="payload_id" type="varchar(40)">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="policy_profile_id" type="varchar(40)">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="policy_title" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="created_at" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+            baseTableName="policy" baseColumnNames="payload_id"
+            referencedTableName="payload" referencedColumnNames="payload_id"
+            constraintName="fk_policy_payload"
+            />
+
+    <addForeignKeyConstraint
+            baseTableName="policy" baseColumnNames="policy_profile_id"
+            referencedTableName="policy_profile" referencedColumnNames="policy_profile_id"
+            constraintName="fk_policy_profile"
+             />
+
+  </changeSet>
+
+</databaseChangeLog>

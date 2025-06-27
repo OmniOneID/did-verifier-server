@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ public class VpOffer extends BaseEntity implements Serializable {
     private String payload;
     @Column(name = "passcode", nullable = true, length = 64)
     private String passcode;
+    @Column(name = "offer_type", nullable = false, length = 40)
+    private String offerType;
     @Column(name = "valid_until", nullable = true)
     private Instant validUntil;
     @Column(name = "vp_policy_id", nullable = false, length = 40)

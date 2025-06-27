@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ProfileType {
     ISSUE_PROFILE("IssueProfile"),
-    VERIFY_PROFILE("VerifyProfile");
+    VERIFY_PROFILE("VerifyProfile"),
+    PROOF_REQUEST_PROFILE("ProofRequestProfile");
 
     private final String displayName;
 

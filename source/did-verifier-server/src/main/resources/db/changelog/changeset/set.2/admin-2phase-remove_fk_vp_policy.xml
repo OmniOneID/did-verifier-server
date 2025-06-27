@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="drop-fk-add-policy-type" author="jhkim6557">
+
+        <dropForeignKeyConstraint
+                baseTableName="policy"
+                constraintName="fk_policy_payload" />
+
+        <dropForeignKeyConstraint
+                baseTableName="policy"
+                constraintName="fk_policy_profile" />
+
+        <addColumn tableName="policy">
+            <column name="policy_type" type="varchar(40)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <update tableName="policy">
+            <column name="policy_type" value="VP" />
+            <where>policy_type IS NULL</where>
+        </update>
+
+        <addNotNullConstraint
+                tableName="policy"
+                columnName="policy_type"
+                columnDataType="varchar(40)" />
+    </changeSet>
+
+</databaseChangeLog>

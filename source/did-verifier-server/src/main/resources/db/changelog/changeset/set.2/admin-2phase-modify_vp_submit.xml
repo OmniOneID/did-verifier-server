@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="add-holder-did-to-vp-submit" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="vp_submit" columnName="holder_did"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="vp_submit">
+            <column name="holder_did" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <update tableName="vp_submit">
+            <column name="holder_did" value="N/A_ZKP_ANONYMOUS" />
+            <where>holder_did IS NULL</where>
+        </update>
+
+        <addNotNullConstraint
+                tableName="vp_submit"
+                columnName="holder_did"
+                columnDataType="varchar(100)" />
+    </changeSet>
+
+</databaseChangeLog>

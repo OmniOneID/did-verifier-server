@@ -3,13 +3,15 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'com.github.jk1.dependency-license-report' version '2.0'
+    id 'com.github.node-gradle.node' version '5.0.0'
 }
 
+
 group = 'org.omnione.did'
-version = '1.0.0'
+version = '2.0.0'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 jar {
@@ -21,10 +23,18 @@ configurations {
         extendsFrom annotationProcessor
     }
 }
+println ">>> Project directory is: ${project.projectDir}"
 
 ext {
     set('springCloudVersion', "2023.0.1")
+    set("skipFrontendBuild", System.getProperty("skipFrontendBuild"))
+    set("frontendResourceDir", "${project.projectDir}/../did-verifier-admin/frontend")
+    set("backendResourceDir", "${projectDir}/src/main/resources/static")
 }
+
+
+
+println ">>> Project directory is: ${frontendResourceDir}"
 
 springBoot {
     buildInfo()
@@ -71,9 +81,24 @@ dependencies {
     implementation 'org.bouncycastle:bcutil-jdk18on:1.78.1'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
+    //Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     implementation 'org.apache.commons:commons-pool2:2.12.0'
     implementation('org.hyperledger.fabric:fabric-gateway-java:2.2.9')
     implementation fileTree(dir: "libs", includes: ["*"])
+
+    implementation 'org.modelmapper:modelmapper:3.0.0'
+
+    // Query DSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //B/C
+    implementation("org.web3j:core:4.14.0")
+
 }
 
 dependencyManagement {
@@ -86,12 +111,85 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+
+import com.github.gradle.node.npm.task.NpmTask
 import com.github.jk1.license.render.*
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.filter.ExcludeTransitiveDependenciesFilter
 
 licenseReport {
     outputDir = "$projectDir/build/licenses"
+
+    // markdown 생성
     renderers = [new InventoryMarkdownReportRenderer()]
+
+    // 보고서에 첫 번째 수준 종속성만 표기
     filters = [new LicenseBundleNormalizer(), new ExcludeTransitiveDependenciesFilter()]
+}
+
+node {
+    version = "22.9.0"
+    download = true
+    nodeProjectDir = file("${frontendResourceDir}")
+    workDir = file("${projectDir}/.gradle/nodejs")
+    npmWorkDir = file("${projectDir}/.gradle/npm")
+}
+
+
+import com.github.gradle.node.npm.task.NpmTask
+
+task printEnv {
+    doLast {
+        println "PATH: " + System.getenv('PATH')
+        println "Node executable: " + exec {
+            ignoreExitValue = true
+            commandLine 'which', 'node'
+            standardOutput = new ByteArrayOutputStream()
+            return standardOutput.toString().trim()
+        }
+        println "npm executable: " + exec {
+            ignoreExitValue = true
+            commandLine 'which', 'npm'
+            standardOutput = new ByteArrayOutputStream()
+            return standardOutput.toString().trim()
+        }
+    }
+}
+
+tasks.register('deleteFrontResources', Delete) {
+    delete "${backendResourceDir}/**"
+    delete "${backendResourceDir}"
+    delete "${frontendResourceDir}/dist/**"
+    delete "${frontendResourceDir}/dist"
+}
+
+tasks.register('npm_install', NpmTask) {
+    dependsOn tasks.named("nodeSetup")
+    workingDir = file("${frontendResourceDir}")
+    args = ['install']
+}
+
+tasks.register('npm_build', NpmTask) {
+    dependsOn 'deleteFrontResources'
+    dependsOn 'npm_install'
+    workingDir = file("${frontendResourceDir}")
+    args = ['run', 'build']
+}
+
+tasks.register('copyFrontResources', Copy) {
+    dependsOn 'npm_build'
+    from "${frontendResourceDir}/dist"
+    into "${backendResourceDir}"
+}
+
+tasks.named('copyFrontResources') {
+    mustRunAfter('npm_build')
+}
+
+tasks.named('processResources') {
+    println "## skipFrontendBuild : ${skipFrontendBuild}"
+    if (!Boolean.valueOf(skipFrontendBuild)) {
+        dependsOn('npm_build', 'copyFrontResources')
+    }
+
 }
