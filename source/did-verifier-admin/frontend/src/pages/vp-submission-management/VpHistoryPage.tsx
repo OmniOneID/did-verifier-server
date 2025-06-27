@@ -15,17 +15,17 @@ type VpSubmitRow = {
   vp: string;
   holderDID: string;
   transactionId: number;
+  txId: string;  // 실제 트랜잭션 ID 추가
   transactionStatus: string;
   createdAt: string;
 };
 
-type TransactionStatusType = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELED';
+type TransactionStatusType = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED';
 
 const transactionStatusMapping: { [key: string]: string } = {
   COMPLETED: "Completed",
   PENDING: "Pending",
   FAILED: "Failed",
-  CANCELED: "Canceled",
 };
 
 const VpHistoryPage = (props: Props) => {
@@ -142,16 +142,34 @@ const VpHistoryPage = (props: Props) => {
                     backgroundColor: 
                       params.value === 'COMPLETED' ? '#e8f5e9' : 
                       params.value === 'PENDING' ? '#fff8e1' : 
-                      params.value === 'FAILED' ? '#ffebee' : 
-                      params.value === 'CANCELED' ? '#eceff1' : '#f5f5f5',
+                      params.value === 'FAILED' ? '#ffebee' : '#f5f5f5',
                     color: 
                       params.value === 'COMPLETED' ? '#2e7d32' : 
                       params.value === 'PENDING' ? '#f57c00' : 
-                      params.value === 'FAILED' ? '#c62828' : 
-                      params.value === 'CANCELED' ? '#546e7a' : '#212121',
+                      params.value === 'FAILED' ? '#c62828' : '#212121',
                   }}>
                     {transactionStatusMapping[params.value] || params.value}
                   </Box>
+                ),
+              },
+              { 
+                field: 'txId', 
+                headerName: "Transaction ID", 
+                width: 200,
+                renderCell: (params) => (
+                  <Typography 
+                    variant="body2"
+                    sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      color: '#1976d2',
+                    }}
+                  >
+                    {params.value}
+                  </Typography>
                 ),
               },
               { 
@@ -165,9 +183,11 @@ const VpHistoryPage = (props: Props) => {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
+                      color: params.value === 'N/A' ? '#9e9e9e' : 'inherit',
+                      fontStyle: params.value === 'N/A' ? 'italic' : 'normal',
                     }}
                   >
-                    {params.value}
+                    {params.value || 'N/A'}
                   </Typography>
                 ),
               },

@@ -20,12 +20,15 @@ did-verifier-admin/frontend
 │   ├── layout
 │   │   └── Layout.tsx
 │   ├── pages
-│   │   ├── ErrorPage.tsx
 │   │   ├── admins
 │   │   ├── auth
+│   │   ├── dashboard
+│   │   ├── service-management
 │   │   ├── verifier
 │   │   ├── vc-policy-management
 │   │   ├── vp-submission-management
+│   │   ├── zkp-policy-management
+│   │   └── ErrorPage.tsx
 │   ├── utils
 │   ├── App.tsx
 │   ├── main.tsx
@@ -33,7 +36,7 @@ did-verifier-admin/frontend
 │   └── vite-env.d.ts
 ├── index.html
 ├── package.json
-├── vite.config.ts
+└── vite.config.ts
 ```
 
 Below is a description of each folder and file in the `src` directory:
@@ -51,12 +54,15 @@ Below is a description of each folder and file in the `src` directory:
 | src/layout                 | Layout components including topbar and sidebar    |
 | ┖ Layout.tsx               | Main layout component                             |
 | src/pages                  | Page-level components mapped to route segments    |
-| ┖ ErrorPage.tsx            | Error fallback page                               |
 | ┖ admins                   | Pages related to the Admin Management menu        |
 | ┖ auth                     | Pages related to login and authentication         |
 | ┖ verifier                 | Pages related to the Verifier Management  menu    |
+| ┖ service-management       | Pages related to the Service Policy Management menu|
 | ┖ vc-policy-management     | Pages related to the VP Policy Management menu    |
-| ┖ vp-submission-management | Pages related to the VP History Page menu         |
+| ┖ vp-submission-management | Pages related to the VP History Page              |
+| ┖ zkp-policy-management    | Pages related to the ZKP Policy Management menu   |
+| ┖ ErrorPage.tsx            | Error fallback page                               |
+| menu    |
 | src/utils                  | Utility functions and helpers                     |
 | src/App.tsx                | Root component of the React application           |
 | src/main.tsx               | Application bootstrap and mount logic             |
@@ -68,7 +74,7 @@ Below is a description of each folder and file in the `src` directory:
 Libraries used in this project are third-party open-source dependencies managed via the [package.json](./package.json) file. Major frameworks and tools include:
 
 - `React` (v19)
-- `Vite` (v5)
+- `Vite` (v6)
 - `TypeScript`
 - `MUI` (Material UI v6, including X-DataGrid and X-Charts)
 - `Styled-Components`

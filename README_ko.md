@@ -4,6 +4,17 @@ Verifier Server
 Verifier 서버 Repository에 오신 것을 환영합니다. <br>
 이 Repository는 Verifier 서버의 소스 코드, 문서, 관련 리소스를 포함하고 있습니다.
 
+## S/W 사양
+| 구분              | 내용                                 |
+|-------------------|--------------------------------------|
+| OS                | macOS / Linux / Windows 10 이상       |
+| Language          | Java 21 이상                          |
+| IDE               | IntelliJ IDEA                         |
+| Build System      | Gradle 7.0 이상                        |
+| Compatibility     | JDK 21 이상                            |
+| Docker            | Docker 및 Docker Compose 설치 필요     |
+| 기타 요구사항      | 최소 2GB RAM, 10GB 디스크 공간 이상     |
+
 ## 폴더 구조
 프로젝트 디렉터리 내 주요 폴더와 문서에 대한 개요:
 
@@ -21,16 +32,20 @@ did-verifier-server
 ├── SECURITY.md
 ├── docs
 │   └── admin
+│       ├── OpenDID_VerifierAdmin_Operation_Guide.md
 │       └── OpenDID_VerifierAdmin_Operation_Guide_ko.md
 │   └── api
+│       ├── Verifier_API.md  
 │       └── Verifier_API_ko.md
 │   └── errorCode
-│       └── Verifier_ErrorCode.md
-│   └── installation
-│       └── OpenDID_VerifierServer_Installation_Guide.md
-│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
+│       ├── Verifier_ErrorCode.md
+│       └── Verifier_ErrorCode_ko.md
 │   └── db
-│       └── OpenDID_TableDefinition_Verifier.md
+│       ├── OpenDID_TableDefinition_Verifier.md
+│       └── OpenDID_TableDefinition_Verifier_ko.md
+│   └── installation
+│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
+│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
 └── source
     └── did-verifier-admin
         ├── frontend

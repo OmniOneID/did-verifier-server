@@ -86,6 +86,8 @@ const ProofRequestConfigurationRegistrationPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<ErrorState>({});
   const [isNameIsValid, setIsNameValid] = useState(false);
+  const [nameCheckMessage, setNameCheckMessage] = useState<string>('');
+  const [nameCheckStatus, setNameCheckStatus] = useState<'success' | 'error' | ''>('');
 
   const handleChange = (field: keyof FormData) =>
   (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -98,6 +100,8 @@ const ProofRequestConfigurationRegistrationPage = () => {
     if (field === "name") {
       setIsNameValid(false);
       setErrors((prev) => ({ ...prev, name: undefined }));
+      setNameCheckMessage('');
+      setNameCheckStatus('');
     }
   };
 
@@ -298,16 +302,35 @@ const ProofRequestConfigurationRegistrationPage = () => {
   };
 
   const handleCheckDuplicateName = async () => {
-    verifyNameUnique(formData.name)
-        .then((response) => {
-        if (response.data.unique === false) {
-            setErrors((prev) => ({ ...prev, name: 'Name already exists.' }));
-            setIsNameValid(false);
-        } else {        
-            setIsNameValid(true);
-            setErrors((prev) => ({ ...prev, name: undefined }));
-        }
-    });
+    if (!formData.name.trim()) {
+      setNameCheckMessage('Please enter a name first.');
+      setNameCheckStatus('error');
+      return;
+    }
+
+    try {
+      const response = await verifyNameUnique(formData.name);
+      console.log('Name check response:', response); // 디버깅용 로그
+      
+      if (response.data.unique === false) {
+        // 중복인 경우
+        setErrors((prev) => ({ ...prev, name: 'Name already exists.' }));
+        setIsNameValid(false);
+        setNameCheckMessage('This name is already in use. Please choose a different one.');
+        setNameCheckStatus('error');
+      } else {        
+        // 중복이 아닌 경우
+        setIsNameValid(true);
+        setErrors((prev) => ({ ...prev, name: undefined }));
+        setNameCheckMessage('This name is available for use.');
+        setNameCheckStatus('success');
+      }
+    } catch (error) {
+      console.error('Name check error:', error); // 디버깅용 로그
+      setIsNameValid(false);
+      setNameCheckMessage('Failed to check name availability. Please try again.');
+      setNameCheckStatus('error');
+    }
   };
 
   const handleReset = () => {
@@ -322,6 +345,8 @@ const ProofRequestConfigurationRegistrationPage = () => {
     });
     setErrors({});
     setIsNameValid(false);
+    setNameCheckMessage('');
+    setNameCheckStatus('');
   };
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
@@ -361,9 +386,16 @@ const ProofRequestConfigurationRegistrationPage = () => {
                 margin="normal" 
                 value={formData.name} 
                 onChange={handleChange("name")} 
-                sx={{ width: '60%' }}
                 error={!!errors.name}
-                helperText={errors.name}
+                helperText={errors.name || nameCheckMessage}
+                sx={{ 
+                  width: '60%',
+                  '& .MuiFormHelperText-root': {
+                    color: nameCheckStatus === 'success' ? 'green' : 
+                           nameCheckStatus === 'error' ? 'red' : 'inherit',
+                    fontWeight: nameCheckStatus ? 500 : 'inherit'
+                  }
+                }}
               />
                <Button 
                   variant="contained" 
@@ -400,7 +432,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                     setErrors(prev => ({ ...prev, curve: undefined }));
                   }}>
                   {curveTypes.map((curve) => (
-                      <MenuItem key={curve.value} value={curve.value}>
+                      <MenuItem 
+                        key={curve.value} 
+                        value={curve.value}
+                        disabled={curve.disabled}
+                        sx={{
+                          color: curve.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                          '&.Mui-disabled': {
+                            color: 'rgba(0, 0, 0, 0.38)'
+                          }
+                        }}
+                      >
                           {curve.label}
                       </MenuItem>
                   ))}
@@ -417,7 +459,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                   setErrors(prev => ({ ...prev, cipher: undefined }));
                 }}>
                 {cipherTypes.map((cipher) => (
-                    <MenuItem key={cipher.value} value={cipher.value}>
+                    <MenuItem 
+                      key={cipher.value} 
+                      value={cipher.value}
+                      disabled={cipher.disabled}
+                      sx={{
+                        color: cipher.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                        '&.Mui-disabled': {
+                          color: 'rgba(0, 0, 0, 0.38)'
+                        }
+                      }}
+                    >
                         {cipher.label}
                     </MenuItem>
                 ))}
@@ -434,7 +486,17 @@ const ProofRequestConfigurationRegistrationPage = () => {
                   setErrors(prev => ({ ...prev, padding: undefined }));
                 }}>
                 {paddingTypes.map((padding) => (
-                    <MenuItem key={padding.value} value={padding.value}>
+                    <MenuItem 
+                      key={padding.value} 
+                      value={padding.value}
+                      disabled={padding.disabled}
+                      sx={{
+                        color: padding.disabled ? 'rgba(0, 0, 0, 0.38)' : 'inherit',
+                        '&.Mui-disabled': {
+                          color: 'rgba(0, 0, 0, 0.38)'
+                        }
+                      }}
+                    >
                         {padding.label}
                     </MenuItem>
                 ))}

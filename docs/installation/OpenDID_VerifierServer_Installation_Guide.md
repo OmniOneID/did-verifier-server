@@ -15,13 +15,17 @@ puppeteer:
         fullPage: false
 ---
 
-# Open DID Verifier Server Installation Guide
+Open DID Verifier Server Installation Guide
+==
 
-- Date: 2025-04-01
-- Version: v1.0.0
+- Date: 2025-05-30
+- Version: v2.0.0
 
-## Table of Contents
+Table of Contents
+==
 
+- [Open DID Verifier Server Installation Guide](#open-did-verifier-server-installation-guide)
+- [Table of Contents](#table-of-contents)
 - [1. Introduction](#1-introduction)
   - [1.1. Overview](#11-overview)
   - [1.2. Verifier Server Definition](#12-verifier-server-definition)
@@ -31,12 +35,22 @@ puppeteer:
   - [2.2. PostgreSQL Installation](#22-postgresql-installation)
   - [2.3. Node.js Installation](#23-nodejs-installation)
 - [3. Cloning Source Code from GitHub](#3-cloning-source-code-from-github)
-  - [3.1. Clone Source Code](#31-clone-source-code)
+  - [3.1. Source Code Clone](#31-source-code-clone)
   - [3.2. Directory Structure](#32-directory-structure)
-- [4. Server Deployment Methods](#4-server-deployment-methods)
-  - [4.1. Running with IDE (Gradle and React Projects)](#41-running-with-ide-gradle-and-react-projects)
-    - [4.1.1. Running Backend (Spring Boot) with IntelliJ IDEA](#411-running-backend-spring-boot-with-intellij-idea)
-    - [4.1.2. Running Frontend (React) with VS Code](#412-running-frontend-react-with-vs-code)
+- [4. Server Running Methods](#4-server-running-methods)
+  - [4.1. Running with IDE (Gradle and React Project Execution)](#41-running-with-ide-gradle-and-react-project-execution)
+    - [4.1.1. Running Backend (Spring Boot) in IntelliJ IDEA](#411-running-backend-spring-boot-in-intellij-idea)
+      - [1. Install IntelliJ IDEA](#1-install-intellij-idea)
+      - [2. Open Project](#2-open-project)
+      - [3. Gradle Build](#3-gradle-build)
+      - [4. Run Server](#4-run-server)
+      - [5. Database Installation](#5-database-installation)
+      - [6. Server Configuration](#6-server-configuration)
+    - [4.1.2. Running Frontend (React) in VS Code](#412-running-frontend-react-in-vs-code)
+      - [1. Install VS Code](#1-install-vs-code)
+      - [2. Open Project](#2-open-project-1)
+      - [3. Install Dependencies](#3-install-dependencies)
+      - [4. Run Development Server](#4-run-development-server)
   - [4.2. Running with Console Commands](#42-running-with-console-commands)
     - [4.2.1. Gradle Build Commands](#421-gradle-build-commands)
   - [4.3. Running with Docker](#43-running-with-docker)
@@ -54,49 +68,53 @@ puppeteer:
     - [5.4.1. Logging Configuration](#541-logging-configuration)
   - [5.5. application-spring-docs.yml](#55-application-spring-docsyml)
   - [5.6. application-wallet.yml](#56-application-walletyml)
-  - [5.7. application-verifier.yml](#57-application-verifieryml)
-  - [5.8. VP policy](#58-vp-policy)
-  - [5.9. blockchain.properties](#59-blockchainproperties)
-    - [5.9.1. Blockchain Integration Configuration](#591-blockchain-integration-configuration)
+  - [5.7. blockchain.properties](#57-blockchainproperties)
+    - [5.7.1. Blockchain Integration Configuration](#571-blockchain-integration-configuration)
+      - [EVM Network Configuration](#evm-network-configuration)
+      - [EVM Contract Configuration](#evm-contract-configuration)
 - [6. Profile Configuration and Usage](#6-profile-configuration-and-usage)
   - [6.1. Profile Overview (`sample`, `dev`)](#61-profile-overview-sample-dev)
     - [6.1.1. `sample` Profile](#611-sample-profile)
     - [6.1.2. `dev` Profile](#612-dev-profile)
   - [6.2. Profile Configuration Methods](#62-profile-configuration-methods)
-    - [6.2.1. When Running the Server Using an IDE](#621-when-running-the-server-using-an-ide)
-    - [6.2.2. When Running the Server Using Console Commands](#622-when-running-the-server-using-console-commands)
-    - [6.2.3. When Running the Server Using Docker](#623-when-running-the-server-using-docker)
-- [7. Building and Running with Docker](#7-building-and-running-with-docker)
-  - [7.1. Building Docker Image (`Dockerfile` Based)](#71-building-docker-image-dockerfile-based)
-  - [7.2. Running Docker Image](#72-running-docker-image)
-  - [7.3. Running with Docker Compose](#73-running-with-docker-compose)
-    - [7.3.1. `docker-compose.yml` File Description](#731-docker-composeyml-file-description)
-    - [7.3.2. Container Execution and Management](#732-container-execution-and-management)
-    - [7.3.3. Server Configuration Method](#733-server-configuration-method)
+    - [6.2.1. When Running Server with IDE](#621-when-running-server-with-ide)
+    - [6.2.2. When Running Server with Console Commands](#622-when-running-server-with-console-commands)
+    - [6.2.3. When Running Server with Docker](#623-when-running-server-with-docker)
+- [7. Running After Building with Docker](#7-running-after-building-with-docker)
+  - [7.1. Docker Image Build Method (Based on `Dockerfile`)](#71-docker-image-build-method-based-on-dockerfile)
+    - [7.1.1. Build Docker image](#711-build-docker-image)
+  - [7.2. Running with Docker Compose](#72-running-with-docker-compose)
+    - [7.2.1. Preparing Directories and Configuration Files](#721-preparing-directories-and-configuration-files)
+      - [1. Create docker-compose directory and config directory](#1-create-docker-compose-directory-and-config-directory)
+      - [2. Copy configuration files (yml) to config directory](#2-copy-configuration-files-yml-to-config-directory)
+      - [3. Modify blockchain.properties file](#3-modify-blockchainproperties-file)
+      - [4. Modify application-database.yml file](#4-modify-application-databaseyml-file)
+    - [7.2.2. Create `docker-compose.yml` file](#722-create-docker-composeyml-file)
+    - [7.2.3. Run Container](#723-run-container)
 - [8. Installing Docker PostgreSQL](#8-installing-docker-postgresql)
-  - [8.1. Installing PostgreSQL with Docker Compose](#81-installing-postgresql-with-docker-compose)
-  - [8.2. Running PostgreSQL Container](#82-running-postgresql-container)
+  - [8.1. PostgreSQL Installation using Docker Compose](#81-postgresql-installation-using-docker-compose)
+  - [8.2. PostgreSQL Container Execution](#82-postgresql-container-execution)
 
 # 1. Introduction
 
 ## 1.1. Overview
 
-This document provides a guide for installing, configuring, and running the Open DID Verifier server. The Verifier server consists of a Spring Boot-based backend and a React-based Admin console frontend, which can be deployed together through Gradle build. The document explains the installation process, environment configuration, Docker execution methods, and profile settings step by step, guiding users to efficiently install and run the server.
+This document provides a guide for installation, configuration, and operation of the Open DID Verifier server. The Verifier server consists of a Spring Boot-based backend and a React-based Admin console frontend, with integrated deployment possible through Gradle builds. It provides step-by-step instructions for installation processes, environment configuration, Docker execution methods, and profile settings, enabling users to efficiently install and run the server.
 
-- For a complete guide on installing OpenDID, please refer to [Open DID Installation Guide].
-- For guidance on the Admin console, please refer to [Open DID Admin Console Guide].
+- For a complete installation guide of OpenDID, please refer to [Open DID Installation Guide].
+- For the Admin console guide, please refer to [Open DID Admin Console Guide].
 
 <br/>
 
 ## 1.2. Verifier Server Definition
 
 The Verifier server provides Verifiable Presentation (VP) verification APIs in Open DID.<br>
-The Verifier server provides APIs such as Request Profile and Request Verify that are performed for verification.
+The Verifier server provides APIs such as Request Proof Request and Proof Verify for ZKP verification, and Request Profile and Request Verify for general VP submission.
 <br/>
 
 ## 1.3. System Requirements
 
-- **Java 17** or higher
+- **Java 21** or higher
 - **Gradle 7.0** or higher
 - **Docker** and **Docker Compose** (when using Docker)
 - Minimum **2GB RAM** and **10GB disk space**
@@ -105,13 +123,13 @@ The Verifier server provides APIs such as Request Profile and Request Verify tha
 
 # 2. Prerequisites
 
-This chapter introduces the prerequisites needed before installing the components of the Open DID project.
+This chapter guides you through the prerequisites needed before installing the components of the Open DID project.
 
 ## 2.1. Git Installation
 
-`Git` is a distributed version control system that tracks changes to source code and supports collaboration between multiple developers. Git is essential for managing and versioning the source code of the Open DID project.
+`Git` is a distributed version control system that tracks changes in source code and supports collaboration among multiple developers. Git is essential for managing the source code of the Open DID project and version control.
 
-After successful installation, you can check the Git version using the following command:
+Once the installation is successful, you can check Git's version using the following command:
 
 ```bash
 git --version
@@ -125,11 +143,11 @@ git --version
 
 ## 2.2. PostgreSQL Installation
 
-To run the Verifier server, a database installation is required, and Open DID uses PostgreSQL.
+To run the Verifier server, database installation is required, and Open DID uses PostgreSQL.
 
 > **Reference Links**
 
-- [PostgreSQL Installation Guide Document](https://www.postgresql.org/download/)
+- [PostgreSQL Installation Guide Documentation](https://www.postgresql.org/download/)
 - [8. Installing Docker PostgreSQL](#8-installing-docker-postgresql)
 
 <br/>
@@ -139,7 +157,7 @@ To run the React-based Verifier Admin Console, `Node.js` and `npm` are required.
 
 npm (Node Package Manager) is used to install and manage dependencies needed for frontend development.
 
-After installation is complete, you can verify that it has been installed correctly with the following commands:
+Once the installation is complete, you can verify proper installation with the following commands:
 
 ```bash
 node --version
@@ -148,24 +166,24 @@ npm --version
 
 > **Reference Links**  
 > - [Node.js Official Download Page](https://nodejs.org/)  
-> - It is recommended to install the LTS (Long Term Support) version.  
+> - LTS (Long Term Support) version installation is recommended.  
 
 > ✅ Installation Verification Tip  
-> If version information is displayed when you enter the `node -v` and `npm -v` commands, the installation is successful.
+> If version information is displayed when you enter `node -v` and `npm -v` commands, the installation was successful.
 
 # 3. Cloning Source Code from GitHub
 
-## 3.1. Clone Source Code
+## 3.1. Source Code Clone
 
-The `git clone` command is used to clone source code from a remote repository hosted on GitHub to your local computer. This command allows you to work with the project's entire source code and related files locally. After cloning, you can work within the repository and push changes back to the remote repository.
+The `git clone` command clones source code from a remote repository hosted on GitHub to your local computer. Using this command, you can work with the entire project source code and related files locally. After cloning, you can proceed with necessary work within the repository, and changes can be pushed back to the remote repository.
 
-Open a terminal and run the following commands to copy the Verifier server repository to your local computer:
+Open a terminal and run the following commands to copy the Verifier server repository to your local computer.
 
 ```bash
 # Clone repository from Git repository
 git clone https://github.com/OmniOneID/did-verifier-server.git
 
-# Navigate to the cloned repository
+# Move to the cloned repository
 cd did-verifier-server
 ```
 
@@ -192,6 +210,9 @@ did-verifier-server
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
+│   └── admin
+│       └── Open DID Verifier Admin Console Guide.md
+│       └── Open DID Verifier Admin Console Guide_ko.md
 │   └── api
 │       └── Verifier_API_ko.md
 │   └── errorCode
@@ -205,12 +226,13 @@ did-verifier-server
     └── did-verifier-server
         ├── gradle
         ├── libs
-            └── did-sdk-common-1.0.0.jar
-            └── did-blockchain-sdk-server-1.0.0.jar
-            └── did-core-sdk-server-1.0.0..jar
-            └── did-crypto-sdk-server-1.0.0.jar
-            └── did-datamodel-server-1.0.0.jar
-            └── did-wallet-sdk-server-1.0.0.jar
+            └── did-sdk-common-2.0.0.jar
+            └── did-blockchain-sdk-server-2.0.0.jar
+            └── did-core-sdk-server-2.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
+            └── did-datamodel-server-2.0.0.jar
+            └── did-wallet-sdk-server-2.0.0.jar
+            └── did-zkp-sdk-server-2.0.0.jar
         ├── sample
         └── src
         └── build.gradle
@@ -220,49 +242,50 @@ did-verifier-server
 
 | Name                    | Description                              |
 | ----------------------- | ---------------------------------------- |
-| CHANGELOG.md            | Version-specific changes of the project  |
+| CHANGELOG.md            | Version-specific changes of the project |
 | CODE_OF_CONDUCT.md      | Code of conduct for contributors         |
 | CONTRIBUTING.md         | Contribution guidelines and procedures   |
-| LICENSE                 | Library license information              |
-| dependencies-license.md | License information for project dependencies |
-| MAINTAINERS.md          | Guidelines for project maintainers       |
+| LICENSE                 | Library license information |
+| dependencies-license.md | License information for project dependency libraries |
+| MAINTAINERS.md          | Guidelines for project maintainers      |
 | RELEASE-PROCESS.md      | Procedures for releasing new versions    |
 | SECURITY.md             | Security policies and vulnerability reporting methods |
 | docs                    | Documentation                            |
-| ┖ api                   | API guide documents                      |
-| ┖ errorCode             | Error codes and troubleshooting guides   |
-| ┖ installation          | Installation and setup guides            |
-| ┖ db                    | Database ERD, table specifications       |
+| ┖ admin                 | Admin guide documentation                |
+| ┖ api                   | API guide documentation                  |
+| ┖ errorCode             | Error codes and troubleshooting guides  |
+| ┖ installation          | Installation and configuration guides   |
+| ┖ db                    | Database ERD, table specifications      |
 | source/did-verifier-server| Verifier server source code and build files |
-| ┖ gradle                | Gradle build settings and scripts        |
+| ┖ gradle                | Gradle build settings and scripts       |
 | ┖ libs                  | External libraries and dependencies      |
 | ┖ sample                | Sample files                             |
-| ┖ src                   | Main source code directory               |
-| ┖ build.gradle          | Gradle build configuration file          |
-| ┖ README.md             | Source code overview and guide           |
-| source/did-verifier-admin| Verifier Admin console source code      |
+| ┖ src                   | Main source code directory              |
+| ┖ build.gradle          | Gradle build configuration file         |
+| ┖ README.md             | Source code overview and guide          |
+| source/did-verifier-admin| Verifier Admin console source code     |
 
 <br/>
 
-# 4. Server Deployment Methods
+# 4. Server Running Methods
 
-This chapter guides you through three methods of deploying the server.
+This chapter guides you through three methods to run the server.
 
-The project source is located under the `source` directory, and you need to configure the source according to each deployment method.
+Project sources are located under the `source` directory, and you need to load and configure sources from the corresponding directory depending on each running method.
 
-1. **Using an IDE**: You can open the project in an integrated development environment (IDE), configure run settings, and run the server directly. This method is useful for quickly testing code changes during development.
+1. **Using IDE**: You can open the project in an Integrated Development Environment (IDE), set up execution configurations, and run the server directly. This method is useful for quickly testing code changes during development.
 
-2. **Using console commands after building**: You can build the project and then run the generated JAR file using console commands (`java -jar`) to deploy the server. This method is primarily used when deploying the server or running it in a production environment.
+2. **Using console commands after Build**: After building the project, you can run the server by executing the generated JAR file with console commands (`java -jar`). This method is mainly used when deploying the server or running in production environments.
 
-3. **Building with Docker**: You can build the server as a Docker image and run it as a Docker container. This method has the advantage of maintaining consistency between environments and facilitating deployment and scaling.
+3. **Building with Docker**: You can build the server as a Docker image and run it as a Docker container. This method maintains consistency across environments and has advantages in deployment and scaling.
 
-## 4.1. Running with IDE (Gradle and React Projects)
+## 4.1. Running with IDE (Gradle and React Project Execution)
 
-The Open DID project consists of a backend (Spring Boot-based) and a frontend (React-based), which can be developed and run in IntelliJ IDEA and VS Code, respectively.
+The Open DID project consists of a backend (Spring Boot-based) and frontend (React-based), which can be developed and executed in IntelliJ IDEA and VS Code respectively.
 
-### 4.1.1. Running Backend (Spring Boot) with IntelliJ IDEA
+### 4.1.1. Running Backend (Spring Boot) in IntelliJ IDEA
 
-IntelliJ IDEA is a widely used IDE for Java development that is compatible with Gradle-based projects. Since the Open DID server uses Gradle, it can be easily run in IntelliJ.
+IntelliJ IDEA is an IDE widely used for Java development and is well compatible with Gradle-based projects. Since the Open DID server uses Gradle, it can be easily executed in IntelliJ.
 
 #### 1. Install IntelliJ IDEA
 
@@ -271,37 +294,37 @@ IntelliJ IDEA is a widely used IDE for Java development that is compatible with 
 #### 2. Open Project
 
 - Select `File -> New -> Project from Existing Sources`  
-- Select the `source/did-verifier-server` directory  
-- The `build.gradle` file will be automatically recognized, and necessary dependencies will be downloaded
+- Select `source/did-verifier-server` directory  
+- The `build.gradle` file is automatically recognized, and necessary dependencies are automatically downloaded
 
 #### 3. Gradle Build
 
-- Run `Tasks -> build -> build` in the `Gradle` tab
+- In the `Gradle` tab, execute `Tasks -> build -> build`
 
 #### 4. Run Server
 
-- Run `Tasks -> application -> bootRun`  
-- The server is running normally when the console displays the message `"Started [ApplicationName] in [time] seconds"`
+- Execute `Tasks -> application -> bootRun`  
+- When the console displays `"Started [ApplicationName] in [time] seconds"` message, it's running normally
 
-> ⚠️ Runs with the default `sample` profile. Runs as a test without a database  
-> For more details, refer to [6. Profile Configuration and Usage](#6-profile-configuration-and-usage)
+> ⚠️ Runs with default `sample` profile. Runs for testing purposes without database  
+> For details, refer to [6. Profile Configuration and Usage](#6-profile-configuration-and-usage)
 
 #### 5. Database Installation
 
-- Use PostgreSQL (Docker installation recommended)  
+- Uses PostgreSQL (Docker installation recommended)  
 - For detailed installation methods, refer to [2.2. PostgreSQL Installation](#22-postgresql-installation)
 
 #### 6. Server Configuration
 
 - Configuration file location: `src/main/resources/config`  
-- Examples: DB connection information, port, email settings, etc.  
+- Example: DB connection information, ports settings, etc.  
 - For detailed configuration methods, refer to [5. Configuration Guide](#5-configuration-guide)
 
 ---
 
-### 4.1.2. Running Frontend (React) with VS Code
+### 4.1.2. Running Frontend (React) in VS Code
 
-The Verifier admin console is React-based and can be run separately in VS Code. This is useful for frontend development or UI checking.
+The Verifier admin console is React-based and can be executed separately in VS Code. It's useful for frontend development or UI verification.
 
 #### 1. Install VS Code
 
@@ -309,7 +332,7 @@ The Verifier admin console is React-based and can be run separately in VS Code. 
 
 #### 2. Open Project
 
-- Open the `source/did-verifier-admin` directory in VS Code
+- Open `source/did-verifier-admin` directory in VS Code
 
 #### 3. Install Dependencies
 
@@ -323,215 +346,213 @@ npm install
 npm run dev
 ```
 
-- Default access URL: [http://localhost:5173](http://localhost:5173)
+- Default access URL: [http://localhost:8092](http://localhost:8092)
 
 > 📌 **Note:**  
-> The backend (Spring Boot server) must be running separately, and  
-> the API server address in the frontend can be specified through the `vite.config.ts` file or configuration file.
+> The backend (Spring Boot server) must be running separately,  
+> and the API server address in the frontend can be specified through the `vite.config.ts` file or configuration files.
    
 
 <br/>
 
-
 ## 4.2. Running with Console Commands
 
-This section guides you on how to run the Open DID server using console commands. It explains the process of building the project using Gradle and running the server using the generated JAR file.
+This section guides you through running the Open DID server using console commands. It explains the process of building the project using Gradle and running the server using the generated JAR file.
 - When building with Gradle, the frontend (Admin Console) is automatically built together and included as static resources.
 
 ### 4.2.1. Gradle Build Commands
 
 - Build the source using gradlew.
   ```shell
-    # Navigate to the source folder of the cloned repository
+    # Move to the source folder of the cloned repository
     cd source/did-verifier-server
 
     # Grant execution permission to Gradle Wrapper
     chmod 755 ./gradlew
 
-    # Clean build the project (delete previous build files and build anew)
+    # Clean build the project (delete previous build files and build new)
     ./gradlew clean build
   ```
-  > Note: If frontend build is not needed (e.g., when testing only the backend or already including frontend build results), you can add the following option to skip the frontend build: 
+  > Note: If frontend build is not needed (e.g., testing backend only or already including frontend artifacts), you can skip frontend build by adding the following option: 
   > - `./gradlew clean build -DskipFrontendBuild=true`
 
-
-- Navigate to the built folder and verify that the JAR file has been created.
+- Move to the built folder and verify that the JAR file is generated.
     ```shell
       cd build/libs
       ls
     ```
-- This command will create a `did-verifier-server-1.0.0.jar` file.
+- This command generates the `did-verifier-server-2.0.0.jar` file.
 
 <br/>
 
 ## 4.3. Running with Docker
 
-- For Docker image building, configuration, execution, etc., please refer to [7. Building and Running with Docker](#7-building-and-running-with-docker) below.
+- For Docker image building, configuration, execution, and other processes, refer to [7. Building and Running with Docker](#7-building-and-running-with-docker) below.
 
 <br/>
 
 # 5. Configuration Guide
 
-This chapter provides guidance on all configuration values included in the server's configuration files. Each configuration is an important element that controls the server's behavior and environment, requiring appropriate settings for stable server operation. Please refer to the item-by-item descriptions and examples to apply the appropriate settings for each environment.
+This chapter guides you through all configuration values included in the server's configuration files. Each configuration is an important element that controls the server's operation and environment, and proper configuration is necessary for stable server operation. Please refer to the item-by-item descriptions and examples to apply configurations suitable for each environment.
 
-Please note that settings with the 🔒 icon are fixed values by default or generally do not need to be modified.
+Settings with the 🔒 icon are generally fixed values or values that typically don't need modification.
 
 ## 5.1. application.yml
 
-- Role: The application.yml file defines the basic settings of a Spring Boot application. Through this file, you can specify various environment variables such as application name, database settings, profile settings, etc., which have a significant impact on how the application operates.
+- Role: The application.yml file defines basic settings for Spring Boot applications. Through this file, you can specify various environment variables such as application name, database settings, profile settings, etc., which significantly impact the application's operation.
 
 - Location: `src/main/resources/`
 
 ### 5.1.1. Spring Basic Configuration
 
-The basic Spring configuration defines the application name and active profiles, playing an important role in setting the server's operating environment.
+Spring's basic configuration defines the application name and profiles to activate, playing an important role in setting up the server's operating environment.
 
 - `spring.application.name`: 🔒
-  - Specifies the name of the application.
-  - Purpose: Mainly used for identifying the application in log messages, monitoring tools, or Spring Cloud services.
+  - Specifies the application name.
+  - Purpose: Mainly used to identify applications in log messages, monitoring tools, or Spring Cloud services
   - Example: `Verifier`
 
 - `spring.profiles.active`:  
   - Defines the profile to activate.
-  - Purpose: Choose between sample or development environment to load settings appropriate for that environment. For more details on profiles, please refer to chapter [6. Profile Configuration and Usage](#6-profile-configuration-and-usage).
+  - Purpose: Selects either sample or development environment to load configurations appropriate for that environment. For detailed profile information, refer to [6. Profile Configuration and Usage](#6-profile-configuration-and-usage).
   - Supported profiles: sample, dev
   - Example: `sample`, `dev`
 
 - `spring.profiles.group.dev`: 🔒
   - Defines individual profiles included in the `dev` profile group.
-  - Purpose: Groups and manages settings to be used in the development environment.
-  - Profile file naming convention: Configuration files for each profile use the name as defined in the group. For example, the auth profile uses application-auth.yml, and the databases profile uses application-databases.yml. You must use the filename exactly as written under group.dev.
+  - Purpose: Groups and manages settings to be used in development environments.
+  - Profile file naming convention: Configuration files corresponding to each profile use the name exactly as defined in the group. For example, the auth profile is written as application-auth.yml, databases profile as application-databases.yml. File names must use exactly the names written under group.dev.
 
 - `spring.profiles.group.sample`: 🔒
   - Defines individual profiles included in the `sample` profile group.
-  - Purpose: Groups and manages settings to be used in the development environment.
-  - Profile file naming convention: Configuration files for each profile use the name as defined in the group. For example, the auth profile uses application-auth.yml, and the databases profile uses application-databases.yml. You must use the filename exactly as written under group.sample.
+  - Purpose: Groups and manages settings to be used in development environments.
+  - Profile file naming convention: Configuration files corresponding to each profile use the name exactly as defined in the group. For example, the auth profile is written as application-auth.yml, databases profile as application-databases.yml. File names must use exactly the names written under group.dev.
 
 <br/>
 
 ### 5.1.2. Jackson Basic Configuration
 
-Jackson is the default JSON serialization/deserialization library used in Spring Boot. Through Jackson's configuration, you can adjust the serialization method or format of JSON data, improving performance and efficiency during data transmission.
+Jackson is the JSON serialization/deserialization library used by default in Spring Boot. Through Jackson configuration, you can adjust JSON data serialization methods or formats, improving performance and efficiency during data transmission.
 
 - `spring.jackson.default-property-inclusion`: 🔒
-  - Sets to not serialize property values when they are null.
+  - Sets not to serialize when property values are null.
   - Example: non_null
 
-- `spring.jackson.fail-on-empty-beans`: 🔒
-  - Sets to not generate an error when serializing empty objects.
+- `spring.jackson.default-property-inclusion`: 🔒
+  - Sets not to cause errors when serializing empty objects.
   - Example: false
 
 <br/>
 
 ### 5.1.3. Server Configuration
 
-Server configuration defines the port number on which the application will receive requests.
+Server configuration defines the port number where the application will receive requests.
 
 - `server.port`:  
-  - The port number on which the application will run. The default port for the Verifier server is 8092.
+  - The port number where the application will run. The default port for Verifier server is 8092.
   - Value: 8092
 
 <br/>
 
 ### 5.1.4. TAS Configuration
 
-The Verifier service communicates with the TAS server. You should configure the address of the TAS server you have directly built.
+The Verifier service communicates with the TAS server. Set the address value of the TAS server you've built directly.
 
 - `tas.url`:  
-  - The URL of the TAS (Trust Anchor Service) service. It can be used for authentication or trust verification.
-  - Example: `http://localhost:8090/contextpath/tas`
+  - URL of the TAS (Trust Anchor Service) service. Can be used for authentication or trust verification.
+  - Example: `http://localhost:8090/tas`
 
 <br/>
 
 ## 5.3. database.yml
 
-- Role: Defines how to manage and operate databases in the server, from database connection information to migration settings using Liquibase and JPA settings.
+- Role: Defines how the server will manage and operate databases, from database connection information to Liquibase migration settings and JPA configuration
 
 - Location: `src/main/resources/`
   
 ### 5.3.1. Spring Liquibase Configuration
 
-Liquibase is a tool for managing database migrations, helping to track changes to database schemas and apply them automatically. This helps maintain database consistency in development and production environments.
+Liquibase is a tool for managing database migrations, helping track database schema changes and automatically apply them. This maintains database consistency across development and production environments.
 
 - `spring.liquibase.change-log`: 🔒
-  - Specifies the location of the database change log file. This is the log file used by Liquibase to track and apply database schema changes.
+  - Specifies the location of the database change log file. This is the location of the log file that Liquibase uses to track and apply database schema changes.
   - Example: `classpath:/db/changelog/master.xml`
 
 - `spring.liquibase.enabled`: 🔒
-  - Sets whether to activate Liquibase. When set to true, Liquibase runs when the application starts and performs database migration. The `sample` profile does not connect to a database, so it should be set to false.
+  - Sets whether to enable Liquibase. When set to true, Liquibase runs when the application starts to perform database migration. The `sample` profile should be set to false since it doesn't integrate with databases.
   - Example: `true` [dev], `false` [sample]
 
 - `spring.liquibase.fall-on-error`: 🔒
-  - Controls the behavior when an error occurs during Liquibase database migration. Only set in the `sample` profile.
+  - Controls behavior when errors occur during Liquibase database migration. Set only in `sample` profile.
   - Example: `false` [sample]
 
 <br/>
 
 ### 5.3.2. Datasource Configuration
 
-Datasource configuration defines basic information for the application to connect to the database. This includes database driver, URL, username, and password information.
+Datasource configuration defines basic information for the application to connect to the database. This includes information such as database driver, URL, username, and password.
 
 - `spring.datasource.driver-class-name`: 🔒
   - Specifies the database driver class to use. Specifies the JDBC driver for connecting to the database.
   - Example: `org.postgresql.Driver`
 
 - `spring.datasource.url`:  
-  - The database connection URL. Specifies the location and name of the database to which the application will connect.
+  - Database connection URL. Specifies the location and name of the database the application will connect to.
   - Example: `jdbc:postgresql://localhost:5432/verifier_db`
 
 - `spring.datasource.username`:  
-  - The username for database access.
+  - Database access username.
   - Example: `verifier`
 
 - `spring.datasource.password`:  
-  - The password for database access.
+  - Database access password.
   - Example: `verifierpassword`
 
 <br/>
 
 ### 5.3.3. JPA Configuration
 
-JPA configuration controls how the application interacts with the database and has a significant impact on performance and readability.
+JPA configuration controls how the application interacts with the database and significantly impacts performance and readability.
 
 - `spring.jpa.open-in-view`: 🔒
-  - Sets whether to use the OSIV (Open Session In View) pattern. When set to true, it maintains database connections for the entire HTTP request.
+  - Sets whether to use the OSIV (Open Session In View) pattern. When set to true, maintains database connection for the entire HTTP request.
   - Example: `true`
 
 - `spring.jpa.show-sql`: 🔒
-  - Sets whether to log SQL queries. When set to true, it outputs executed SQL queries to the log. Useful for debugging during development.
+  - Sets whether to log SQL queries. When set to true, outputs executed SQL queries to logs. Useful for debugging during development.
   - Example: `true`
 
 - `spring.jpa.hibernate.ddl-auto`: 🔒
-  - Sets the automatic DDL generation mode for Hibernate. Specifies the automatic schema generation strategy for the database. When set to 'none', automatic generation is disabled.
+  - Sets Hibernate's DDL automatic generation mode. Specifies database schema automatic generation strategy. When set to 'none', disables automatic generation.
   - Example: `none`
 
 - `spring.jpa.hibernate.naming.physical-strategy`: 🔒
-  - Sets the naming strategy for database objects. Specifies the strategy for converting entity class names to database table names.
+  - Sets database object naming strategy. Specifies the strategy for converting entity class names to database table names.
   - Example: `org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy`
 
 - `spring.jpa.properties.hibernate.format_sql`: 🔒
-  - Sets whether to format SQL. When set to false, it disables formatting of SQL queries output to the log.
+  - Sets whether to format SQL. When set to false, disables formatting of SQL queries output to logs.
   - Example: `false`
 
 <br/>
 
 ## 5.4. application-logging.yml
 
-- Role: Configures log groups and log levels. Through this configuration file, you can define log groups for specific packages or modules and individually specify log levels for each group.
+- Role: Sets log groups and log levels. Through this configuration file, you can define log groups for specific packages or modules and specify log levels individually for each group.
 
 - Location: `src/main/resources/`
   
 ### 5.4.1. Logging Configuration
 
-- Log Groups: You can group and manage desired packages under logging.group. For example, include the org.omnione.did.base.util package in the util group, and define other packages as separate groups.
+- Log Groups: Under logging.group, you can group and manage desired packages. For example, include the org.omnione.did.base.util package in the util group, and define other packages as their respective groups.
 
-- Log Levels: Through the logging.level setting, you can specify the log level for each group. You can set various log levels such as debug, info, warn, error to output logs at the desired level.
+- Log Levels: Through logging.level settings, you can specify log levels for each group. You can set various log levels such as debug, info, warn, error to output logs at desired levels.
 
 - `logging.level`:
-  - Sets the log level.
-  - By setting the level to debug, you can see all log messages at DEBUG level and above (INFO, WARN, ERROR, FATAL) for the specified package.
+  - Sets log levels.
+  - By setting the level to debug, you can see all log messages at DEBUG level and above (INFO, WARN, ERROR, FATAL) for specified packages.
 
-Complete example:
+Full example:
 
 ```yaml
 logging:
@@ -548,15 +569,15 @@ logging:
 - Location: `src/main/resources/`
 
 - `springdoc.swagger-ui.path`: 🔒
-  - Defines the URL path for accessing Swagger UI.
+  - Defines the URL path to access Swagger UI.
   - Example: `/swagger-ui.html`
 
 - `springdoc.swagger-ui.groups-order`: 🔒
-  - Specifies the order in which API groups are displayed in Swagger UI.
+  - Specifies the order of displaying API groups in Swagger UI.
   - Example: `ASC`
 
 - `springdoc.swagger-ui.operations-sorter`: 🔒
-  - Sorts API endpoints in Swagger UI based on HTTP method.
+  - Sorts API endpoints by HTTP method in Swagger UI.
   - Example: `method`
 
 - `springdoc.swagger-ui.disable-swagger-default-url`: 🔒
@@ -564,23 +585,23 @@ logging:
   - Example: `true`
 
 - `springdoc.swagger-ui.display-request-duration`: 🔒
-  - Sets whether to display the request time in Swagger UI.
+  - Sets whether to display request time in Swagger UI.
   - Example: `true`
 
 - `springdoc.api-docs.path`: 🔒
-  - Defines the path where API documentation is provided.
+  - Defines the path where API documentation is served.
   - Example: `/api-docs`
 
 - `springdoc.show-actuator`: 🔒
-  - Sets whether to display Actuator endpoints in the API documentation.
+  - Sets whether to display Actuator endpoints in API documentation.
   - Example: `true`
 
 - `springdoc.default-consumes-media-type`: 🔒
-  - Sets the default media type for request bodies in the API documentation.
+  - Sets the default media type for request bodies in API documentation.
   - Example: `application/json`
 
 - `springdoc.default-produces-media-type`: 🔒
-  - Sets the default media type for response bodies in the API documentation.
+  - Sets the default media type for response bodies in API documentation.
   - Example: `application/json`
 
 <br/>
@@ -592,159 +613,52 @@ logging:
 - Location: `src/main/resources/`
 
 - `wallet.file-path`:  
-  - Specifies the path to the wallet file. Specifies the location of the file storing the file wallet. This file may contain important information such as private keys. *Must be entered as an absolute path*.
+  - Specifies the path to the wallet file. Specifies the location of the file that stores the file wallet. This file may contain important information such as private keys. *Must be entered as an absolute path*
   - Example: `/path/to/your/verifier.wallet`
 
 - `wallet.password`:  
-  - The password used to access the wallet. This is the password used to access the wallet file. It is information requiring high security.
+  - Password used for wallet access. Password used when accessing the wallet file. This is information that requires high security.
   - Example: `your_secure_wallet_password`
 
-## 5.7. application-verifier.yml
+## 5.7. blockchain.properties
 
-This configuration file defines the basic information for the Verifier server and VP policy Offer expiration time.
-
-- `verifier.name`:
-  - Specifies the name of the Verifier server. This value is used as the value of name in the membership certificate VC.
-  - Example: raonsecure
-
-- `verifier.did`:
-  - Sets the DID for the Verifier server.
-  - Example: did:omn:verifier
-
-- `verifier.certificate-vc`:
-  - Specifies the address (URL) where the Verifier's registration certificate (VC) can be accessed.
-  - This URL allows verification of the authenticity of certificates issued by the Issuer.
-  - Format: {Verifier domain}/verifier/api/v1/certificate-vc
-  - Example: <http://127.0.0.1:8092/verifier/api/v1/certificate-vc>
-
-- `verifier.cipher-type:`: 🔒
-  - Specifies the encryption algorithm to be used by the Verifier server.
-  - Example: AES-256-CBC
-
-- `verifier.padding-type:`: 🔒
-  - Specifies the padding method to use in encryption.
-  - Example: PKCS5
-
-- `verifier.token-expiration-time-hours:`:
-  - Sets the expiration time of authentication tokens in hours.
-  - Example: 1
-
-- `verifier.sample-path`:
-  - Description: Sets the path to store sample data. The sample folder is located in the root path of the source folder.
-    The Verifier server provides two sample files for arbitrary VP policies for sample and demo implementation. These are for reference and are not specifications (Out of scope).
-  - Example: ./source/did-verifier-server/sample/data/vpPolicy
-
-- `verifier.valid-seconds`:
-  - Description: The validity period (in seconds) for QR codes when requesting a VP offer. The default value is 180 seconds.
-  - Example: 180
-
-<br/>
-
-## 5.8. VP policy
-
-This section explains examples and configurations for VpPolicy files. While there are no regulations on the form or storage method of these files, they have been stored for offer request implementation and demonstration. For the data structure and main content, please refer to the data specification. The address values below need to be modified to match your server.
-
-- `policdyId`: An ID for VpPolicy with no regulated data format.
-- `payload`: The payload provided during the Verifier's offer request. Refer to the data specification (4.6.7.1. VerifyOfferPayload) and the Presentation of VP_ko.md file.
-- `profile`: The Verifier's profile. For details, refer to the data specification (4.5.2. VerifyProfile).
-
-```json
-//Example
-{
-  "policyId": "99999-9992",
-  "payload" : {
-    "device": "WEB",
-    "service": "signup",
-    "endpoints": [      
-      "http://{verifier_domain}:8092/verifier"
-    ],
-    "locked": false,
-    "mode": "Direct"
-  },
-  "profile": {
-    "id": "",
-    "type": "VerifyProfile",
-    "title": "OpenDID Registration VP Profile",
-    "description": "Profile for VPs required for OpenDID registration submission.",
-    "encoding": "UTF-8",
-    "language": "ko",
-    "profile": {
-      "verifier": {
-        "did": "did:omn:verifier",
-        // Verifier Cert VC URL
-        "certVcRef": "http://{verifier_domain}:8092/verifier/api/v1/certificate-vc",
-        "name": "verifier",
-        "description": "verifier",
-        "ref": "http://{verifier_domain}:8092/verifier/api/v1/certificate-vc"
-      },
-      "filter": {
-        "credentialSchemas": [
-          {
-            //Issuer Server's domain
-            "id": "http://{issuer_domain}:8091/issuer/api/v1/vc/vcschema?name=mdl",
-            "type": "OsdSchemaCredential",
-            "requiredClaims": [
-              "org.iso.18013.5.birth_date",
-              "org.iso.18013.5.family_name",
-              "org.iso.18013.5.given_name"
-            ],
-            "allowedIssuers":[
-              "did:omn:issuer"
-            ],
-            "displayClaims":[
-              "testId.aa"
-            ],
-            "value": "VerifiableProfile"
-          }
-        ]
-      },
-      "process": {
-        "endpoints": [
-          "http://{verifier_domain}:8092/verifier"
-        ],
-        "reqE2e": {
-          "nonce": "",
-          "curve": "Secp256r1",
-          "publicKey": "",
-          "cipher": "AES-256-CBC",
-          "padding": "PKCS5"
-        },
-        "verifierNonce": "",
-        "authType": 0
-      }
-    }
-  }
-}
-```
-
-## 5.9. blockchain.properties
-
-- Role: Configures the blockchain server information to be linked with the Verifier server. According to '5.1.1. Installing Hyperledger Fabric Test Network' in the [Open DID Installation Guide], when you install the Hyperledger Fabric test network, configuration files for private keys, certificates, and server connection information are automatically generated. In blockchain.properties, you configure the path where these files are located and the network name you entered during the Hyperledger Fabric test network installation. You also set the Open DID chaincode name deployed in '5.1.2. Deploying Open DID Chaincode'.
+- Role: Configures blockchain server information for integration with the Verifier server. When you install the Hyperledger Besu network according to '5.3. Step 3: Blockchain Installation' in [Open DID Installation Guide], private keys, certificates, and server connection information configuration files are automatically generated. In blockchain.properties, you set the paths where these files are located and the network name entered during Hyperledger Besu installation.
 
 - Location: `src/main/resources/properties`
 
-### 5.9.1. Blockchain Integration Configuration
+### 5.7.1. Blockchain Integration Configuration
 
-- `fabric.configFilePath:`:
-  - Sets the path where the Hyperledger Fabric connection information file is located. This file is automatically generated during Hyperledger Fabric test network installation, and the default filename is 'connection-org1.json'.
-  - Example: {yourpath}/connection-org1.json
+#### EVM Network Configuration
 
-- `fabric.privateKeyFilePath:`:
-  - Sets the path to the private key file used by the Hyperledger Fabric client for transaction signatures and authentication on the network. This file is automatically generated during Hyperledger Fabric test network installation.
-  - Example: {yourpath}/{private key filename}
+- `evm.network.url`:
+  - EVM Network address. Use this fixed value when running Besu on the same local as the client. (Default Port: 8545)
+  - Example: http://localhost:8545
 
-- `fabric.certificateFilePath:`:
-  - Sets the path where the Hyperledger Fabric client certificate is located. This file is automatically generated during Hyperledger Fabric test network installation, and the default filename is 'cert.pem'.
-  - Example: /{yourpath}/cert.pem
+- `evm.chainId`:
+  - Chain ID identifier. Currently uses a fixed value of 1337. (Default Value: 1337)
+  - Example: 1337
 
-- `fabric.mychannel:`:
-  - The name of the private network (channel) used in Hyperledger Fabric. You must set the channel name that you entered during Hyperledger Fabric test network installation.
-  - Example: mychannel
+- `evm.gas.limit`:
+  - Maximum gas limit allowed for Hyperledger Besu EVM transactions. Currently uses a fixed value as Free Gas. (Default Value: 100000000)
+  - Example: 100000000
 
-- `fabric.chaincodeName:`: 🔒
-  - The name of the Open DID chaincode used in Hyperledger Fabric. This value is fixed as 'opendid'.
-  - Example: opendid
+- `evm.gas.price`:
+  - Gas price per unit. Currently uses a fixed value of 0 as Free Gas. (Default Value: 0)
+  - Example: 0
 
+- `evm.connection.timeout`: 
+  - Network connection timeout value (milliseconds). Currently uses the recommended fixed value of 10000. (Default Value: 10000)
+  - Example: 10000
+
+#### EVM Contract Configuration
+
+- `evm.connection.address`: 
+  - Address value of the OpenDID Contract returned when deploying Smart Contract with Hardhat. For detailed guide, refer to [DID Besu Contract].
+  - Example: 0xa0E49611FB410c00f425E83A4240e1681c51DDf4
+
+- `evm.connection.privateKey`: 
+  - k1 key used for API access control. Enter the key string defined in accounts inside hardhat.config.js (remove the 0x string at the beginning) to enable API calls with Owner privileges (Default setting). For detailed guide, refer to [DID Besu Contract].
+  - Example: 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63
 <br/>
 
 # 6. Profile Configuration and Usage
@@ -753,116 +667,143 @@ This section explains examples and configurations for VpPolicy files. While ther
 
 The Verifier server supports two profiles, `dev` and `sample`, to run in various environments.
 
-Each profile is designed to apply settings appropriate for that environment. By default, the Verifier server is configured with the `sample` profile, which is designed to run the server independently without integration with external services such as databases or blockchain. The `sample` profile is suitable for API call testing, allowing developers to quickly check the basic operation of the application. This profile returns fixed response data for all API calls, making it useful in initial development environments.
+Each profile is designed to apply configurations appropriate for the corresponding environment. By default, the Verifier server is set to the `sample` profile, which is designed to run the server independently without integration with external services such as databases or blockchains. The `sample` profile is suitable for API call testing, allowing developers to quickly verify the basic operation of the application. This profile returns fixed response data for all API calls, making it useful in initial development environments.
 
-Sample API calls are written as JUnit tests, which can be referenced when writing tests.
+Sample API calls are written as JUnit tests, so you can refer to them when writing tests.
 
-On the other hand, the `dev` profile is designed to perform actual operations. Using this profile allows testing and validation of real data. When the `dev` profile is activated, it integrates with external services such as real databases and blockchain, allowing you to test the application's behavior in a real environment.
+In contrast, the `dev` profile is designed to perform actual operations. Using this profile enables testing and verification with real data. When the `dev` profile is activated, it integrates with actual external services such as databases and blockchains, allowing you to test application behavior in real environments.
 
 ### 6.1.1. `sample` Profile
-The `sample` profile is designed to run the server independently without integration with external services (DB, blockchain, etc.). This profile is suitable for API call testing, allowing developers to quickly check the basic operation of the application. It returns fixed response data for all API calls, making it useful in the initial development stage or for functional testing. As it doesn't require any integration with external systems, it provides an environment where the server can be run and tested standalone.
-> Note: When using the sample profile, the Admin Console does not work.
+The `sample` profile is designed to run the server independently without integration with external services (DB, blockchain, etc.). This profile is suitable for API call testing and allows developers to quickly verify the basic operation of the application. Since it returns fixed response data for all API calls, it's useful for initial development stages or functional testing. Because no integration with external systems is required, it provides an environment where you can run and test the server standalone.
+> Note: When using the sample profile, the Admin Console will not work.
 
 ### 6.1.2. `dev` Profile
 
-The `dev` profile includes settings suitable for the development environment and is used on development servers. To use this profile, settings for the development environment's database and blockchain nodes are required.
+The `dev` profile includes configurations suitable for development environments and is used on development servers. To use this profile, configuration for development environment databases and blockchain nodes is required.
 
 ## 6.2. Profile Configuration Methods
 
-This section explains how to change the profile for each deployment method.
+This section explains how to change profiles for each running method.
 
-### 6.2.1. When Running the Server Using an IDE
+### 6.2.1. When Running Server with IDE
 
-- **Select Configuration File:** Select the `application.yml` file in the `src/main/resources` path.
-- **Specify Profile:** Add the `--spring.profiles.active={profile}` option in the IDE's run settings (Run/Debug Configurations) to activate the desired profile.
-- **Apply Settings:** The corresponding configuration file is applied according to the activated profile.
+- **Configuration File Selection:** Select the `application.yml` file in the `src/main/resources` path.
+- **Profile Specification:** Add the `--spring.profiles.active={profile}` option in the IDE's run settings (Run/Debug Configurations) to activate the desired profile.
+- **Configuration Application:** The corresponding configuration file is applied according to the activated profile.
 
-### 6.2.2. When Running the Server Using Console Commands
+### 6.2.2. When Running Server with Console Commands
 
-- **Select Configuration File:** Prepare profile-specific configuration files in the same directory as the built JAR file or in the path where configuration files are located.
-- **Specify Profile:** Add the `--spring.profiles.active={profile}` option to the server startup command to activate the desired profile.
+- **Configuration File Selection:** Prepare profile-specific configuration files in the same directory as the built JAR file or in the path where configuration files are located.
+- **Profile Specification:** Add the `--spring.profiles.active={profile}` option to the server running command to activate the desired profile.
   
   ```bash
-  java -jar build/libs/did-verifier-server-1.0.0.jar --spring.profiles.active={profile}
+  java -jar build/libs/did-verifier-server-2.0.0.jar --spring.profiles.active={profile}
   ```
 
-- **Apply Settings:** The corresponding configuration file is applied according to the activated profile.
+- **Configuration Application:** The corresponding configuration file is applied according to the activated profile.
 
-### 6.2.3. When Running the Server Using Docker
+### 6.2.3. When Running Server with Docker
 
-- **Select Configuration File:** When creating a Docker image, specify the configuration file path in the Dockerfile or mount an external configuration file to the Docker container.
-- **Specify Profile:** Set the `SPRING_PROFILES_ACTIVE` environment variable in the Docker Compose file or Docker run command to specify the profile.
+- **Configuration File Selection:** When creating a Docker image, specify the configuration file path in the Dockerfile or mount external configuration files to the Docker container.
+- **Profile Specification:** Set the profile by configuring the `SPRING_PROFILES_ACTIVE` environment variable in the Docker Compose file or Docker execution command.
   
   ```yaml
   environment:
     - SPRING_PROFILES_ACTIVE={profile}
   ```
 
-- **Apply Settings:** Settings are applied according to the profile specified when the Docker container runs.
+- **Configuration Application:** Configuration is applied according to the specified profile when running the Docker container.
 
-You can flexibly change profile-specific settings according to each method and easily apply settings appropriate for your project environment.
+You can flexibly change profile-specific configurations according to each method and easily apply configurations suitable for your project environment.
 
-# 7. Building and Running with Docker
+# 7. Running After Building with Docker
 
-## 7.1. Building Docker Image (`Dockerfile` Based)
+## 7.1. Docker Image Build Method (Based on `Dockerfile`)
 
-Build a Docker image with the following command:
-
-```bash
-docker build -t did-verifier-server .
-```
-
-## 7.2. Running Docker Image
-
-Run the built image:
+### 7.1.1. Build Docker image
+Build the Docker image with the following command:
 
 ```bash
-docker run -d -p 8092:8092 did-verifier-server
+cd {source_directory}
+docker build -t did-verifier-server -f did-verifier-server/Dockerfile .
 ```
 
-## 7.3. Running with Docker Compose
+<br/>
 
-### 7.3.1. `docker-compose.yml` File Description
+## 7.2. Running with Docker Compose
 
-You can easily manage multiple containers using a `docker-compose.yml` file.
+### 7.2.1. Preparing Directories and Configuration Files
 
-```yaml
+#### 1. Create docker-compose directory and config directory
+```bash
+mkdir -p {docker_compose_directory}/config
+```
+
+#### 2. Copy configuration files (yml) to config directory
+```bash
+cp {application_yml_directory}/* {docker_compose_directory}/config/
+cp {blockchain_properties_path} {docker_compose_directory}/config/
+```
+
+#### 3. Modify blockchain.properties file
+```yml
+evm.network.url=http://host.docker.internal:8545
+... (omitted)
+```
+
+> **host.docker.internal** is a special address that points to the host machine from within a Docker container.  
+> Since localhost inside a container refers to the container itself, you must use host.docker.internal to access services (PostgreSQL, blockchain) running on the host.
+
+#### 4. Modify application-database.yml file
+```yml
+spring:
+ ... (omitted)
+ datasource:
+   driver-class-name: org.postgresql.Driver
+   url: jdbc:postgresql://host.docker.internal:5430/verifier
+   username: omn
+   password: omn
+ ... (omitted)
+```
+
+### 7.2.2. Create `docker-compose.yml` file
+You can easily manage multiple containers using the `docker-compose.yml` file.
+
+```yml
 version: '3'
 services:
-  app:
-    image: did-verifier-server
-    ports:
-      - "8092:8092"
-    volumes:
-      - ${your-config-dir}:/app/config
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
+ app:
+   image: did-verifier-server
+   ports:
+     - "8092:8092"
+   volumes:
+     - {config_directory}:/app/config
+   environment:
+     - SPRING_PROFILES_ACTIVE=dev
+   extra_hosts:
+     - "host.docker.internal:host-gateway"
 ```
 
-### 7.3.2. Container Execution and Management
+> - In the example above, the `config_directory` is mounted to `/app/config` inside the container to share configuration files.
+>   - Configuration files located in `config_directory` take priority over default configuration files.
+>   - For detailed configuration instructions, please refer to [5. Configuration Guide](#5-configuration-guide).
 
-Run containers using Docker Compose with the following command:
 
+### 7.2.3. Run Container
 ```bash
+cd {docker_compose_directory}
 docker-compose up -d
 ```
 
-### 7.3.3. Server Configuration Method
-
-In the example above, the `${your-config-dir}` directory is mounted to `/app/config` inside the container to share configuration files.
-
-- If additional configuration is needed, you can add separate property files to the mounted folder to change settings.
-  - For example, add an `application.yml` file to `${your-config-dir}` and write the settings you want to change in this file.
-  - The `application.yml` file located in `${your-config-dir}` takes precedence over the default configuration file.
-- For detailed configuration methods, please refer to [5. Configuration Guide](#5-configuration-guide).
+<br/>
 
 # 8. Installing Docker PostgreSQL
 
-This section explains how to install PostgreSQL using Docker. Using this method, you can easily install PostgreSQL and link it to the server.
+This section explains how to install PostgreSQL using Docker. Through this method, you can easily install PostgreSQL and integrate it with the server for use.
 
-## 8.1. Installing PostgreSQL with Docker Compose
+## 8.1. PostgreSQL Installation using Docker Compose
 
-Here's how to install PostgreSQL using Docker Compose.
+The following shows how to install PostgreSQL using Docker Compose.
 
 ```yml
 services:
@@ -883,22 +824,23 @@ volumes:
   postgres_data_verifier:
 ```
 
-This Docker Compose file installs PostgreSQL version 16.4 and makes the following settings:
+This Docker Compose file installs PostgreSQL version 16.4 and makes the following configurations:
 
-- **container_name**: Sets the container name to `postgre-verifier`.
-- **volumes**: Mounts the `postgres_data_verifier` volume to PostgreSQL's data directory (`/var/lib/postgresql/data`). This ensures that data is permanently preserved.
-- **ports**: Maps port 5432 on the host to port 5432 in the container.
+- **container_name**: Names the container `postgre-verifier`.
+- **volumes**: Mounts the `postgres_data_verifier` volume to PostgreSQL's data directory (`/var/lib/postgresql/data`). This ensures data is permanently preserved.
+- **ports**: Maps the host's port 5432 to the container's port 5432.
 - **environment**: Sets PostgreSQL's username, password, and database name. Here, `${USER}` and `${PW}` can be set as environment variables.
 
-## 8.2. Running PostgreSQL Container
+## 8.2. PostgreSQL Container Execution
 
-To run the PostgreSQL container using the Docker Compose file above, run the following command in the terminal:
+To run the PostgreSQL container using the above Docker Compose file, execute the following command in the terminal:
 
 ```bash
 docker-compose up -d
 ```
 
-This command runs the PostgreSQL container in the background. The PostgreSQL server runs according to the environment variables set, and the database is prepared. You can proceed with the connection settings to use this database in your application.
+This command runs the PostgreSQL container in the background. The PostgreSQL server runs according to the configured environment variables, and the database is prepared. You can then proceed with integration settings to use this database in your application.
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
-[Open DID Admin Console Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/feature/yklee0911/v1.0.1.0/unrelease-V1.0.1.0/OpenDID_Documentation_Hub.md
+[Open DID Admin Console Guide]: ../admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
+[DID Besu Contract]: https://github.com/OmniOneID/did-besu-contract

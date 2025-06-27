@@ -11,6 +11,7 @@ import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.util.BaseMultibaseUtil;
+import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.admin.dto.CombinedIdListDto;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
@@ -54,8 +55,8 @@ public class FilterService {
             String serializeToFilter = JsonUtil.serializeToJson(filterDTO);
             String value = BaseMultibaseUtil.encode(serializeToFilter.getBytes(StandardCharsets.UTF_8));
             vpFilter.setValue(value);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (CommonSdkException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
 
         vpFilterRepository.save(vpFilter);

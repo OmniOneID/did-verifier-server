@@ -316,7 +316,7 @@ public class VerifierManagementService {
                 .name(verifierInfo.getName())
                 .serverUrl(verifierInfo.getServerUrl())
                 .certificateUrl(verifierInfo.getCertificateUrl())
-                .role(RoleType.APP_PROVIDER)
+                .role(RoleType.VERIFIER)
                 .build();
         try {
             String request = JsonUtil.serializeToJson(registerDidToTaReqDto);

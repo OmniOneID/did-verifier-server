@@ -18,13 +18,15 @@ puppeteer:
 Open DID Verifier Server Installation Guide
 ==
 
-- Date: 2025-04-01
-- Version: v1.0.0
+- Date: 2025-05-30
+- Version: v2.0.0
 
 목차
 ==
 
 
+- [Open DID Verifier Server Installation Guide](#open-did-verifier-server-installation-guide)
+- [목차](#목차)
 - [1. 소개](#1-소개)
   - [1.1. 개요](#11-개요)
   - [1.2. Verifier 서버 정의](#12-verifier-서버-정의)
@@ -39,7 +41,17 @@ Open DID Verifier Server Installation Guide
 - [4. 서버 구동 방법](#4-서버-구동-방법)
   - [4.1. IDE로 구동하기 (Gradle 및 React 프로젝트 실행)](#41-ide로-구동하기-gradle-및-react-프로젝트-실행)
     - [4.1.1. IntelliJ IDEA에서 백엔드(Spring Boot) 실행](#411-intellij-idea에서-백엔드spring-boot-실행)
+      - [1. IntelliJ IDEA 설치](#1-intellij-idea-설치)
+      - [2. 프로젝트 열기](#2-프로젝트-열기)
+      - [3. Gradle 빌드](#3-gradle-빌드)
+      - [4. 서버 실행](#4-서버-실행)
+      - [5. 데이터베이스 설치](#5-데이터베이스-설치)
+      - [6. 서버 설정](#6-서버-설정)
     - [4.1.2. VS Code에서 프론트엔드(React) 실행](#412-vs-code에서-프론트엔드react-실행)
+      - [1. VS Code 설치](#1-vs-code-설치)
+      - [2. 프로젝트 열기](#2-프로젝트-열기-1)
+      - [3. 의존성 설치](#3-의존성-설치)
+      - [4. 개발 서버 실행](#4-개발-서버-실행)
   - [4.2. 콘솔 명령어로 구동하기](#42-콘솔-명령어로-구동하기)
     - [4.2.1. Gradle 빌드 명령어](#421-gradle-빌드-명령어)
   - [4.3. Docker로 구동하기](#43-docker로-구동하기)
@@ -56,10 +68,11 @@ Open DID Verifier Server Installation Guide
   - [5.4. application-logging.yml](#54-application-loggingyml)
     - [5.4.1. 로깅 설정](#541-로깅-설정)
   - [5.5. application-spring-docs.yml](#55-application-spring-docsyml)
-  - [5.6. application-wallet.yml](#56-application-walletyml)  
-  - [5.7. VP policy(VP 정책)](#57-vp-policyvp-정책)
-  - [5.8. blockchain.properties](#58-blockchainproperties)
-    - [5.8.1. 블록체인 연동 설정](#581-블록체인-연동-설정)
+  - [5.6. application-wallet.yml](#56-application-walletyml)
+  - [5.7. blockchain.properties](#57-blockchainproperties)
+    - [5.7.1. 블록체인 연동 설정](#571-블록체인-연동-설정)
+      - [EVM Network Configuration](#evm-network-configuration)
+      - [EVM Contract Configuration](#evm-contract-configuration)
 - [6. 프로파일 설정 및 사용](#6-프로파일-설정-및-사용)
   - [6.1. 프로파일 개요 (`sample`, `dev`)](#61-프로파일-개요-sample-dev)
     - [6.1.1. `sample` 프로파일](#611-sample-프로파일)
@@ -70,11 +83,15 @@ Open DID Verifier Server Installation Guide
     - [6.2.3. Docker를 사용한 서버 구동 시](#623-docker를-사용한-서버-구동-시)
 - [7. Docker로 빌드 후 구동하기](#7-docker로-빌드-후-구동하기)
   - [7.1. Docker 이미지 빌드 방법 (`Dockerfile` 기반)](#71-docker-이미지-빌드-방법-dockerfile-기반)
-  - [7.2. Docker 이미지 실행](#72-docker-이미지-실행)
-  - [7.3. Docker Compose를 이용한 구동](#73-docker-compose를-이용한-구동)
-    - [7.3.1. `docker-compose.yml` 파일 설명](#731-docker-composeyml-파일-설명)
-    - [7.3.2. 컨테이너 실행 및 관리](#732-컨테이너-실행-및-관리)
-    - [7.3.3. 서버 설정 방법](#733-서버-설정-방법)
+    - [7.1.1. Docker 이미지 빌드](#711-docker-이미지-빌드)
+  - [7.2. Docker Compose를 이용한 구동](#72-docker-compose를-이용한-구동)
+    - [7.2.1. 디렉토리 및 설정 파일 준비](#721-디렉토리-및-설정-파일-준비)
+      - [1. docker-compose 디렉토리 및 config 디렉토리 생성](#1-docker-compose-디렉토리-및-config-디렉토리-생성)
+      - [2. 설정 파일(yml)들을 config 디렉토리로 복사](#2-설정-파일yml들을-config-디렉토리로-복사)
+      - [3. blockchain.properties 파일 수정](#3-blockchainproperties-파일-수정)
+      - [4. application-database.yml 파일 수정](#4-application-databaseyml-파일-수정)
+    - [7.2.2. `docker-compose.yml` 파일 생성](#722-docker-composeyml-파일-생성)
+    - [7.2.3. 컨테이너 실행](#723-컨테이너-실행)
 - [8. Docker PostgreSQL 설치하기](#8-docker-postgresql-설치하기)
   - [8.1. Docker Compose를 이용한 PostgreSQL 설치](#81-docker-compose를-이용한-postgresql-설치)
   - [8.2. PostgreSQL 컨테이너 실행](#82-postgresql-컨테이너-실행)
@@ -93,12 +110,13 @@ Open DID Verifier Server Installation Guide
 ## 1.2. Verifier 서버 정의
 
 Verifier 서버는 Open DID에서 Verifiable Presentation(VP) 검증 API를 제공합니다.<br>
-Verifier 서버는 검증을 위해 수행되는 Request Profile, Request Verify 등의 API를 제공합니다.
+Verifier 서버는 ZKP 검증을 위해 수행되는 Request Proof Request, Proof Verify 와 일반 VP 제출을 위한
+Request Profile, Request Verify 등의 API를 제공합니다.
 <br/>
 
 ## 1.3. 시스템 요구 사항
 
-- **Java 17** 이상
+- **Java 21** 이상
 - **Gradle 7.0** 이상
 - **Docker** 및 **Docker Compose** (Docker 사용 시)
 - 최소 **2GB RAM** 및 **10GB 디스크 공간**
@@ -212,12 +230,13 @@ did-verifier-server
     └── did-verifier-server
         ├── gradle
         ├── libs
-            └── did-sdk-common-1.0.0.jar
-            └── did-blockchain-sdk-server-1.0.0.jar
-            └── did-core-sdk-server-1.0.0..jar
-            └── did-crypto-sdk-server-1.0.0.jar
-            └── did-datamodel-server-1.0.0.jar
-            └── did-wallet-sdk-server-1.0.0.jar
+            └── did-sdk-common-2.0.0.jar
+            └── did-blockchain-sdk-server-2.0.0.jar
+            └── did-core-sdk-server-2.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
+            └── did-datamodel-server-2.0.0.jar
+            └── did-wallet-sdk-server-2.0.0.jar
+            └── did-zkp-sdk-server-2.0.0.jar
         ├── sample
         └── src
         └── build.gradle
@@ -302,7 +321,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 IDE로, Gradle 기반 프로
 #### 6. 서버 설정
 
 - 설정 파일 위치: `src/main/resources/config`  
-- 예: DB 연결 정보, 포트, 이메일 설정 등  
+- 예: DB 연결 정보, 포트 설정 등  
 - 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 참고
 
 ---
@@ -331,7 +350,7 @@ npm install
 npm run dev
 ```
 
-- 기본 접속 URL: [http://localhost:5173](http://localhost:5173)
+- 기본 접속 URL: [http://localhost:8092](http://localhost:8092)
 
 > 📌 **참고:**  
 > 백엔드(Spring Boot 서버)는 별도로 실행되어 있어야 하며,  
@@ -368,7 +387,7 @@ npm run dev
       cd build/libs
       ls
     ```
-- 이 명령어는 `did-verifier-server-1.0.0.jar` 파일을 생성합니다.
+- 이 명령어는 `did-verifier-server-2.0.0.jar` 파일을 생성합니다.
 
 <br/>
 
@@ -443,11 +462,11 @@ Jackson은 Spring Boot에서 기본적으로 사용되는 JSON 직렬화/역직�
 
 ### 5.1.4. TAS 설정
 
-Verifier 서비스는 TAS 서버와 통신을 합니다. 직접 구축한 TAS서버의 주소값을 설정하면 됩니다.
+Verifier 서비스는 TAS 서버와 통신을 합니다. 직접 구축한 TAS서버의 주소값을 설정하면 됩니다. 
 
 - `tas.url`:  
   - TAS(Trust Anchor Service) 서비스의 URL입니다. 인증이나 신뢰 검증에 사용될 수 있습니다.
-  - 예시: `http://localhost:8090/contextpath/tas`
+  - 예시: `http://localhost:8090/tas`
 
 <br/>
 
@@ -607,111 +626,45 @@ logging:
   - 월렛 접근에 사용되는 비밀번호입니다. 월렛 파일의 접근시 사용되는 비밀번호입니다. 높은 보안이 요구되는 정보입니다.
   - 예시: `your_secure_wallet_password`
 
-## 5.7. VP policy(VP 정책)
+## 5.7. blockchain.properties
 
-VpPolicy(VP정책)파일에 대한 예시 및 구성을 설명합니다. 해당 파일은 파일의 형태 혹은 저장방식은 규정된것은 없으나 offer 요청에 대한 구현 및 데모를 위해 저장했습니다. 데이터의 구조 및 주된 내용은 데이터명세서를 참고하기 바랍니다. 아래 주소값은 구축하신 서버의 값으로 수정이 필요합니다.
-
-- `policdyId`: VpPolicy에 대한 아이디로 규정된 데이터 형태는 없습니다.
-- `payload`: Verifier의 off 요청시 제공되는 payload입니다.데이터명세서(4.6.7.1. VerifyOfferPayload), Presentation of VP_ko.md 파일을 참고바랍니다.
-- `profile`: Verifier의 profile입니다. 세부사항은 데이터명세서(4.5.2. VerifyProfile) 참고바랍니다.
-
-```json
-//예시
-{
-  "policyId": "99999-9992",
-  "payload" : {
-    "device": "WEB",
-    "service": "signup",
-    "endpoints": [      
-      "http://127.0.0.1:8092/verifier"
-    ],
-    "locked": false,
-    "mode": "Direct"
-  },
-  "profile": {
-    "id": "",
-    "type": "VerifyProfile",
-    "title": "OpenDID 가입 VP 프로파일",
-    "description": "OpenDID 가입을 위해 제출이 필요한 VP에 대한 프로파일 입니다.",
-    "encoding": "UTF-8",
-    "language": "ko",
-    "profile": {
-      "verifier": {
-        "did": "did:omn:verifier",
-        // Verifier Cert VC URL
-        "certVcRef": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc",
-        "name": "verifier",
-        "description": "verifier",
-        "ref": "http://127.0.0.1:8092/verifier/api/v1/certificate-vc"
-      },
-      "filter": {
-        "credentialSchemas": [
-          {
-            //Issuer Server's domain
-            "id": "http://127.0.0.1:8091/issuer/api/v1/vc/vcschema?name=mdl",
-            "type": "OsdSchemaCredential",
-            "requiredClaims": [
-              "org.iso.18013.5.birth_date",
-              "org.iso.18013.5.family_name",
-              "org.iso.18013.5.given_name"
-            ],
-            "allowedIssuers":[
-              "did:omn:issuer"
-            ],
-            "displayClaims":[
-              "testId.aa"
-            ],
-            "value": "VerifiableProfile"
-          }
-        ]
-      },
-      "process": {
-        "endpoints": [
-          "http://127.0.0.1:8092/verifier"
-        ],
-        "reqE2e": {
-          "nonce": "",
-          "curve": "Secp256r1",
-          "publicKey": "",
-          "cipher": "AES-256-CBC",
-          "padding": "PKCS5"
-        },
-        "verifierNonce": "",
-        "authType": 0
-      }
-    }
-  }
-}
-```
-
-## 5.8. blockchain.properties
-
-- 역할: Verifier 서버에서 연동할 블록체인 서버 정보를 설정합니다. [Open DID Installation Guide]의 '5.1.1. Hyperledger Fabric 테스트 네트워크 설치'에 따라 Hyperledger Fabric 테스트 네트워크를 설치하면, 개인 키, 인증서, 서버 접속 정보 설정 파일이 자동으로 생성됩니다. blockchain.properties에서는 이들 파일이 위치한 경로와, Hyperledger Fabric 테스트 네트워크 설치 시 입력한 네트워크 이름을 설정합니다. 또한, '5.1.2. Open DID 체인코드 배포'에서 배포한 Open DID의 체인코드 이름도 설정합니다.
+- 역할: Verifier 서버에서 연동할 블록체인 서버 정보를 설정합니다. [Open DID Installation Guide]의 '5.3. Step 3: Blockchain 설치'에 따라 Hyperledger Besu 네트워크를 설치하면, 개인 키, 인증서, 서버 접속 정보 설정 파일이 자동으로 생성됩니다. blockchain.properties에서는 이들 파일이 위치한 경로와, Hyperledger Besu 설치 시 입력한 네트워크 이름을 설정합니다.
 
 - 위치: `src/main/resources/properties`
 
-### 5.8.1. 블록체인 연동 설정
+### 5.7.1. 블록체인 연동 설정
 
-- `fabric.configFilePath:`:
-  - Hyperledger Fabric의 접속 정보 파일이 위치한 경로를 설정합니다. 해당 파일은 Hyperledger Fabric 테스트 네트워크 설치시 자동으로 생성되며, 기본 파일명은 'connection-org1.json' 입니다.
-  - 예시: {yourpath}/connection-org1.json
+#### EVM Network Configuration
 
-- `fabric.privateKeyFilePath:`:
-  - Hyperledger Fabric의 클라이언트가 네트워크 상에서 트랜잭션 서명과 인증을 위해 사용하는 개인 키 파일 경로를 설정합니다. 해당 파일은 Hyperledger Fabric 테스트 네트워크 설치시 자동으로 생성됩니다.
-  - 예시: {yourpath}/{개인키 파일명}
+- `evm.network.url`:
+  - EVM Network 주소, 클라이언트와 동일한 로컬에 Besu를 구동하는 경우 해당 값은 고정 사용합니다. (Defalt Port : 8545)
+  - 예시: http://localhost:8545
 
-- `fabric.certificateFilePath:`:
-  - Hyperledger Fabric의 클라이언트 인증서가 위치한 경로를 설정합니다. 해당 파일은 Hyperledger Fabric 테스트 네트워크 설치시 자동으로 생성되며, 기본 파일명은 'cert.pem' 입니다.
-  - 예시: /{yourpath}/cert.pem
+- `evm.chainId`:
+  - Chain ID 식별자입니다. 현재는 1337의 고정값을 사용중입니다.(Defalt Value : 1337)
+  - 예시: 1337
 
-- `fabric.mychannel:`:
-  - Hyperledger Fabric에서 사용하는 프파이빗 네트워크(채널) 이름입니다. Hyperledger Fabric 테스트 네트워크 설치시 입력한 채널명을 설정해야 합니다.
-  - 예시: mychannel
+- `evm.gas.limit`:
+  - Hyperledger Besu EVM 트랜잭션에서 최대로 허용되는 가스 한도, 현재는 Free Gas로서 고정으로 사용합니다. (Defalt Value : 100000000)
+  - 예시: 100000000
 
-- `fabric.chaincodeName:`: 🔒
-  - Hyperledger Fabric에서 사용하는 Open DID의 체인코드 이름입니다. 해당 값은 'opendid'로 고정입니다.
-  - 예시: opendid
+- `evm.gas.price`:
+  - 유닛 단위 가스 가격, 현재는 Free Gas로서 0으로  고정으로 사용합니다.(Defalt Value : 0)
+  - 예시: 0
 
+- `evm.connection.timeout`: 
+  - 네트워크 커넥션 타임아웃 값(milliseconds), 현재는 권장 값인 10000으로 고정 사용합니다. (Defalt Value : 10000)
+  - 예시: 10000
+
+#### EVM Contract Configuration
+
+- `evm.connection.address`: 
+  - Hardhat으로 Smart Contract 배포 시 리턴되는 OpenDID Contract의 Address 값, 상세 가이드는 [DID Besu Contract] 참조 바랍니다.
+  - 예시: 0xa0E49611FB410c00f425E83A4240e1681c51DDf4
+
+- `evm.connection.privateKey`: 
+  - API 접근 통제에 사용되는 k1 키, hardhat.config.js 내부 accounts에 정의된 키 문자열을 입력(앞에 0x 문자열은 제거)하면 Owner 권한으로 API 호출 가능(Default 설정), 상세 가이드는 [DID Besu Contract] 참조바랍니다.
+  - 예시: 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63
 <br/>
 
 # 6. 프로파일 설정 및 사용
@@ -750,7 +703,7 @@ Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `samp
 - **프로파일 지정:** 서버 구동 명령어에 `--spring.profiles.active={profile}` 옵션을 추가하여 원하는 프로파일을 활성화합니다.
   
   ```bash
-  java -jar build/libs/did-verifier-server-1.0.0.jar --spring.profiles.active={profile}
+  java -jar build/libs/did-verifier-server-2.0.0.jar --spring.profiles.active={profile}
   ```
 
 - **설정 적용:** 활성화된 프로파일에 따라 해당 설정 파일이 적용됩니다.
@@ -769,31 +722,61 @@ Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `samp
 
 각 방법에 따라 프로파일별 설정을 유연하게 변경하여 사용할 수 있으며, 프로젝트 환경에 맞는 설정을 쉽게 적용할 수 있습니다.
 
+
 # 7. Docker로 빌드 후 구동하기
 
 ## 7.1. Docker 이미지 빌드 방법 (`Dockerfile` 기반)
 
+### 7.1.1. Docker 이미지 빌드
 다음 명령어로 Docker 이미지를 빌드합니다:
 
 ```bash
-docker build -t did-verifier-server .
+cd {source_directory}
+docker build -t did-verifier-server -f did-verifier-server/Dockerfile .
 ```
 
-## 7.2. Docker 이미지 실행
+<br/>
 
-빌드된 이미지를 실행합니다:
+## 7.2. Docker Compose를 이용한 구동
 
+### 7.2.1. 디렉토리 및 설정 파일 준비
+
+#### 1. docker-compose 디렉토리 및 config 디렉토리 생성
 ```bash
-docker run -d -p 8092:8092 did-verifier-server
+mkdir -p {docker_compose_directory}/config
 ```
 
-## 7.3. Docker Compose를 이용한 구동
+#### 2. 설정 파일(yml)들을 config 디렉토리로 복사
+```bash
+cp {application_yml_directory}/* {docker_compose_directory}/config/
+cp {blockchain_properties_path} {docker_compose_directory}/config/
+```
 
-### 7.3.1. `docker-compose.yml` 파일 설명
+#### 3. blockchain.properties 파일 수정
+```yml
+evm.network.url=http://host.docker.internal:8545
+... 생략
+```
 
+> **host.docker.internal**은 Docker 컨테이너에서 호스트 머신을 가리키는 특별한 주소입니다.  
+> 컨테이너 내부에서 localhost는 컨테이너 자신을 의미하므로, 호스트에서 실행 중인 서비스(PostgreSQL, 블록체인)에 접근하려면 host.docker.internal을 사용해야 합니다.
+
+#### 4. application-database.yml 파일 수정
+```yml
+spring:
+  ... 생략
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://host.docker.internal:5430/verifier
+    username: omn
+    password: omn
+  ... 생략
+```
+
+### 7.2.2. `docker-compose.yml` 파일 생성
 `docker-compose.yml` 파일을 사용하여 여러 컨테이너를 쉽게 관리할 수 있습니다.
 
-```yaml
+```yml
 version: '3'
 services:
   app:
@@ -801,27 +784,25 @@ services:
     ports:
       - "8092:8092"
     volumes:
-      - ${your-config-dir}:/app/config
+      - {config_directory}:/app/config
     environment:
-      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_PROFILES_ACTIVE=dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 ```
 
-### 7.3.2. 컨테이너 실행 및 관리
+> - 위의 예시에서 `config_directory` 디렉토리를 컨테이너 내 `/app/config`로 마운트하여 설정 파일을 공유합니다.
+>   - `config_directory`에 위치한 설정 파일은 기본 설정 파일보다 우선적으로 적용됩니다.
+>   - 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 를 참고해 주세요.
 
-다음 명령어로 Docker Compose를 사용해 컨테이너를 실행합니다:
 
+### 7.2.3. 컨테이너 실행
 ```bash
+cd {docker_compose_directory}
 docker-compose up -d
 ```
 
-### 7.3.3. 서버 설정 방법
-
-위의 예시에서 `${your-config-dir}` 디렉토리를 컨테이너 내 `/app/config`로 마운트하여 설정 파일을 공유합니다.
-
-- 추가적인 설정이 필요한 경우, 마운트된 폴더에 별도의 property 파일을 추가하여 설정을 변경할 수 있습니다.
-  - 예를 들어, `application.yml` 파일을 `${your-config-dir}`에 추가하고, 이 파일에 변경할 설정을 작성합니다.
-  - `${your-config-dir}`에 위치한 `application.yml` 파일은 기본 설정 파일보다 우선적으로 적용됩니다.
-- 자세한 설정 방법은 [5. 설정 가이드](#5-설정-가이드) 를 참고해 주세요.
+<br/>
 
 # 8. Docker PostgreSQL 설치하기
 
@@ -869,3 +850,4 @@ docker-compose up -d
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/feature/yklee0911/v1.0.1.0/unrelease-V1.0.1.0/OpenDID_Documentation_Hub.md
 [Open DID Admin Console Guide]: ../admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
+[DID Besu Contract]: https://github.com/OmniOneID/did-besu-contract

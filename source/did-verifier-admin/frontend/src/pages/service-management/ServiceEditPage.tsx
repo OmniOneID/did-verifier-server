@@ -323,7 +323,7 @@ const ServiceEditPage = (props: Props) => {
                         }))}  
                         label="Lock Status"
                     >
-                        <MenuItem value={"true"}>Locked</MenuItem>
+                        <MenuItem value={"true"} disabled sx={{ color: 'gray' }}>Locked</MenuItem>
                         <MenuItem value={"false"}>Unlocked</MenuItem>
                     </Select>
                     {errors.locked && <FormHelperText>{errors.locked}</FormHelperText>}
@@ -351,8 +351,8 @@ const ServiceEditPage = (props: Props) => {
                         label="Submission Mode"
                     >
                         <MenuItem value="Direct">Direct</MenuItem>
-                        <MenuItem value="Indirect">inDirect</MenuItem>
-                        <MenuItem value="Proxy">Proxy</MenuItem>
+                        <MenuItem value="Indirect" disabled sx={{ color: 'gray' }}>inDirect</MenuItem>
+                        <MenuItem value="Proxy" disabled sx={{ color: 'gray' }}>Proxy</MenuItem>
                     </Select>
                     {errors.mode && <FormHelperText>{errors.mode}</FormHelperText>}
                 </FormControl>

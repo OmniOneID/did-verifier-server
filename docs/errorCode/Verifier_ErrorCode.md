@@ -192,6 +192,7 @@ public class ErrorResponse {
 | Error Code   | Error Message                                  | HTTP Status | Action Required                                |
 |--------------|------------------------------------------------|-------------|------------------------------------------------|
 | SSRVVRF00800 | Certificate VC data not found.                 | 500         | Check certificate VC data existence and storage. |
+| SSRVVRF00801 | VC Status id not valid.                        | 400         | Status of the issued VC is invalid. Please check the VC status |
 
 <br>
 

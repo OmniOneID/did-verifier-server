@@ -714,98 +714,98 @@ const ProfileEdit = (props: Props) => {
                         helperText={errors.language}
                     />
                     
-                    <Box sx={{ mt: 3, display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="h6" sx={{ mr: 2 }}>Include Logo</Typography>
-                        <FormControlLabel
-                            control={
-                                <Radio
-                                    checked={showLogo}
-                                    onChange={() => setShowLogo(true)}
-                                />
-                            }
-                            label="Yes"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Radio
-                                    checked={!showLogo}
-                                    onChange={() => setShowLogo(false)}
-                                />
-                            }
-                            label="No"
-                        />
-                    </Box>
+                    {/*<Box sx={{ mt: 3, display: 'flex', alignItems: 'center' }}>*/}
+                    {/*    <Typography variant="h6" sx={{ mr: 2 }}>Include Logo</Typography>*/}
+                    {/*    <FormControlLabel*/}
+                    {/*        control={*/}
+                    {/*            <Radio*/}
+                    {/*                checked={showLogo}*/}
+                    {/*                onChange={() => setShowLogo(true)}*/}
+                    {/*            />*/}
+                    {/*        }*/}
+                    {/*        label="Yes"*/}
+                    {/*    />*/}
+                    {/*    <FormControlLabel*/}
+                    {/*        control={*/}
+                    {/*            <Radio*/}
+                    {/*                checked={!showLogo}*/}
+                    {/*                onChange={() => setShowLogo(false)}*/}
+                    {/*            />*/}
+                    {/*        }*/}
+                    {/*        label="No"*/}
+                    {/*    />*/}
+                    {/*</Box>*/}
                     
-                    {showLogo && (
-                        <>
-                            <Typography variant="h6" sx={{ mt: 3 }}>Logo Information</Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow sx={{ backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.paper : "#f5f5f5" }}>
-                                            <TableCell>Property</TableCell>
-                                            <TableCell>Value</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell>Format</TableCell>
-                                            <TableCell>
-                                                <TextField 
-                                                    fullWidth 
-                                                    size="small" 
-                                                    name="format"
-                                                    value={profileData.logo?.format || ''} 
-                                                    onChange={handleLogoChange}
-                                                    error={!!errors.logo?.format}
-                                                    helperText={errors.logo?.format}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                <RadioGroup
-                                                    row
-                                                    value={logoType}
-                                                    onChange={handleLogoTypeChange}
-                                                >
-                                                    <FormControlLabel value="link" control={<Radio />} label="Link" />
-                                                    <FormControlLabel value="value" control={<Radio />} label="Value" />
-                                                </RadioGroup>
-                                            </TableCell>
-                                            <TableCell>
-                                                {logoType === 'link' ? (
-                                                    <TextField 
-                                                        fullWidth 
-                                                        size="small" 
-                                                        name="link"
-                                                        value={profileData.logo?.link || ''} 
-                                                        onChange={handleLogoChange}
-                                                        placeholder="Enter URL"
-                                                        error={!!errors.logo?.link}
-                                                        helperText={errors.logo?.link}
-                                                    />
-                                                ) : (
-                                                    <TextField 
-                                                        fullWidth 
-                                                        size="small" 
-                                                        name="value"
-                                                        value={profileData.logo?.value || ''}
-                                                        onChange={handleLogoChange}
-                                                        multiline
-                                                        rows={2}
-                                                        placeholder="Enter value"
-                                                        error={!!errors.logo?.value}
-                                                        helperText={errors.logo?.value}
-                                                    />
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </>
-                    )}
+                    {/*{showLogo && (*/}
+                    {/*    <>*/}
+                    {/*        <Typography variant="h6" sx={{ mt: 3 }}>Logo Information</Typography>*/}
+                    {/*        <TableContainer component={Paper}>*/}
+                    {/*            <Table>*/}
+                    {/*                <TableHead>*/}
+                    {/*                    <TableRow sx={{ backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.paper : "#f5f5f5" }}>*/}
+                    {/*                        <TableCell>Property</TableCell>*/}
+                    {/*                        <TableCell>Value</TableCell>*/}
+                    {/*                    </TableRow>*/}
+                    {/*                </TableHead>*/}
+                    {/*                <TableBody>*/}
+                    {/*                    <TableRow>*/}
+                    {/*                        <TableCell>Format</TableCell>*/}
+                    {/*                        <TableCell>*/}
+                    {/*                            <TextField */}
+                    {/*                                fullWidth */}
+                    {/*                                size="small" */}
+                    {/*                                name="format"*/}
+                    {/*                                value={profileData.logo?.format || ''} */}
+                    {/*                                onChange={handleLogoChange}*/}
+                    {/*                                error={!!errors.logo?.format}*/}
+                    {/*                                helperText={errors.logo?.format}*/}
+                    {/*                            />*/}
+                    {/*                        </TableCell>*/}
+                    {/*                    </TableRow>*/}
+                    {/*                    <TableRow>*/}
+                    {/*                        <TableCell>*/}
+                    {/*                            <RadioGroup*/}
+                    {/*                                row*/}
+                    {/*                                value={logoType}*/}
+                    {/*                                onChange={handleLogoTypeChange}*/}
+                    {/*                            >*/}
+                    {/*                                <FormControlLabel value="link" control={<Radio />} label="Link" />*/}
+                    {/*                                <FormControlLabel value="value" control={<Radio />} label="Value" />*/}
+                    {/*                            </RadioGroup>*/}
+                    {/*                        </TableCell>*/}
+                    {/*                        <TableCell>*/}
+                    {/*                            {logoType === 'link' ? (*/}
+                    {/*                                <TextField */}
+                    {/*                                    fullWidth */}
+                    {/*                                    size="small" */}
+                    {/*                                    name="link"*/}
+                    {/*                                    value={profileData.logo?.link || ''} */}
+                    {/*                                    onChange={handleLogoChange}*/}
+                    {/*                                    placeholder="Enter URL"*/}
+                    {/*                                    error={!!errors.logo?.link}*/}
+                    {/*                                    helperText={errors.logo?.link}*/}
+                    {/*                                />*/}
+                    {/*                            ) : (*/}
+                    {/*                                <TextField */}
+                    {/*                                    fullWidth */}
+                    {/*                                    size="small" */}
+                    {/*                                    name="value"*/}
+                    {/*                                    value={profileData.logo?.value || ''}*/}
+                    {/*                                    onChange={handleLogoChange}*/}
+                    {/*                                    multiline*/}
+                    {/*                                    rows={2}*/}
+                    {/*                                    placeholder="Enter value"*/}
+                    {/*                                    error={!!errors.logo?.value}*/}
+                    {/*                                    helperText={errors.logo?.value}*/}
+                    {/*                                />*/}
+                    {/*                            )}*/}
+                    {/*                        </TableCell>*/}
+                    {/*                    </TableRow>*/}
+                    {/*                </TableBody>*/}
+                    {/*            </Table>*/}
+                    {/*        </TableContainer>*/}
+                    {/*    </>*/}
+                    {/*)}*/}
                     
                     <Typography variant="h6" sx={{ mt: 3 }}>Verifier Information</Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>

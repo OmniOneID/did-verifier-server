@@ -1,5 +1,6 @@
 package org.omnione.did.base.db.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -8,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import org.omnione.did.base.db.constant.TransactionStatus;
+import org.omnione.did.base.db.constant.TransactionType;
 import org.omnione.did.base.db.domain.QTransaction;
 import org.omnione.did.base.db.domain.QVpSubmit;
 import org.omnione.did.base.db.domain.VpSubmit;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,8 +33,8 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
         QVpSubmit qVpSubmit = QVpSubmit.vpSubmit;
         QTransaction qTransaction = QTransaction.transaction;
 
-        // Join with Transaction entity to access status
-        BooleanExpression predicate = qVpSubmit.transactionId.eq(qTransaction.id);
+        // Base predicate: only VP_SUBMIT type transactions
+        BooleanExpression predicate = qTransaction.type.eq(org.omnione.did.base.db.constant.TransactionType.VP_SUBMIT);
 
         // Add additional filters based on search parameters
         BooleanExpression searchPredicate = buildPredicate(searchKey, searchValue, qTransaction);
@@ -39,25 +42,44 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
             predicate = predicate.and(searchPredicate);
         }
 
-        // Get total count with join
+        // Get total count - count transactions, not vp_submits
         long total = queryFactory
-                .select(qVpSubmit.count())
-                .from(qVpSubmit)
-                .join(qTransaction).on(qVpSubmit.transactionId.eq(qTransaction.id))
+                .select(qTransaction.count())
+                .from(qTransaction)
                 .where(predicate)
                 .fetchOne();
 
-        // Get results with join
-        List<VpSubmit> results = queryFactory
-                .selectFrom(qVpSubmit)
-                .join(qTransaction).on(qVpSubmit.transactionId.eq(qTransaction.id))
+        // Get results with LEFT JOIN - Transaction as main entity
+        List<Tuple> results = queryFactory
+                .select(qTransaction, qVpSubmit)
+                .from(qTransaction)
+                .leftJoin(qVpSubmit).on(qTransaction.id.eq(qVpSubmit.transactionId))
                 .where(predicate)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifier(pageable, qVpSubmit, qTransaction))
                 .fetch();
 
-        return new PageImpl<>(results, pageable, total);
+        // Convert Tuple results to VpSubmit entities
+        List<VpSubmit> vpSubmits = results.stream()
+                .map(tuple -> {
+                    org.omnione.did.base.db.domain.Transaction transaction = tuple.get(qTransaction);
+                    VpSubmit vpSubmit = tuple.get(qVpSubmit);
+                    
+                    if (vpSubmit == null) {
+                        // Create a placeholder VpSubmit for transactions without actual VP submission
+                        vpSubmit = VpSubmit.builder()
+                                .id(transaction.getId()) // Use transaction ID as placeholder
+                                .transactionId(transaction.getId())
+                                .vp(null)
+                                .holderDid(null)
+                                .build();
+                    }
+                    return vpSubmit;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(vpSubmits, pageable, total);
     }
 
     public BooleanExpression buildPredicate(String searchKey, String searchValue, QTransaction qTransaction) {
@@ -80,8 +102,8 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
         List<OrderSpecifier<?>> orders = new ArrayList<>();
 
         if (!pageable.getSort().isSorted()) {
-            // Default sort by created date descending
-            orders.add(new OrderSpecifier<>(Order.DESC, qVpSubmit.createdAt));
+            // Default sort by transaction created date descending
+            orders.add(new OrderSpecifier<>(Order.DESC, qTransaction.createdAt));
         } else {
             // Process the sort specifications from the pageable
             for (Sort.Order order : pageable.getSort()) {
@@ -89,14 +111,15 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
 
                 switch (order.getProperty()) {
                     case "createdAt":
-                        orders.add(new OrderSpecifier<>(direction, qVpSubmit.createdAt));
+                        // Use transaction created date since that's always available
+                        orders.add(new OrderSpecifier<>(direction, qTransaction.createdAt));
                         break;
                     case "transactionStatus":
                         orders.add(new OrderSpecifier<>(direction, qTransaction.status));
                         break;
                     default:
-                        // Default to sort by created date
-                        orders.add(new OrderSpecifier<>(direction, qVpSubmit.createdAt));
+                        // Default to sort by transaction created date
+                        orders.add(new OrderSpecifier<>(direction, qTransaction.createdAt));
                         break;
                 }
             }
@@ -104,7 +127,7 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
 
         // If no sort orders were added, add a default one
         if (orders.isEmpty()) {
-            orders.add(new OrderSpecifier<>(Order.DESC, qVpSubmit.createdAt));
+            orders.add(new OrderSpecifier<>(Order.DESC, qTransaction.createdAt));
         }
 
         return orders.toArray(new OrderSpecifier[0]);

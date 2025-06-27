@@ -1,6 +1,13 @@
 # Changelog
 
-## [Unreleased] (v1.0.1)
+## [Released] (v2.0.0)
+
+## v2.0.0 (2025-05-30)
+- Admin Console
+    - ZKP policy Management
+    - Adjusted some menu positions
+- Added functionality for ZKP ProofRequest verification
+- Support for Besu blockchain
 
 ### 🚀 New Features
 - Admin Console

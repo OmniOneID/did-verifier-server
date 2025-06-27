@@ -27,5 +27,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class VerifyUniqueResDto {
-    private boolean isUnique;
+    private boolean unique;
 }

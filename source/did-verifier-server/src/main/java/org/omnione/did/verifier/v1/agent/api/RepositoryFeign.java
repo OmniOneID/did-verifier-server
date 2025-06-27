@@ -17,31 +17,50 @@
 package org.omnione.did.verifier.v1.agent.api;
 
 
-import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
-import org.omnione.did.verifier.v1.agent.api.dto.VcMetaApiResDto;
+import org.omnione.did.base.constants.UrlConstant;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
 
 /**
  * Feign client for the Storage server.
  * This class was temporarily used instead of the BlockChain service and is no longer in use.
  */
-@FeignClient(value = "Storage", url = "192.168.3.130:8097", path = "/repository/api/v1")
+@FeignClient(value = "Storage", url = "${lss.url:http://127.0.0.1:8098}" + UrlConstant.LSS.V1)
 public interface RepositoryFeign {
-    /**
-     * Get DID Document
-     * @param did DID
-     * @return DidDocApiResDto
-     */
-    @GetMapping("/did-doc")
-    DidDocApiResDto getDid(@RequestParam(name = "did") String did);
 
     /**
-     * Get VC Meta Data
-     * @param vcId VC ID23
-     * @return VcMetaApiResDto
+     * Gets a DID document by its DID.
+     *
+     * @param did DID to get the document for.
+     * @return Found DID document.
      */
-    @GetMapping("/vc-meta")
-    VcMetaApiResDto getVcMetaData(@RequestParam(name = "vcId") String vcId);
+    @GetMapping(UrlConstant.LSS.DID)
+    String getDid(@RequestParam(name = "did") String did);
+
+
+    /**
+     * Gets metadata for a Verifiable Credential (VC) by its identifier.
+     *
+     * @param vcId Identifier of the Verifiable Credential.
+     * @return Found VC metadata.
+     */
+    @GetMapping(UrlConstant.LSS.VC_META)
+    String getVcMetaData(@RequestParam(name = "vcId") String vcId);
+
+    /**
+     * Get a Credential Schema by schema-id
+     * @param schemaId the credential schema id
+     * @return the encoded Credential Schema
+     */
+    @GetMapping(UrlConstant.LSS.CREDENTIAL_SCHEMA)
+    String getCredentialSchema(@RequestParam(name = "schemaId") String schemaId);
+
+    /**
+     * Get a Credential Definition by credential-definition-id
+     * @param definitionId the credential definition id
+     * @return the encoded Credential Definition
+     */
+    @GetMapping(UrlConstant.LSS.CREDENTIAL_DEFINITION)
+    String getCredentialDefinition(@RequestParam(name = "definitionId") String definitionId);
 }

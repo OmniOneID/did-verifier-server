@@ -4,6 +4,17 @@ Verifier Server
 Welcome to the Verifier Server Repository. <br>
 This repository contains the source code, documentation, and related resources for the Verifier Server.
 
+## S/W Specifications
+| Category           | Details                                         |
+|--------------------|-------------------------------------------------|
+| OS                 | macOS / Linux / Windows 10 or higher            |
+| Language           | Java 21 or higher                               |
+| IDE                | IntelliJ IDEA                                   |
+| Build System       | Gradle 7.0 or higher                            |
+| Compatibility      | Requires JDK 21 or higher                       |
+| Docker             | Docker and Docker Compose must be installed     |
+| Other Requirements | Minimum 2GB RAM and 10GB of disk space required |
+
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
 
@@ -21,12 +32,18 @@ did-verifier-server
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
+│   └── admin
+│       ├── OpenDID_VerifierAdmin_Operation_Guide.md
+│       └── OpenDID_VerifierAdmin_Operation_Guide_ko.md
 │   └── api
+│       ├── Verifier_API.md  
 │       └── Verifier_API_ko.md
 │   └── errorCode
-│       └── Verifier_ErrorCode.md
+│       ├── Verifier_ErrorCode.md
+│       └── Verifier_ErrorCode_ko.md
 │   └── db
-│       └── OpenDID_TableDefinition_Verifier.md
+│       ├── OpenDID_TableDefinition_Verifier.md
+│       └── OpenDID_TableDefinition_Verifier_ko.md
 │   └── installation
 │       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
 │       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md

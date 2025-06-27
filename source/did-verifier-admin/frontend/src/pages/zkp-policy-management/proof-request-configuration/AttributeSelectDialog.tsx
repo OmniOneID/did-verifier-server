@@ -104,13 +104,15 @@ const AttributeSelectDialog: React.FC<AttributeSelectDialogProps> = ({ open, onC
       const namespaceId = group.namespace.id;
       const items = group.items || [];
       items.forEach((item) => {
-        extractedAttributes.push({
-          id: Math.random(),
-          zkpNamespaceId: namespaceId,
-          label: item.label,
-          caption: item.caption,
-          type: item.type,
-        });
+        if (item.type === 'String') {
+          extractedAttributes.push({
+            id: Math.random(),
+            zkpNamespaceId: namespaceId,
+            label: item.label,
+            caption: item.caption,
+            type: item.type,
+          });
+        }
       });
     });
 

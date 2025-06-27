@@ -27,5 +27,6 @@
   <include file="set.2/admin-2phase-zkp_policy_profile.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-remove_fk_vp_policy.xml" relativeToChangelogFile="true" />
   <include file="set.2/admin-2phase-modify_vp_submit.xml" relativeToChangelogFile="true" />
+  <include file="set.2/admin-2phase_admin.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

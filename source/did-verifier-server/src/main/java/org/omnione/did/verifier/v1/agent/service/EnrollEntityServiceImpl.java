@@ -31,6 +31,7 @@ import org.omnione.did.base.db.domain.VerifierInfo;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.util.*;
+import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.crypto.exception.CryptoException;
 import org.omnione.did.crypto.keypair.EcKeyPair;
@@ -303,7 +304,7 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
             String serializeSource = JsonUtil.serializeAndSort(source);
             byte[] signature =  walletManagerInterface.generateCompactSignature(keyId, serializeSource);
             return BaseMultibaseUtil.encode(signature);
-        } catch (JsonProcessingException e) {
+        } catch (CommonSdkException e) {
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }

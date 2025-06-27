@@ -329,7 +329,7 @@ const PolicyEditPage = (props: Props) => {
         message: 'Policy has been updated successfully.', 
         isModal: true 
       }, {
-        onClose: async () => navigate(`/vp-policy-management/policy-managetment/${policyId}`, { replace: true }),
+        onClose: async () => navigate(`/vp-policy-management/policy-management/${policyId}`, { replace: true }),
       });
     } catch (err) {
       console.error('Failed to update policy:', err);

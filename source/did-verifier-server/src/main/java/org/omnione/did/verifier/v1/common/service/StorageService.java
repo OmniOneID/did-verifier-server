@@ -18,6 +18,7 @@ package org.omnione.did.verifier.v1.common.service;
 
 import org.omnione.did.data.model.did.DidDocument;
 
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
 
@@ -28,5 +29,5 @@ public interface StorageService {
     DidDocument findDidDoc(String didKeyUrl);
     CredentialSchema getZKPCredential(String credentialSchemaId);
     CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId);
-
+    VcMeta getVcMeta(String vcId);
 }

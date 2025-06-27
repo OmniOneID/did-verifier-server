@@ -16,6 +16,7 @@
 
 package org.omnione.did.verifier.v1.common.service;
 
+import com.google.gson.JsonSyntaxException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,13 @@ import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
+import org.omnione.did.data.model.enums.vc.VcStatus;
+import org.omnione.did.data.model.vc.VcMeta;
 import org.omnione.did.verifier.v1.agent.api.RepositoryFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.DidDocApiResDto;
 import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
 import org.omnione.did.zkp.datamodel.schema.CredentialSchema;
+import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -42,7 +46,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Primary
-@Profile("repository")
+@Profile("lss")
 public class RepositoryServiceImpl implements StorageService {
     private final RepositoryFeign repositoryFeign;
 
@@ -56,14 +60,9 @@ public class RepositoryServiceImpl implements StorageService {
     @Override
     public DidDocument findDidDoc(String didKeyUrl) {
         try {
-            String did = DidUtil.extractDid(didKeyUrl);
+            String didDocument = repositoryFeign.getDid(didKeyUrl);
 
-            DidDocApiResDto didDocApiResDto = repositoryFeign.getDid(did);
-
-            byte[] decodedDidDoc = BaseMultibaseUtil.decode(didDocApiResDto.getDidDoc());
-
-            String didDocJson = new String(decodedDidDoc);
-            DidManager didManager = BaseCoreDidUtil.parseDidDoc(didDocJson);
+            DidManager didManager = BaseCoreDidUtil.parseDidDoc(didDocument);
 
             return didManager.getDocument();
         } catch (OpenDidException e) {
@@ -71,24 +70,47 @@ public class RepositoryServiceImpl implements StorageService {
             throw e;
         } catch (FeignException e) {
             log.error("Failed to find DID document.", e);
-            throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
-        } catch (Exception e) {
-            log.error("Failed to find DID document.", e);
-            throw new OpenDidException(ErrorCode.DID_DOCUMENT_RETRIEVAL_FAILED);
+            throw new OpenDidException(ErrorCode.FAILED_TO_FIND_DID_DOC);
+        }
+    }
+
+
+    @Override
+    public CredentialSchema getZKPCredential(String credentialSchemaId) {
+        String credentialSchemaJson = repositoryFeign.getCredentialSchema(credentialSchemaId);
+        return parseCredentialSchema(credentialSchemaJson);
+    }
+
+    private CredentialSchema parseCredentialSchema(String credentialSchemaJson) {
+        try {
+            log.debug("\t--> Parsing Credential Schema JSON");
+
+            return GsonWrapper.getGson().fromJson(credentialSchemaJson, CredentialSchema.class);
+        } catch (JsonSyntaxException e) {
+            log.error("\t--> Failed to decode or parse Credential Schema: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
 
     @Override
-    public CredentialSchema getZKPCredential(String credentialSchemaId) {
-        return null;
+    public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
+        String credentialDefinitionJson = repositoryFeign.getCredentialDefinition(credentialDefinitionId);
+        return parseCredentialDefinition(credentialDefinitionJson);
     }
 
     @Override
-    public CredentialDefinition getZKPCredentialDefinition(String credentialDefinitionId) {
-        return null;
+    public VcMeta getVcMeta(String vcId) {
+        String vcMetaData = repositoryFeign.getVcMetaData(vcId);
+        return GsonWrapper.getGson().fromJson(vcMetaData, VcMeta.class);
     }
 
-    ;
-
-
+    private CredentialDefinition parseCredentialDefinition(String credentialDefinitionJson) {
+        try {
+            log.debug("\t--> Parsing Credential Definition");
+            return GsonWrapper.getGson().fromJson(credentialDefinitionJson, CredentialDefinition.class);
+        } catch (JsonSyntaxException e) {
+            log.error("\t--> Failed to parse Credential Definition: {}", e.getMessage());
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
+    }
 }
