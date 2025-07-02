@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
  * This class also provides a RequestInterceptor bean that adds a Content-Type header to all requests.
  */
 @Configuration
-@EnableFeignClients("org.omnione.did.verifier.v1.api")
+@EnableFeignClients("org.omnione.did.verifier.v1")
 public class OpenFeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
