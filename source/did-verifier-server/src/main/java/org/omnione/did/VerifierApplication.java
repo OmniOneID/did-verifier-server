@@ -25,7 +25,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
 @Slf4j
-@EnableFeignClients
 public class VerifierApplication {
 
     public static void main(String[] args)  {
