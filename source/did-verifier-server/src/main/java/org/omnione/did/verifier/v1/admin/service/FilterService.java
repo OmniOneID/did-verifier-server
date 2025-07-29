@@ -13,9 +13,8 @@ import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.JsonUtil;
-import org.omnione.did.verifier.v1.admin.dto.CombinedIdListDto;
-import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.omnione.did.verifier.v1.admin.api.ListFeign;
+import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.omnione.did.verifier.v1.admin.dto.VcSchemaListResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -120,7 +118,7 @@ public class FilterService {
 
         return vpFilterList.stream()
                 .map(FilterDTO::fromVpFilter)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public VcSchemaListResDto getVcSchemas() {

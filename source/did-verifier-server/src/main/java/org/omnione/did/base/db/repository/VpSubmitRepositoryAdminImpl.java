@@ -77,7 +77,7 @@ public class VpSubmitRepositoryAdminImpl implements VpSubmitRepositoryAdmin {
                     }
                     return vpSubmit;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(vpSubmits, pageable, total);
     }

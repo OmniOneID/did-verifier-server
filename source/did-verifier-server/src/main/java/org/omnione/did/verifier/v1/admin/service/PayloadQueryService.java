@@ -43,7 +43,7 @@ public class PayloadQueryService {
         // 1. Extract list of payload IDs
         List<String> payloadIds = payloadList.stream()
                 .map(Payload::getPayloadId)
-                .collect(Collectors.toList());
+                .toList();
 
         // 2. Fetch counts in batch
         List<PayloadIdProjection> countResults = policyRepository.countByPayloadIdIn(payloadIds);
@@ -59,7 +59,7 @@ public class PayloadQueryService {
                     PayloadDTO dto = PayloadDTO.fromPayload(payload, count);
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(payloadDtos, pageable, payloadPage.getTotalElements());
     }

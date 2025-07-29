@@ -26,14 +26,12 @@ import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.PolicyRepository;
 import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
-import org.omnione.did.verifier.v1.admin.dto.PolicyProfileDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -61,7 +59,7 @@ public class PolicyQueryService {
                             .orElse("Unknown Profile Title");
 
             return PolicyDTO.toDTO(policy, payloadService, profileTitle);
-        }).collect(Collectors.toList());
+        }).toList();
 
         return new PageImpl<>(policyDTOs, pageable, policies.getTotalElements());
     }

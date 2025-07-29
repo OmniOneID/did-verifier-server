@@ -90,6 +90,6 @@ public class ProcessService {
 
         return vpProcessList.stream()
                 .map(process -> modelMapper.map(process, ProcessDTO.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

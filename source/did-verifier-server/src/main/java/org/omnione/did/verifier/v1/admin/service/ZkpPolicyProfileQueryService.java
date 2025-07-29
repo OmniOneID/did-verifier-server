@@ -63,7 +63,7 @@ public class ZkpPolicyProfileQueryService {
                     Long count = countMap.getOrDefault(zkpPolicyProfile.getProfileId(), 0L);
                     return ZkpPolicyProfileDto.fromDomain(zkpPolicyProfile, count);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(zkpPolicyProfileDtos, pageable, zkpPolicyProfilePage.getTotalElements());
     }
