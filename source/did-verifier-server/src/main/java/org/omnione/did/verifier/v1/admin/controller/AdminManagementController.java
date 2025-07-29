@@ -34,13 +34,11 @@ public class AdminManagementController {
     private final AdminManagementService adminManagementService;
 
     @PostMapping(value = "/admins/reset-password")
-    @ResponseBody
     public AdminDto resetPassword(@Valid @RequestBody ResetPasswordReqDto resetPasswordReqDto) {
         return adminManagementService.resetPassword(resetPasswordReqDto);
     }
 
     @GetMapping(value = "/admins/list")
-    @ResponseBody
     public Page<AdminDto> searchAdmins(String searchKey, String searchValue, Pageable pageable) {
         return adminManagementService.searchAdmins(searchKey, searchValue, pageable);
     }
@@ -60,13 +58,12 @@ public class AdminManagementController {
         return adminManagementService.verifyAdminIdUnique(loginId);
     }
 
-    @RequestMapping(value = "/admins", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/admins")
     public EmptyResDto deleteAdmin(@RequestParam Long id) {
         return adminManagementService.deleteAdmin(id);
     }
 
     @PostMapping(value = "/admins/root/reset-password")
-    @ResponseBody
     public EmptyResDto resetPasswordByRoot(@RequestBody ResetPasswordByRootReqDto resetPasswordByRootReqDto) {
         return adminManagementService.resetPasswordByRoot(resetPasswordByRootReqDto);
     }
