@@ -27,7 +27,6 @@ import org.omnione.did.verifier.v1.agent.service.VerifierService;
 import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 
 
 /**
@@ -108,4 +107,3 @@ public class VerifierController {
 
 
 }
-
