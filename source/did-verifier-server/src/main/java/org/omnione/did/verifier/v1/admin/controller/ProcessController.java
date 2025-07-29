@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
-import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.admin.service.ProcessService;
 import org.springframework.data.domain.Page;
