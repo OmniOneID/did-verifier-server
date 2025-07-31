@@ -49,7 +49,7 @@ public class PolicyProfileService {
 
         return policyProfileList.stream()
                 .map(this::convertToProfileDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public PolicyProfileDTO getProfileInfo(long profileId) {

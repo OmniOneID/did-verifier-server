@@ -104,6 +104,6 @@ public class ZkpProfileService {
 
         return zkpPolicyProfileList.stream()
                 .map(ZkpPolicyProfileDto::fromDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

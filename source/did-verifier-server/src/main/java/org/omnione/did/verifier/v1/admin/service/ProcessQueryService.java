@@ -22,7 +22,7 @@ public class ProcessQueryService {
 
         List<ProcessDTO> processDtos = processPage.getContent().stream()
                 .map(ProcessDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(processDtos, pageable, processPage.getTotalElements());
     }

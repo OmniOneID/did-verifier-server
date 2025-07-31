@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * The AdminServiceImpl class provides methods for saving and getting verifier information.
@@ -41,7 +40,7 @@ public class PayloadService {
         }
         return payloadList.stream()
             .map(payload -> modelMapper.map(payload, PayloadDTO.class))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Transactional

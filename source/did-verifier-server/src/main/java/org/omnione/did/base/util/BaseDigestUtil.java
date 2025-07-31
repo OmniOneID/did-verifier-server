@@ -23,9 +23,6 @@ import org.omnione.did.crypto.enums.DigestType;
 import org.omnione.did.crypto.exception.CryptoException;
 import org.omnione.did.crypto.util.DigestUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Utility class for generating hash values using various algorithms.
  * This class provides methods to generate SHA-256 hashes from byte arrays and strings.

@@ -23,7 +23,7 @@ public class FilterQueryService {
 
         List<FilterDTO> filterDtos = vpFilters.getContent().stream()
                 .map(FilterDTO::fromVpFilter)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(filterDtos, pageable, vpFilters.getTotalElements());
 

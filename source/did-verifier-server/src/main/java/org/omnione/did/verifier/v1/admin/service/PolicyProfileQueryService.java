@@ -23,7 +23,7 @@ public class PolicyProfileQueryService {
 
         List<PolicyProfileDTO> policyProfileDTOS = policyProfileList.getContent().stream()
                 .map(PolicyProfileDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(policyProfileDTOS, pageable, policyProfileList.getTotalElements());
     }

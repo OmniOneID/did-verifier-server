@@ -22,9 +22,9 @@ import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.verifier.v1.admin.dto.server.VerifyServerUrlReqDto;
 import org.omnione.did.verifier.v1.admin.dto.server.VerifyServerUrlResDto;
 import org.omnione.did.verifier.v1.admin.service.UrlPingChecker;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class ServerCheckController {
 
     private final UrlPingChecker urlPingChecker;
 
-    @RequestMapping(value = "/servers/ping", method = RequestMethod.POST)
+    @PostMapping(value = "/servers/ping")
     public VerifyServerUrlResDto verifyServerUrl(@RequestBody VerifyServerUrlReqDto verifyServerUrlReqDto) {
         return urlPingChecker.isUrlReachable(verifyServerUrlReqDto);
     }

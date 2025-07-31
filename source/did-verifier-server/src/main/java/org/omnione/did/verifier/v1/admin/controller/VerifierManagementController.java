@@ -38,27 +38,27 @@ public class VerifierManagementController {
         return verifierManagementService.getVerifierInfo();
     }
 
-    @RequestMapping(value = "/certificate-vc", method = RequestMethod.POST)
+    @PostMapping(value = "/certificate-vc")
     public EmptyResDto createCertificateVc(@RequestBody SendCertificateVcReqDto sendCertificateVcReqDto) {
         return verifierManagementService.createCertificateVc(sendCertificateVcReqDto);
     }
 
-    @RequestMapping(value = "/entity-info", method = RequestMethod.POST)
+    @PostMapping(value = "/entity-info")
     public EmptyResDto updateEntityInfo(@RequestBody SendEntityInfoReqDto sendEntityInfoReqDto) {
         return verifierManagementService.updateEntityInfo(sendEntityInfoReqDto);
     }
 
-    @RequestMapping(value = "/register-verifier-info", method = RequestMethod.POST)
+    @PostMapping(value = "/register-verifier-info")
     public VerifierInfoResDto registerVerifierInfo(@RequestBody RegisterVerifierInfoReqDto registerVerifierInfoReqDto) {
         return verifierManagementService.registerVerifierInfo(registerVerifierInfoReqDto);
     }
 
-    @RequestMapping(value = "/generate-did-auto", method = RequestMethod.POST)
+    @PostMapping(value = "/generate-did-auto")
     public Map<String, Object> generateVerifierDidDocumentAuto() {
         return verifierManagementService.registerVerifierDidDocumentAuto();
     }
 
-    @RequestMapping(value = "/register-did", method = RequestMethod.POST)
+    @PostMapping(value = "/register-did")
     public EmptyResDto requestRegisterDid(@RequestBody RequestRegisterDidReqDto requestRegisterDidReqDto) {
         return verifierManagementService.requestRegisterDid(requestRegisterDidReqDto);
     }

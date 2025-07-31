@@ -34,7 +34,6 @@ public class SessionController {
     private final SessionService sessionService;
 
     @PostMapping(UrlConstant.Verifier.LOGIN)
-    @ResponseBody
     public AdminDto requestAdminLogin(@Valid @RequestBody RequestAdminLoginReqDto requestAdminLoginReqDto) {
         return sessionService.requestAdminLogin(requestAdminLoginReqDto);
     }

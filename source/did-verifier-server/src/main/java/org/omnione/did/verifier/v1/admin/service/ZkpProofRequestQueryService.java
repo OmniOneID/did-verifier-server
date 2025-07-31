@@ -16,15 +16,12 @@
 package org.omnione.did.verifier.v1.admin.service;
 
 import lombok.RequiredArgsConstructor;
-import org.omnione.did.base.db.domain.ZkpPolicyProfile;
 import org.omnione.did.base.db.domain.ZkpProofRequest;
 import org.omnione.did.base.db.repository.ZkpPolicyProfileRepository;
 import org.omnione.did.base.db.repository.ZkpProofRequestRepository;
 import org.omnione.did.base.db.repository.projection.ZkpProofRequestIdProjection;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
-import org.omnione.did.verifier.v1.admin.dto.VerifyUniqueResDto;
 import org.omnione.did.verifier.v1.admin.dto.ZkpProofRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -64,7 +61,7 @@ public class ZkpProofRequestQueryService {
                     Long count = countMap.getOrDefault(ns.getId(), 0L);
                     return ZkpProofRequestDto.fromDomain(ns, count);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(zkpNamespaceDtos, pageable, zkpProofRequestPage.getTotalElements());
     }
