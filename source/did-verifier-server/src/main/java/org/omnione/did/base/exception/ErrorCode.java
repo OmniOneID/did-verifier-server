@@ -109,7 +109,7 @@ public enum ErrorCode {
 
     // Certificate VC Errors (800~899)
     CERTIFICATE_DATA_NOT_FOUND("SSRVVRF00800", "Certificate VC data not found.", 500),
-    VC_STAUS_NOT_VALID("SSRVVRF00801", "VC Status id not valid" , 400),
+    VC_STAUS_NOT_VALID("SSRVVRF00801", "VC Status is not valid" , 400),
 
     // API Process Errors (900~999)
     FAILED_TO_REQUEST_OFFER_QR("SSRVVRF00900", "Failed to process the 'request-offer-qr' API request.", 500),

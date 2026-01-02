@@ -189,10 +189,10 @@ public class ErrorResponse {
 
 ## 1-8. Certificate VC Errors (800-899)
 
-| Error Code   | Error Message                                  | HTTP Status | Action Required                                |
-|--------------|------------------------------------------------|-------------|------------------------------------------------|
-| SSRVVRF00800 | Certificate VC data not found.                 | 500         | 인증서 VC 데이터 존재 여부와 저장소를 확인하세요. |
-| SSRVVRF00801 | VC Status id not valid.                        | 400         | 발급받은 VC의 상태가 유효하지 않습니다. VC 상태를 확인하세요. |
+| Error Code   | Error Message                  | HTTP Status | Action Required                                |
+|--------------|--------------------------------|-------------|------------------------------------------------|
+| SSRVVRF00800 | Certificate VC data not found. | 500         | 인증서 VC 데이터 존재 여부와 저장소를 확인하세요. |
+| SSRVVRF00801 | VC Status is not valid.        | 400         | 발급받은 VC의 상태가 유효하지 않습니다. VC 상태를 확인하세요. |
 
 <br>
 
