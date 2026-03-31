@@ -73,7 +73,7 @@ public class PayloadRepositoryAdminImpl implements PayloadRepositoryAdmin {
                     predicate = predicate.and(qPayload.device.eq(searchValue));
                     break;
                 case "mode":
-                    ProfileMode profileMode = ProfileMode.valueOf(searchValue.toUpperCase());
+                    ProfileMode profileMode = ProfileMode.valueOf(searchValue);
                     predicate = predicate.and(qPayload.mode.eq(profileMode));
                     break;
                 default:

@@ -1,20 +1,21 @@
 import { Box, Link, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { deletePolicy, fetchZkpPolicies } from '../../../apis/zkp-policy-api';
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from "../../../components/loading/FullscreenLoader";
+import { formatErrorMessage } from '../../../utils/error-handler';
 
 type Props = {}
 
 type PolicyRow = {
   id: number;
-  policyTitle: string;     
-  payloadService: string;     
+  policyTitle: string;
+  payloadService: string;
   payloadId: string;
   profileId: string;
   profileTitle: string;
@@ -28,6 +29,8 @@ const ZkpPolicyManagementPage = (props: Props) => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [selectedRow, setSelectedRow] = useState<string | number | null>(null);
   const [rows, setRows] = useState<PolicyRow[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedSearch, setSelectedSearch] = useState<string>('policyTitle');
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -38,7 +41,61 @@ const ZkpPolicyManagementPage = (props: Props) => {
     () => Array.isArray(rows) ? rows.find(row => row.id === selectedRow) || null : null,
     [rows, selectedRow]
   );
-  
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchZkpPolicies(
+        paginationModel.page,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+    } catch (error) {
+      console.error("Failed to retrieve Policies. ", error);
+      navigate('/error', { state: { message: `Failed to retrieve Policies: ${error}` } });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.page, paginationModel.pageSize, selectedSearch, searchText, navigate]);
+
+  const getData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchZkpPolicies(
+        0,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+      setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    } catch (err) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch ZKP Policy list"),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const handleSearch = useCallback(async (field: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setSelectedSearch(field);
+    setSearchText(trimmed);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleDelete = async () => {
     const id = selectedRowData?.id as number;
     if (id) {
@@ -47,7 +104,7 @@ const ZkpPolicyManagementPage = (props: Props) => {
         message: 'Are you sure you want to delete this Policy?',
         isModal: true,
       });
-  
+
       if (result) {
         setLoading(true);
         deletePolicy(id)
@@ -58,32 +115,22 @@ const ZkpPolicyManagementPage = (props: Props) => {
               isModal: true,
             }, {
               onClose: async () => {
-                setPaginationModel(prev => ({ ...prev }));
+                getData();
               },
             });
           })
           .catch((error) => {
             console.error("Failed to delete Policy. ", error);
-            navigate('/error', { state: { message: `Failed to delete Policy: ${error}` } });
+            dialogs.open(CustomDialog, {
+              title: 'Notification',
+              message: formatErrorMessage(error, "Failed to delete Policy"),
+              isModal: true,
+            });
           })
           .finally(() => setLoading(false));
       }
     }
   };
-  
-  useEffect(() => {
-    setLoading(true);
-    fetchZkpPolicies(paginationModel.page, paginationModel.pageSize, null, null)
-      .then((response) => {
-        setRows(response.data.content);
-        setTotalRows(response.data.totalElements);
-      })
-      .catch((error) => {
-        console.error("Failed to retrieve Policies. ", error);
-        navigate('/error', { state: { message: `Failed to retrieve Policies: ${error}` } });
-      })
-      .finally(() => setLoading(false));
-  }, [paginationModel]);
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     margin: 'auto',
@@ -106,15 +153,15 @@ const ZkpPolicyManagementPage = (props: Props) => {
       <FullscreenLoader open={loading} />
       <StyledContainer>
       <StyledSubTitle>ZKP Policy Management</StyledSubTitle>
-        <CustomDataGrid 
-          rows={rows} 
+        <CustomDataGrid
+          rows={rows}
           columns={[
-            { 
-              field: 'policyTitle', 
-              headerName: "Policy Title", 
+            {
+              field: 'policyTitle',
+              headerName: "Policy Title",
               width: 180,
               renderCell: (params) => (
-                <Link 
+                <Link
                   component="button"
                   variant='body2'
                   onClick={() => navigate(`/zkp-policy-management/zkp-policy-management/${params.row.id}`)}
@@ -123,24 +170,34 @@ const ZkpPolicyManagementPage = (props: Props) => {
                   {params.value}
                 </Link>),
             },
-            { 
-              field: 'payloadService', 
-              headerName: "Payload Service", 
+            {
+              field: 'payloadService',
+              headerName: "Payload Service",
               width: 180,
             },
-            { 
-              field: 'profileTitle', 
-              headerName: "Profile Title", 
+            {
+              field: 'profileTitle',
+              headerName: "Profile Title",
               width: 180,
             },
-            { 
-              field: 'createdAt', 
-              headerName: "Created At", 
+            {
+              field: 'createdAt',
+              headerName: "Created At",
               width: 180,
             },
-          ]} 
-          selectedRow={selectedRow} 
+          ]}
+          selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
+          enableSearch={true}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          selectedSearch={selectedSearch}
+          setSelectedSearch={setSelectedSearch}
+          searchOptions={[
+            { value: 'policyTitle', label: 'Title' },
+          ]}
+          onSearch={handleSearch}
+          onRefresh={getData}
           onEdit={() => {
             if (selectedRowData) {
               navigate(`/zkp-policy-management/zkp-policy-management/zkp-policy-edit/${selectedRowData.id}`);
@@ -148,13 +205,11 @@ const ZkpPolicyManagementPage = (props: Props) => {
           }}
           onRegister={() => navigate('/zkp-policy-management/zkp-policy-management/zkp-policy-registration')}
           onDelete={handleDelete}
-          additionalButtons={[
-            
-          ]}
-          paginationMode="server" 
-          totalRows={totalRows} 
-          paginationModel={paginationModel} 
-          setPaginationModel={setPaginationModel} 
+          additionalButtons={[]}
+          paginationMode="server"
+          totalRows={totalRows}
+          paginationModel={paginationModel}
+          setPaginationModel={setPaginationModel}
         />
       </StyledContainer>
     </>

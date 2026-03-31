@@ -1,7 +1,7 @@
 import { Box, Link, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { deleteFilter, fetchFilters } from "../../../apis/vp-filter-api";
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
@@ -19,7 +19,7 @@ type FilterRow = {
   type: string;
   requiredClaims: string[];
   allowedIssuers: string[];
-  displayClaims: string[];  
+  displayClaims: string[];
   presentAll: boolean;
   createdAt: string;
 };
@@ -29,8 +29,10 @@ const FilterManagementPage = (props: Props) => {
   const dialogs = useDialogs();
   const [loading, setLoading] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [selectedRow, setSelectedRow] = useState<string | number | null>(null);  
+  const [selectedRow, setSelectedRow] = useState<string | number | null>(null);
   const [rows, setRows] = useState<FilterRow[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedSearch, setSelectedSearch] = useState<string>('title');
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -40,7 +42,69 @@ const FilterManagementPage = (props: Props) => {
   const selectedRowData = useMemo(() => {
     return rows.find(row => row.filterId === selectedRow) || null;
   }, [rows, selectedRow]);
-  
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchFilters(
+        paginationModel.page,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      const transformedRows = response.data.content.map((row: { filterId: any; }) => ({
+        ...row,
+        id: row.filterId
+      }));
+      setRows(transformedRows);
+      setTotalRows(response.data.totalElements);
+    } catch (error) {
+      console.error("Failed to retrieve Filter. ", error);
+      navigate('/error', { state: { message: `Failed to retrieve Filters: ${error}` } });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.page, paginationModel.pageSize, selectedSearch, searchText, navigate]);
+
+  const getData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchFilters(
+        0,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      const transformedRows = response.data.content.map((row: { filterId: any; }) => ({
+        ...row,
+        id: row.filterId
+      }));
+      setRows(transformedRows);
+      setTotalRows(response.data.totalElements);
+      setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    } catch (err) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch Filter list"),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const handleSearch = useCallback(async (field: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setSelectedSearch(field);
+    setSearchText(trimmed);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleDelete = async () => {
     const id = selectedRowData?.filterId;
     if (id) {
@@ -49,7 +113,7 @@ const FilterManagementPage = (props: Props) => {
         message: 'Are you sure you want to delete Filter?',
         isModal: true,
       });
-  
+
       if (result) {
         setLoading(true);
         deleteFilter(id)
@@ -60,39 +124,21 @@ const FilterManagementPage = (props: Props) => {
               isModal: true,
             }, {
               onClose: async () => {
-                setPaginationModel(prev => ({ ...prev }));
+                getData();
               },
             });
           })
-          .catch((error) => {            
-            const result = dialogs.open(CustomDialog, {
+          .catch((error) => {
+            dialogs.open(CustomDialog, {
               title: 'Notification',
-              message: formatErrorMessage(error, "Failed to delete Filter!! "),
+              message: formatErrorMessage(error, "Failed to delete Filter"),
               isModal: true,
-            });            
+            });
           })
           .finally(() => setLoading(false));
       }
     }
   };
-  
-  useEffect(() => {
-    setLoading(true);
-    fetchFilters(paginationModel.page, paginationModel.pageSize, null, null)
-      .then((response) => {        
-        const transformedRows = response.data.content.map((row: { filterId: any; }) => ({
-          ...row,          
-          id: row.filterId
-        }));
-        setRows(transformedRows);
-        setTotalRows(response.data.totalElements);
-      })
-      .catch((error) => {
-        console.error("Failed to retrieve Filter. ", error);
-        navigate('/error', { state: { message: `Failed to retrieve Filters: ${error}` } });
-      })
-      .finally(() => setLoading(false));
-  }, [paginationModel, navigate]);
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     margin: 'auto',
@@ -115,15 +161,15 @@ const FilterManagementPage = (props: Props) => {
       <FullscreenLoader open={loading} />
       <StyledContainer>
         <StyledSubTitle>Filter Management</StyledSubTitle>
-        <CustomDataGrid 
-          rows={rows} 
+        <CustomDataGrid
+          rows={rows}
           columns={[
-            { 
-              field: 'title', 
-              headerName: "Title", 
+            {
+              field: 'title',
+              headerName: "Title",
               width: 200,
               renderCell: (params) => (
-                <Link 
+                <Link
                   component="button"
                   variant="body2"
                   onClick={() => navigate(`/vp-policy-management/filter-management/${params.row.filterId}`)}
@@ -131,20 +177,31 @@ const FilterManagementPage = (props: Props) => {
                 >
                   {params.value}
                 </Link>),
-            },          
-            { 
-              field: 'type', 
-              headerName: "Type", 
+            },
+            {
+              field: 'type',
+              headerName: "Type",
               width: 200,
             },
-            { 
-              field: 'createdAt', 
-              headerName: "Created At", 
+            {
+              field: 'createdAt',
+              headerName: "Created At",
               width: 200,
             },
-          ]} 
-          selectedRow={selectedRow} 
+          ]}
+          selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
+          enableSearch={true}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          selectedSearch={selectedSearch}
+          setSelectedSearch={setSelectedSearch}
+          searchOptions={[
+            { value: 'title', label: 'Title' },
+            { value: 'type', label: 'Type' },
+          ]}
+          onSearch={handleSearch}
+          onRefresh={getData}
           onEdit={() => {
             if (selectedRowData) {
               navigate(`/vp-policy-management/filter-management/filter-edit/${selectedRowData.filterId}`);
@@ -153,10 +210,10 @@ const FilterManagementPage = (props: Props) => {
           onRegister={() => navigate('/vp-policy-management/filter-management/filter-registration')}
           onDelete={handleDelete}
           additionalButtons={[]}
-          paginationMode="server" 
-          totalRows={totalRows} 
-          paginationModel={paginationModel} 
-          setPaginationModel={setPaginationModel}           
+          paginationMode="server"
+          totalRows={totalRows}
+          paginationModel={paginationModel}
+          setPaginationModel={setPaginationModel}
         />
       </StyledContainer>
     </>
