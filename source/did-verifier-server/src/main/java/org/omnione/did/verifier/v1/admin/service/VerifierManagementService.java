@@ -86,6 +86,13 @@ public class VerifierManagementService {
         }
 
         DidDocument didDocument = storageService.findDidDoc(verifierInfo.getDid());
+
+        if (verifierInfo.getStatus() == VerifierStatus.ACTIVATE) {
+            log.debug("\t--> Returning complete Verifier info with certificate VC");
+            String certificateVc = certificateVcQueryService.findCertificateVc().getVc();
+            return GetVerifierInfoReqDto.fromEntity(verifierInfo, didDocument, certificateVc);
+        }
+
         return GetVerifierInfoReqDto.fromEntity(verifierInfo, didDocument);
     }
 

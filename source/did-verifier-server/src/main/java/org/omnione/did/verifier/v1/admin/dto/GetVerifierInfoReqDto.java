@@ -41,6 +41,7 @@ public class GetVerifierInfoReqDto {
     private VerifierStatus status;
     private String serverUrl;
     private String certificateUrl;
+    private String certificateVc;
     private DidDocument didDocument;
     private String createdAt;
     private String updatedAt;
@@ -69,6 +70,23 @@ public class GetVerifierInfoReqDto {
                         .status(t.getStatus())
                         .serverUrl(t.getServerUrl())
                         .certificateUrl(t.getCertificateUrl())
+                        .didDocument(didDocument)
+                        .createdAt(formatInstant(t.getCreatedAt()))
+                        .updatedAt(formatInstant(t.getUpdatedAt()))
+                        .build())
+                .orElse(null);
+    }
+
+    public static GetVerifierInfoReqDto fromEntity(VerifierInfo verifierInfo, DidDocument didDocument, String certificateVc) {
+        return Optional.ofNullable(verifierInfo)
+                .map(t -> GetVerifierInfoReqDto.builder()
+                        .id(t.getId())
+                        .did(t.getDid())
+                        .name(t.getName())
+                        .status(t.getStatus())
+                        .serverUrl(t.getServerUrl())
+                        .certificateUrl(t.getCertificateUrl())
+                        .certificateVc(certificateVc)
                         .didDocument(didDocument)
                         .createdAt(formatInstant(t.getCreatedAt()))
                         .updatedAt(formatInstant(t.getUpdatedAt()))
