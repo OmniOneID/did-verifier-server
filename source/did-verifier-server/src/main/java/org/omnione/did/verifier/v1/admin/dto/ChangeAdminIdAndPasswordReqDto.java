@@ -15,13 +15,18 @@
  */
 package org.omnione.did.verifier.v1.admin.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class VerifyAdminIdUniqueResDto {
-    private boolean unique;
+public class ChangeAdminIdAndPasswordReqDto {
+    private String oldLoginId;
+    private String newLoginId;
+    private String oldPassword;
+    private String newPassword;
 }

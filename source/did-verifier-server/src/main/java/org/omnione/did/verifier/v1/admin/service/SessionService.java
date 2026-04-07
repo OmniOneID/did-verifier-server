@@ -19,6 +19,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.db.domain.Admin;
+import org.omnione.did.base.db.domain.AdminPasswordPolicy;
+import org.omnione.did.base.db.repository.AdminPasswordPolicyRepository;
 import org.omnione.did.verifier.v1.admin.dto.AdminDto;
 import org.omnione.did.verifier.v1.admin.dto.RequestAdminLoginReqDto;
 import org.springframework.stereotype.Service;
@@ -29,9 +31,11 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SessionService {
     private final AdminQueryService adminQueryService;
+    private final AdminPasswordPolicyRepository adminPasswordPolicyRepository;
 
     public AdminDto requestAdminLogin(RequestAdminLoginReqDto requestAdminLoginReqDto) {
         Admin admin = adminQueryService.findByLoginIdAndLoginPassword(requestAdminLoginReqDto.getLoginId(), requestAdminLoginReqDto.getLoginPassword());
-        return AdminDto.fromAdmin(admin);
+        AdminPasswordPolicy policy = adminPasswordPolicyRepository.findTop1ByOrderByIdAsc().orElse(null);
+        return AdminDto.fromAdmin(admin, policy);
     }
 }

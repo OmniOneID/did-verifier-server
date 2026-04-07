@@ -46,6 +46,8 @@ import ZkpProfileEditPage from './pages/zkp-policy-management/zkp-profile-manage
 import ZkpPolicyRegistration from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyRegistrationPage';
 import ZkpPolicyEditPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyEditPage';
 import ZkpPolicyDetailPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyDetailPage';
+import ServerConfigurationPage from './pages/server-configuration/ServerConfigurationPage';
+import PasswordPolicyManagementPage from './pages/admins/password-policy/PasswordPolicyManagementPage';
 
 
 const router = createBrowserRouter([
@@ -162,17 +164,30 @@ const router = createBrowserRouter([
             path: '/vp-submission-management',
             Component: VpHistoryPage,
           },
+          // Server Configuration
+          {
+            path: 'server-configuration',
+            Component: ServerConfigurationPage,
+          },
           // Admin Management
           {
-            path: 'admin-management/admin-registration',
+            path: 'admins/admin-management/admin-registration',
             Component: AdminRegisterPage,
           },
           {
-            path: 'admin-management/:id',
+            path: 'admins/admin-management/:id',
             Component: AdminDetailPage,
           },
           {
-            path: 'admin-management',
+            path: 'admins/admin-management',
+            Component: AdminManagementPage,
+          },
+          {
+            path: 'admins/password-policy',
+            Component: PasswordPolicyManagementPage,
+          },
+          {
+            path: 'admins',
             Component: AdminManagementPage,
           },
           {
