@@ -8,6 +8,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+        
+        /cc @OmniOneID/openrnd
+        
   - type: textarea
     id: what-happened
     attributes:
