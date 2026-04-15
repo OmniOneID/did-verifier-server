@@ -1,7 +1,12 @@
-
+name: Notify Team
 on:
   issues:
     types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   notify:
     runs-on: ubuntu-latest
