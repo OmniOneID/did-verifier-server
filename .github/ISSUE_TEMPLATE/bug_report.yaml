@@ -9,8 +9,6 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
         
-        /cc @OmniOneID/openrnd
-        
   - type: textarea
     id: what-happened
     attributes:
@@ -40,3 +38,13 @@ body:
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
+          
+  - type: textarea
+    id: notify
+    attributes:
+      label: Notify
+      description: Leave this as-is so the team gets notified.
+      value: "/cc @OmniOneID/openrnd"
+    validations:
+      required: true        
+        
