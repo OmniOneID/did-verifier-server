@@ -29,6 +29,10 @@ export const putPolicy = async (data: any) => {
     return putData(API_BASE_URL, `policies/${data.id}?policyType=ZKP`, data);
 }
 
-export const deletePolicy = async (id: number) => {    
+export const deletePolicy = async (id: number) => {
     return deleteData(API_BASE_URL, `policies/${id}`);
+}
+
+export const getPolicyVerifyProfile = async (id: number) => {
+    return getData(API_BASE_URL, `policies/${id}/verify-profile?policyType=ZKP`);
 }

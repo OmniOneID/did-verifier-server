@@ -65,4 +65,10 @@ public class PolicyController {
     public ResponseEntity<List<PolicyDTO>> getAllPolicies() {
         return ResponseEntity.ok(policyService.getAllPolicies());
     }
+
+    @Operation(summary = "Get Policy Verify Profile", description = "Get the verify profile JSON for a policy.")
+    @GetMapping(UrlConstant.Verifier.GET_POLICY_VERIFY_PROFILE)
+    public ResponseEntity<Object> getPolicyVerifyProfile(@PathVariable Long id, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+        return ResponseEntity.ok(policyService.getPolicyVerifyProfile(id, policyType));
+    }
 }

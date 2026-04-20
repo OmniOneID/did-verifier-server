@@ -1,8 +1,8 @@
-import { Box, Button, TextField, Typography, styled, useTheme } from '@mui/material';
+import { Box, Button, Modal, TextField, Typography, styled, useTheme } from '@mui/material';
 import { useDialogs } from '@toolpad/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getPolicy } from '../../../apis/zkp-policy-api';
+import { getPolicy, getPolicyVerifyProfile } from '../../../apis/zkp-policy-api';
 import CustomDialog from '../../../components/dialog/CustomDialog';
 import FullscreenLoader from '../../../components/loading/FullscreenLoader';
 
@@ -28,6 +28,8 @@ const ZkpPolicyDetailPage = (props: Props) => {
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [policyData, setPolicyData] = useState<PolicyData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [verifyProfileData, setVerifyProfileData] = useState<any>(null);
   
   useEffect(() => {
     const fetchPolicyData = async () => {
@@ -84,6 +86,26 @@ const ZkpPolicyDetailPage = (props: Props) => {
   const handleBack = () => {
     navigate('/zkp-policy-management/zkp-policy-management');
   };
+
+  const handleViewPolicyOpen = async () => {
+    if (!policyData) return;
+    try {
+      const response = await getPolicyVerifyProfile(policyData.id);
+      setVerifyProfileData(response.data);
+      setIsModalOpen(true);
+    } catch (err) {
+      await dialogs.open(CustomDialog, {
+        title: 'Error',
+        message: `Failed to fetch verify profile: ${err}`,
+        isModal: true,
+      });
+    }
+  };
+
+  const handleViewPolicyClose = () => {
+    setIsModalOpen(false);
+    setVerifyProfileData(null);
+  };
   
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     width: 800,
@@ -111,8 +133,21 @@ const ZkpPolicyDetailPage = (props: Props) => {
       <FullscreenLoader open={isLoading} />
       <Typography variant="h4">ZKP Policy Management</Typography>
       <StyledContainer>
-        <StyledTitle>ZKP Policy Detail Information</StyledTitle>
-        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <StyledTitle>ZKP Policy Detail Information</StyledTitle>
+          {policyData && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={handleViewPolicyOpen}
+              sx={{ height: 'fit-content', whiteSpace: 'nowrap' }}
+            >
+              View Policy
+            </Button>
+          )}
+        </Box>
+
         {policyData && (
           <StyledInputArea>
             <TextField
@@ -202,6 +237,48 @@ const ZkpPolicyDetailPage = (props: Props) => {
             </Box>
           </StyledInputArea>
         )}
+        <Modal
+          open={isModalOpen}
+          onClose={handleViewPolicyClose}
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Box
+            sx={{
+              width: '80vw',
+              maxWidth: 600,
+              maxHeight: '80vh',
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              overflow: 'auto',
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+              ZKP Policy Verify Profile
+            </Typography>
+            <Box
+              sx={{
+                whiteSpace: 'pre-wrap',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                backgroundColor: '#f5f5f5',
+                padding: 2,
+                borderRadius: 1,
+                maxHeight: '60vh',
+                overflow: 'auto',
+              }}
+            >
+              {verifyProfileData ? JSON.stringify(verifyProfileData, null, 2) : 'Loading...'}
+            </Box>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="outlined" onClick={handleViewPolicyClose}>
+                Close
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </StyledContainer>
     </>
   );
