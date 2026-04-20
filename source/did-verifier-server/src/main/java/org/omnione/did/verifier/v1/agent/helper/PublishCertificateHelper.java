@@ -20,6 +20,9 @@ import org.omnione.did.base.db.domain.VerifierInfo;
 public class PublishCertificateHelper {
 
     public static String getCertificateVcURL(VerifierInfo verifierInfo) {
+        if (verifierInfo.getPublishedCertificateUrl() != null) {
+            return verifierInfo.getPublishedCertificateUrl();
+        }
         return verifierInfo.getCertificateUrl();
     }
 }

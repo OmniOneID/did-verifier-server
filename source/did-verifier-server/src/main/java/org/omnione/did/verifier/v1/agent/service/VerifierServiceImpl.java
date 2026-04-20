@@ -71,6 +71,7 @@ import org.omnione.did.data.model.vc.VerifiableCredential;
 import org.omnione.did.data.model.vp.VerifiablePresentation;
 import org.omnione.did.verifier.v1.admin.dto.ProcessDTO;
 import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
+import org.omnione.did.verifier.v1.agent.helper.PublishCertificateHelper;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.common.service.BlockChainServiceImpl;
 import org.omnione.did.verifier.v1.common.service.StorageService;
@@ -252,7 +253,7 @@ public class VerifierServiceImpl implements VerifierService {
         InnerVerifyProfile profile = new InnerVerifyProfile();
         ProviderDetail providerDetail = new ProviderDetail();
         VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
-        providerDetail.setCertVcRef(verifierInfo.getCertificateUrl());
+        providerDetail.setCertVcRef(PublishCertificateHelper.getCertificateVcURL(verifierInfo));
         providerDetail.setDid(verifierInfo.getDid());
         providerDetail.setRef(verifierInfo.getServerUrl());
         providerDetail.setName(verifierInfo.getName());
@@ -649,7 +650,7 @@ public class VerifierServiceImpl implements VerifierService {
         ZkpInnerVerifyProfile innerVerifyProfile = new ZkpInnerVerifyProfile();
         ProviderDetail providerDetail = new ProviderDetail();
         VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
-        providerDetail.setCertVcRef(verifierInfo.getCertificateUrl());
+        providerDetail.setCertVcRef(PublishCertificateHelper.getCertificateVcURL(verifierInfo));
         providerDetail.setDid(verifierInfo.getDid());
         providerDetail.setRef(verifierInfo.getServerUrl());
         providerDetail.setName(verifierInfo.getName());

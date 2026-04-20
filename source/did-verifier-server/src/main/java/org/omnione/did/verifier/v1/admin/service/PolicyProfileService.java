@@ -12,6 +12,7 @@ import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.VerifierProperty;
 import org.omnione.did.verifier.v1.admin.dto.PolicyProfileDTO;
+import org.omnione.did.verifier.v1.agent.helper.PublishCertificateHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -114,7 +115,7 @@ public class PolicyProfileService {
         PolicyProfileDTO.Verifier verifier = new PolicyProfileDTO.Verifier();
         VerifierInfo verifierInfo = verifierInfoQueryService.getVerifierInfo();
         verifier.setDid(verifierInfo.getDid());
-        verifier.setCertVcRef(verifierInfo.getCertificateUrl());
+        verifier.setCertVcRef(PublishCertificateHelper.getCertificateVcURL(verifierInfo));
         verifier.setName(verifierInfo.getName());
         verifier.setRef(verifierInfo.getServerUrl());
 

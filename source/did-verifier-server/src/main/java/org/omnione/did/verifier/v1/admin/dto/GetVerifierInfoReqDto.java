@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.omnione.did.base.db.constant.VerifierStatus;
 import org.omnione.did.base.db.domain.VerifierInfo;
+import org.omnione.did.verifier.v1.agent.helper.PublishCertificateHelper;
 import org.omnione.did.data.model.did.DidDocument;
 
 import java.time.Instant;
@@ -54,7 +55,7 @@ public class GetVerifierInfoReqDto {
                         .name(t.getName())
                         .status(t.getStatus())
                         .serverUrl(t.getServerUrl())
-                        .certificateUrl(t.getCertificateUrl())
+                        .certificateUrl(PublishCertificateHelper.getCertificateVcURL(t))
                         .createdAt(formatInstant(t.getCreatedAt()))
                         .updatedAt(formatInstant(t.getUpdatedAt()))
                         .build())
@@ -69,7 +70,7 @@ public class GetVerifierInfoReqDto {
                         .name(t.getName())
                         .status(t.getStatus())
                         .serverUrl(t.getServerUrl())
-                        .certificateUrl(t.getCertificateUrl())
+                        .certificateUrl(PublishCertificateHelper.getCertificateVcURL(t))
                         .didDocument(didDocument)
                         .createdAt(formatInstant(t.getCreatedAt()))
                         .updatedAt(formatInstant(t.getUpdatedAt()))
@@ -85,7 +86,7 @@ public class GetVerifierInfoReqDto {
                         .name(t.getName())
                         .status(t.getStatus())
                         .serverUrl(t.getServerUrl())
-                        .certificateUrl(t.getCertificateUrl())
+                        .certificateUrl(PublishCertificateHelper.getCertificateVcURL(t))
                         .certificateVc(certificateVc)
                         .didDocument(didDocument)
                         .createdAt(formatInstant(t.getCreatedAt()))

@@ -114,6 +114,9 @@ public class EnrollEntityServiceImpl implements EnrollEntityService {
         log.debug("\t--> 5. VerifierInfo Status Update");
 
         verifierInfo.setStatus(VerifierStatus.ACTIVATE);
+        if (enrollEntityResponse.getVcUrl() != null) {
+            verifierInfo.setPublishedCertificateUrl(enrollEntityResponse.getVcUrl());
+        }
         verifierInfoQueryService.save(verifierInfo);
 
 
