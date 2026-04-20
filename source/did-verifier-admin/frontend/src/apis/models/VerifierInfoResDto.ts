@@ -7,6 +7,7 @@ export interface VerifierInfoResDto {
   status: VerifierStatus;
   serverUrl: string;
   certificateUrl: string;
+  certificateVc: string;
   didDocument?: any;
   createdAt: string;
   updatedAt: string;

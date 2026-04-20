@@ -1,7 +1,7 @@
 import { Box, Link, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
@@ -28,6 +28,8 @@ const ZkpProfileManagementPage = () => {
   const [rows, setRows] = useState<ProofRequestRow[]>([]);
   const [totalRows, setTotalRows] = useState(0);
   const [selectedRow, setSelectedRow] = useState<string | number | null>(null);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedSearch, setSelectedSearch] = useState<string>('title');
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -38,6 +40,64 @@ const ZkpProfileManagementPage = () => {
     () => Array.isArray(rows) ? rows.find(row => row.id === selectedRow) || null : null,
     [rows, selectedRow]
   );
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchZkpProfiles(
+        paginationModel.page,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+    } catch (err) {
+      console.error("Failed to retrieve ZKP Profiles", err);
+      dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch ZKP Profile list."),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.page, paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const getData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchZkpProfiles(
+        0,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+      setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    } catch (err) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch ZKP Profile list."),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const handleSearch = useCallback(async (field: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setSelectedSearch(field);
+    setSearchText(trimmed);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleDelete = async () => {
     if (!selectedRowData) return;
@@ -69,7 +129,7 @@ const ZkpProfileManagementPage = () => {
             isModal: true,
           }, {
             onClose: async () => {
-              setPaginationModel(prev => ({ ...prev }));
+              getData();
             },
           });
         })
@@ -83,24 +143,6 @@ const ZkpProfileManagementPage = () => {
         .finally(() => setLoading(false));
     }
   };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchZkpProfiles(paginationModel.page, paginationModel.pageSize, null, null)
-      .then((response) => {
-        setRows(response.data.content);
-        setTotalRows(response.data.totalElements);
-      })
-      .catch((err) => {
-        console.error("Failed to retrieve ZKP Profiles", err);
-        dialogs.open(CustomDialog, {
-          title: 'Notification',
-          message: formatErrorMessage(err, "Failed to fetch ZKP Profile list."),
-          isModal: true,
-        });
-      })
-      .finally(() => setLoading(false));
-  }, [paginationModel]);
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     margin: 'auto',
@@ -146,6 +188,16 @@ const ZkpProfileManagementPage = () => {
           ]}
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
+          enableSearch={true}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          selectedSearch={selectedSearch}
+          setSelectedSearch={setSelectedSearch}
+          searchOptions={[
+            { value: 'title', label: 'Title' },
+          ]}
+          onSearch={handleSearch}
+          onRefresh={getData}
           onRegister={() => navigate('/zkp-policy-management/zkp-profile-management/zkp-profile-registration')}
           paginationMode="server"
           totalRows={totalRows}

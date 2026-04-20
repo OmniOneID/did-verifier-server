@@ -68,4 +68,9 @@ public class AdminManagementController {
         return adminManagementService.resetPasswordByRoot(resetPasswordByRootReqDto);
     }
 
+    @PostMapping(value = "/admins/change-id-and-password")
+    public AdminDto changeAdminIdAndPassword(@RequestBody ChangeAdminIdAndPasswordReqDto changeAdminIdAndPasswordReqDto) {
+        return adminManagementService.changeAdminIdAndPassword(changeAdminIdAndPasswordReqDto);
+    }
+
 }

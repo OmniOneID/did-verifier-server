@@ -73,8 +73,8 @@ public class PolicyProfileRepositoryAdminImpl implements PolicyProfileRepository
                 case "title":
                     predicate = predicate.and(qPolicyProfile.title.eq(searchValue));
                     break;
-                case "authType":
-                    predicate = predicate.and(qPolicyProfile.policyProfileId.eq(searchValue));
+                case "description":
+                    predicate = predicate.and(qPolicyProfile.description.contains(searchValue));
                     break;
                 default:
                     predicate = predicate.and(Expressions.FALSE);

@@ -31,4 +31,5 @@ public class RequestEnrollEntityApiResDto {
     private String txId;
     private String iv;
     private String encVc;
+    private String vcUrl;
 }

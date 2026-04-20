@@ -71,7 +71,7 @@ public class PolicyRepositoryAdminImpl implements PolicyRepositoryAdmin {
 
         if (searchKey != null && searchValue != null && !searchValue.isEmpty()) {
             switch (searchKey) {
-                case "policyTtitle":
+                case "policyTitle":
                     predicate = predicate.and(qPolicy.policyTitle.eq(searchValue));
                     break;
                 default:

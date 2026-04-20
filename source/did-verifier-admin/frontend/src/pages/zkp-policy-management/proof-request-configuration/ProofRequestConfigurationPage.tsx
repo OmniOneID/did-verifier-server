@@ -1,7 +1,7 @@
 import { Box, Link, Typography, styled } from '@mui/material';
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { useDialogs } from "@toolpad/core";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import CustomDataGrid from "../../../components/data-grid/CustomDataGrid";
 import CustomConfirmDialog from '../../../components/dialog/CustomConfirmDialog';
@@ -27,6 +27,8 @@ const ProofRequestConfigurationPage = () => {
   const [rows, setRows] = useState<ProofRequestRow[]>([]);
   const [totalRows, setTotalRows] = useState(0);
   const [selectedRow, setSelectedRow] = useState<string| number | null>(null);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedSearch, setSelectedSearch] = useState<string>('name');
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -37,6 +39,64 @@ const ProofRequestConfigurationPage = () => {
     () => Array.isArray(rows) ? rows.find(row => row.id === selectedRow) || null : null,
     [rows, selectedRow]
   );
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchProofRequests(
+        paginationModel.page,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+    } catch (err) {
+      console.error("Failed to retrieve Proof Request Configurations", err);
+      dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch Proof Request Configuration list."),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.page, paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const getData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchProofRequests(
+        0,
+        paginationModel.pageSize,
+        selectedSearch && searchText.trim() ? selectedSearch : null,
+        selectedSearch && searchText.trim() ? searchText.trim() : null
+      );
+      setRows(response.data.content);
+      setTotalRows(response.data.totalElements);
+      setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    } catch (err) {
+      await dialogs.open(CustomDialog, {
+        title: 'Notification',
+        message: formatErrorMessage(err, "Failed to fetch Proof Request Configuration list."),
+        isModal: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [paginationModel.pageSize, selectedSearch, searchText, dialogs]);
+
+  const handleSearch = useCallback(async (field: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setSelectedSearch(field);
+    setSearchText(trimmed);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleDelete = async () => {
     if (!selectedRowData) return;
@@ -69,14 +129,14 @@ const ProofRequestConfigurationPage = () => {
                 isModal: true,
               }, {
                 onClose: async () => {
-                  setPaginationModel(prev => ({ ...prev }));
+                  getData();
                 },
               });
             })
             .catch((error) => {
-              const result = dialogs.open(CustomDialog, {
+              dialogs.open(CustomDialog, {
                 title: 'Notification',
-                message: formatErrorMessage(error, "Failed to delete Proof Request!! "),
+                message: formatErrorMessage(error, "Failed to delete Proof Request"),
                 isModal: true,
               });
             })
@@ -84,25 +144,6 @@ const ProofRequestConfigurationPage = () => {
         }
       }
    };
-
-  useEffect(() => {
-    setLoading(true)
-    fetchProofRequests(paginationModel.page, paginationModel.pageSize, null, null)
-    .then((response) => {
-      setLoading(false);
-      setRows(response.data.content);
-      setTotalRows(response.data.totalElements);
-    })
-    .catch((err) => {
-      setLoading(false);
-      console.error("Failed to retrieve Proof Request Configurations", err);
-      dialogs.open(CustomDialog, {
-          title: 'Notification',
-          message: formatErrorMessage(err, "Failed to fetch Proof Request Configuration list."),
-          isModal: true,
-      });
-    });
-  }, [paginationModel]);
 
   const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
     margin: 'auto',
@@ -138,8 +179,7 @@ const ProofRequestConfigurationPage = () => {
                     {params.value}
                   </Link>
                 ),
-  
-                },
+              },
               { field: 'version', headerName: 'Version', width: 100 },
               { field: 'profileCount', headerName: 'Profile Count', width: 150 },
               { field: 'createdAt', headerName: 'Registered At', width: 150 },
@@ -147,6 +187,17 @@ const ProofRequestConfigurationPage = () => {
             ]}
             selectedRow={selectedRow}
             setSelectedRow={setSelectedRow}
+            enableSearch={true}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            selectedSearch={selectedSearch}
+            setSelectedSearch={setSelectedSearch}
+            searchOptions={[
+              { value: 'name', label: 'Name' },
+              { value: 'version', label: 'Version' },
+            ]}
+            onSearch={handleSearch}
+            onRefresh={getData}
             onRegister={() => navigate('/zkp-policy-management/proof-request-configuration/proof-request-configuration-registration')}
             paginationMode="server"
             totalRows={totalRows}

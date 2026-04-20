@@ -77,6 +77,7 @@ public class UrlConstant {
         public static final String DELETE_POLICY_INFO = "/policies/{id}";
         public static final String UPDATE_POLICY_INFO = "/policies/{id}";
         public static final String GET_ALL_POLICY_LIST = "/policies/all";
+        public static final String GET_POLICY_VERIFY_PROFILE = "/policies/{id}/verify-profile";
 
         //Verifier Manage
         public static final String GET_VERIFIER_INFO = "/info";

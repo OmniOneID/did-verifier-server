@@ -23,5 +23,5 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class VerifyAdminIdUniqueResDto {
-    private boolean isUnique;
+    private boolean unique;
 }
