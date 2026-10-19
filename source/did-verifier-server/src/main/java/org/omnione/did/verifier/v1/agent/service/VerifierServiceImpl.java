@@ -74,14 +74,9 @@ import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.dto.*;
 import org.omnione.did.verifier.v1.common.service.BlockChainServiceImpl;
 import org.omnione.did.verifier.v1.common.service.StorageService;
-import org.omnione.did.zkp.core.manager.ZkpProofManager;
 import org.omnione.did.zkp.crypto.constant.ZkpCryptoConstants;
 import org.omnione.did.zkp.crypto.util.BigIntegerUtil;
-import org.omnione.did.zkp.datamodel.definition.CredentialDefinition;
-import org.omnione.did.zkp.datamodel.proof.Identifiers;
-import org.omnione.did.zkp.datamodel.proof.verifyparam.ProofVerifyParam;
 import org.omnione.did.zkp.datamodel.proofrequest.ProofRequest;
-import org.omnione.did.zkp.exception.ZkpException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -125,6 +120,7 @@ public class VerifierServiceImpl implements VerifierService {
     private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
     private final ZkpProofRequestRepository zkpProofRequestRepository;
     private final VpOfferRepository vpOfferRepository;
+    private final ZkpProofVerifier zkpProofVerifier;
 
 
     /**
@@ -514,12 +510,8 @@ public class VerifierServiceImpl implements VerifierService {
             }
             org.omnione.did.zkp.datamodel.proof.Proof proof = decryptProof(requestVerifyProofReqDto);
 
-
-            BigInteger proofNonce = new BigInteger(requestVerifyProofReqDto.getNonce());
-
-            List<ProofVerifyParam> proofVerifyParams = getProofVerifyParams(proof.getIdentifiers());
-
-            VerifyProof(proof, proofNonce, findProofRequestProfile.getProfile().getProofRequest(), proofVerifyParams);
+            log.debug("\t --> Verifying proof with the stored proof request and nonce");
+            zkpProofVerifier.verify(proof, findProofRequestProfile.getProfile().getProofRequest(), requestVerifyProofReqDto.getNonce());
 
 
             vpSubmitRepository.save(VpSubmit.builder()
@@ -546,35 +538,6 @@ public class VerifierServiceImpl implements VerifierService {
         } catch (Exception e) {
             log.error("Exception occurred during RequestingVerifyProof: {}", e.getMessage(), e);
             handleTxFailure(requestVerifyProofReqDto.getTxId(), e);
-            throw new OpenDidException(ErrorCode.FAILED_TO_VERIFY_PROOF);
-        }
-
-    }
-
-    private LinkedList<ProofVerifyParam> getProofVerifyParams(List<Identifiers> identifiers) {
-
-        LinkedList<ProofVerifyParam> proofVerifyParams = new LinkedList<>();
-        for (Identifiers id : identifiers) {
-            org.omnione.did.zkp.datamodel.schema.CredentialSchema zkpCredSchema = storageService.getZKPCredential(id.getSchemaId());
-            CredentialDefinition zkpCredentialDefinition = storageService.getZKPCredentialDefinition(id.getCredDefId());
-            ProofVerifyParam proofVerifyParam = new ProofVerifyParam.Builder()
-                    .setSchema(zkpCredSchema)
-                    .setCredentialDefinition(zkpCredentialDefinition)
-                    .build();
-            proofVerifyParams.add(proofVerifyParam);
-        }
-        return proofVerifyParams;
-    }
-
-
-
-    private void VerifyProof(org.omnione.did.zkp.datamodel.proof.Proof proof, BigInteger proofNonce, ProofRequest proofRequest, List<ProofVerifyParam> proofVerifyParams)  {
-        ZkpProofManager zkpProofManager = new ZkpProofManager();
-        try {
-            zkpProofManager.verifyProof(proof, proofNonce, proofRequest, proofVerifyParams);
-        } catch (ZkpException e) {
-            log.error("ZkpException occurred during VerifyProof: {}", e.getErrorCode());
-            log.error("ZkpException occurred during VerifyProof: {}", e.getMessage());
             throw new OpenDidException(ErrorCode.FAILED_TO_VERIFY_PROOF);
         }
 
