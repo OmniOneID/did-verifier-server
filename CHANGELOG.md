@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### 🐛 Bug Fixes
+- Updated ZKP proof verification
+- Upgraded did-zkp-sdk-server to 2.0.1
+
 ## [Released] (v2.0.0)
 
 ## v2.0.0 (2025-05-30)
