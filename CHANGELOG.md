@@ -5,6 +5,7 @@
 ### 🐛 Bug Fixes
 - Updated ZKP proof verification
 - Upgraded did-zkp-sdk-server to 2.0.1
+- Upgraded Node.js to 22.23.4 for the admin console build
 
 ## [Released] (v2.0.0)
 
