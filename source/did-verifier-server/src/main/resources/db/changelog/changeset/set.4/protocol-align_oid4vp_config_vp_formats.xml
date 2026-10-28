@@ -12,7 +12,7 @@
            - For SD-JWT, only the kid (DID)-based dc+sd-jwt-did / vc+sd-jwt are kept.
          Only the vpFormatsSupported key is replaced as a whole; the rest of the config such as baseUrl/clientId/crypto
          is preserved (for the same reason as the oid4vp-config-add-sdjwt-did-format changeset). -->
-    <changeSet id="oid4vp-config-align-vp-formats" author="jhkim6557">
+    <changeSet id="oid4vp-config-align-vp-formats" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP' AND config NOT LIKE '%mso_mdoc-did%'</sqlCheck>
         </preConditions>

@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <!-- OID4VP JWE response encryption: columns storing the per-transaction ephemeral enc key pair (kid + private key JWK) -->
-    <changeSet id="oid4vp-session-add-enc-key" author="jhkim6557">
+    <changeSet id="oid4vp-session-add-enc-key" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="oid4vp_session" columnName="enc_kid"/>

@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <!-- Add the mso_mdoc format and the verification section to oid4vp_config -->
-    <changeSet id="oid4vp-config-add-mso-mdoc" author="jhkim6557">
+    <changeSet id="oid4vp-config-add-mso-mdoc" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP'</sqlCheck>
         </preConditions>

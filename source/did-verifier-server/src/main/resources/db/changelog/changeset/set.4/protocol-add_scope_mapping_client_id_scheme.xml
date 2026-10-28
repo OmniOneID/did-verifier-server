@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <!-- Add a per-scope-mapping clientId scheme column (NULL = determined automatically from the DCQL format) -->
-    <changeSet id="dcql-scope-mapping-add-client-id-scheme" author="jhkim6557">
+    <changeSet id="dcql-scope-mapping-add-client-id-scheme" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="dcql_scope_mapping" columnName="client_id_scheme"/>

@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <!-- Add an index on enc_kid for lookups by findByEncKid -->
-    <changeSet id="oid4vp-session-add-enc-kid-index" author="jhkim6557">
+    <changeSet id="oid4vp-session-add-enc-kid-index" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists tableName="oid4vp_session" indexName="idx_oid4vp_session_enc_kid"/>

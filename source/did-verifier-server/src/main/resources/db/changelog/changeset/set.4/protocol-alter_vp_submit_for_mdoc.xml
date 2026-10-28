@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <changeSet id="vp-submit-add-format" author="jhkim6557">
+    <changeSet id="vp-submit-add-format" author="unified-verifier">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="vp_submit" columnName="format"/>
