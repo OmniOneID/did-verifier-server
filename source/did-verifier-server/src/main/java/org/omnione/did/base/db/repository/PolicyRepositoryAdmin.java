@@ -16,10 +16,12 @@
 package org.omnione.did.base.db.repository;
 
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.base.db.domain.Policy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PolicyRepositoryAdmin {
     Page<Policy> searchPolicyList(String searchKey, String searchValue, PolicyType policyType, Pageable pageable);
+    Page<Policy> searchPolicyList(String searchKey, String searchValue, PolicyType policyType, ProtocolType protocolType, Pageable pageable);
 }

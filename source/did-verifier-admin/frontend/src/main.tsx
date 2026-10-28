@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createBrowserRouter, redirect, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layout/Layout';
 import AdminManagementPage from './pages/admins/AdminManagementPage';
@@ -46,6 +46,15 @@ import ZkpProfileEditPage from './pages/zkp-policy-management/zkp-profile-manage
 import ZkpPolicyRegistration from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyRegistrationPage';
 import ZkpPolicyEditPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyEditPage';
 import ZkpPolicyDetailPage from './pages/zkp-policy-management/zkp-policy-management/ZkpPolicyDetailPage';
+import Oid4vpConfigPage from './pages/oid4vp-management/config/Oid4vpConfigPage';
+import ScopeMappingManagementPage from './pages/oid4vp-management/scope-mapping/ScopeMappingManagementPage';
+import ScopeMappingRegistrationPage from './pages/oid4vp-management/scope-mapping/ScopeMappingRegistrationPage';
+import ScopeMappingDetailPage from './pages/oid4vp-management/scope-mapping/ScopeMappingDetailPage';
+import ScopeMappingEditPage from './pages/oid4vp-management/scope-mapping/ScopeMappingEditPage';
+import Oid4vpPolicyManagementPage from './pages/oid4vp-management/policy/Oid4vpPolicyManagementPage';
+import Oid4vpPolicyRegistrationPage from './pages/oid4vp-management/policy/Oid4vpPolicyRegistrationPage';
+import Oid4vpPolicyDetailPage from './pages/oid4vp-management/policy/Oid4vpPolicyDetailPage';
+import Oid4vpPolicyEditPage from './pages/oid4vp-management/policy/Oid4vpPolicyEditPage';
 import ServerConfigurationPage from './pages/server-configuration/ServerConfigurationPage';
 import PasswordPolicyManagementPage from './pages/admins/password-policy/PasswordPolicyManagementPage';
 
@@ -77,87 +86,87 @@ const router = createBrowserRouter([
           },
           // VP Policy Management
           {
-            path: '/vp-policy-management/service-management/service-registration',
+            path: '/opendid/vp-policy-management/service-management/service-registration',
             Component: ServiceRegistrationPage,
           },
           {
-            path: '/vp-policy-management/service-management/service-edit/:id',
+            path: '/opendid/vp-policy-management/service-management/service-edit/:id',
             Component: ServiceEditPage,
           },
           {
-            path: '/vp-policy-management/service-management/:id',
+            path: '/opendid/vp-policy-management/service-management/:id',
             Component: ServiceDetailPage,
           },
           {
-            path: '/vp-policy-management/service-management',
+            path: '/opendid/vp-policy-management/service-management',
             Component: ServiceManagementPage,
           },
           {
-            path: '/vp-policy-management/profile-management',
+            path: '/opendid/vp-policy-management/profile-management',
             Component: ProfileManagementPage,
           },
           {
-            path: '/vp-policy-management/profile-management/profile-edit/:id',
+            path: '/opendid/vp-policy-management/profile-management/profile-edit/:id',
             Component: ProfileEditPage,
           },
           {
-            path: '/vp-policy-management/profile-management/profile-registration',
+            path: '/opendid/vp-policy-management/profile-management/profile-registration',
             Component: ProfileRegistrationPage,
           },
           {
-            path: '/vp-policy-management/profile-management/:id',
+            path: '/opendid/vp-policy-management/profile-management/:id',
             Component: ProfileDetailPage,
           },
           {
-            path: '/vp-policy-management/filter-management',
+            path: '/opendid/vp-policy-management/filter-management',
             Component: FilterManagementPage,
           },
           {
-            path: '/vp-policy-management/filter-management/filter-edit/:id',
+            path: '/opendid/vp-policy-management/filter-management/filter-edit/:id',
             Component: FilterEditPage,            
           },
           {
-            path: '/vp-policy-management/filter-management/filter-registration',
+            path: '/opendid/vp-policy-management/filter-management/filter-registration',
             Component: FilterRegistrationPage,
           },
           {
-            path: '/vp-policy-management/filter-management/:id',
+            path: '/opendid/vp-policy-management/filter-management/:id',
             Component: FilterDetailPage,
           },
           {
-            path: '/vp-policy-management/process-management',
+            path: '/opendid/vp-policy-management/process-management',
             Component: ProcessManagementPage,
           },
           {
-            path: '/vp-policy-management/process-management/process-edit/:id',
+            path: '/opendid/vp-policy-management/process-management/process-edit/:id',
             Component: ProcessEditPage,
           },
           {
-            path: '/vp-policy-management/process-management/process-registration',
+            path: '/opendid/vp-policy-management/process-management/process-registration',
             Component: ProcessRegistrationPage,
           },
           {
-            path: '/vp-policy-management/process-management/:id',
+            path: '/opendid/vp-policy-management/process-management/:id',
             Component: ProcessDetailPage,
           },
           {
-            path: '/vp-policy-management/policy-management',
+            path: '/opendid/vp-policy-management/policy-management',
             Component: PolicyManagementPage,
           },
           {
-            path: '/vp-policy-management/policy-management/policy-edit/:id',
+            path: '/opendid/vp-policy-management/policy-management/policy-edit/:id',
             Component: PolicyEditPage,
           },
           {
-            path: '/vp-policy-management/policy-management/policy-registration',
+            path: '/opendid/vp-policy-management/policy-management/policy-registration',
             Component: PolicyRegistrationPage,
           },
           {
-            path: '/vp-policy-management/policy-management/:id',
+            path: '/opendid/vp-policy-management/policy-management/:id',
             Component: PolicyDetailPage,
           },
           {
-            path: '/vp-policy-management',
+            path: '/opendid/vp-policy-management',
             Component: VpPolicyManagementPage,
           },
           {
@@ -194,63 +203,115 @@ const router = createBrowserRouter([
             path: '/server-management',
             Component: ServerManagementPage,
           },
+          // OID4VP Management
+          {
+            path: '/oid4vp-management/config',
+            Component: Oid4vpConfigPage,
+          },
+          {
+            path: '/oid4vp-management/scope-mapping/scope-mapping-registration',
+            Component: ScopeMappingRegistrationPage,
+          },
+          {
+            path: '/oid4vp-management/scope-mapping/scope-mapping-edit/:id',
+            Component: ScopeMappingEditPage,
+          },
+          {
+            path: '/oid4vp-management/scope-mapping/:id',
+            Component: ScopeMappingDetailPage,
+          },
+          {
+            path: '/oid4vp-management/scope-mapping',
+            Component: ScopeMappingManagementPage,
+          },
+          {
+            path: '/oid4vp-management/policy/policy-registration',
+            Component: Oid4vpPolicyRegistrationPage,
+          },
+          {
+            path: '/oid4vp-management/policy/policy-edit/:id',
+            Component: Oid4vpPolicyEditPage,
+          },
+          {
+            path: '/oid4vp-management/policy/:id',
+            Component: Oid4vpPolicyDetailPage,
+          },
+          {
+            path: '/oid4vp-management/policy',
+            Component: Oid4vpPolicyManagementPage,
+          },
           // ZKP Policy Management
           {
-            path: '/zkp-policy-management/proof-request-configuration/proof-request-configuration-registration',
+            path: '/opendid/zkp-policy-management/proof-request-configuration/proof-request-configuration-registration',
             Component: ProofRequestConfigurationRegistrationPage,
           },
           {
-            path: '/zkp-policy-management/proof-request-configuration/:id',
+            path: '/opendid/zkp-policy-management/proof-request-configuration/:id',
             Component: ProofRequestConfigurationDetailPage,
           },
           {
-            path: '/zkp-policy-management/proof-request-configuration/proof-request-edit/:id',
+            path: '/opendid/zkp-policy-management/proof-request-configuration/proof-request-edit/:id',
             Component: ProofRequestConfigurationEditPage,
           },
           {
-            path: '/zkp-policy-management/proof-request-configuration',
+            path: '/opendid/zkp-policy-management/proof-request-configuration',
             Component: ProofRequestConfigurationPage,
           },
           // ZKP Profile Management
           {
-            path: '/zkp-policy-management/zkp-profile-management/zkp-profile-registration',
+            path: '/opendid/zkp-policy-management/zkp-profile-management/zkp-profile-registration',
             Component: ZkpProfileRegistrationPage,
           },
           {
-            path: '/zkp-policy-management/zkp-profile-management/profile-edit/:id',
+            path: '/opendid/zkp-policy-management/zkp-profile-management/profile-edit/:id',
             Component: ZkpProfileEditPage,
           },
           {
-            path: '/zkp-policy-management/zkp-profile-management/:id',
+            path: '/opendid/zkp-policy-management/zkp-profile-management/:id',
             Component: ZkpProfileDetailPage,
           },
           {
-            path: '/zkp-policy-management/zkp-profile-management',
+            path: '/opendid/zkp-policy-management/zkp-profile-management',
             Component: ZkpProfileManagementPage,
           },
 
           // ZKP Policy Management
           {
-            path: '/zkp-policy-management/zkp-policy-management/zkp-policy-registration',
+            path: '/opendid/zkp-policy-management/zkp-policy-management/zkp-policy-registration',
             Component: ZkpPolicyRegistration,
           },
           {
-            path: '/zkp-policy-management/zkp-policy-management/zkp-policy-edit/:id',
+            path: '/opendid/zkp-policy-management/zkp-policy-management/zkp-policy-edit/:id',
             Component: ZkpPolicyEditPage,
           },
           {
-            path: '/zkp-policy-management/zkp-policy-management/:id',
+            path: '/opendid/zkp-policy-management/zkp-policy-management/:id',
             Component: ZkpPolicyDetailPage,
           },
           {
-            path: '/zkp-policy-management/zkp-policy-management',
+            path: '/opendid/zkp-policy-management/zkp-policy-management',
             Component: ZkpPolicyManagementPage,
           },
           {
-            path: '/zkp-policy-management',
+            path: '/opendid/zkp-policy-management',
             Component: ProofRequestConfigurationPage,
           },
         ],
+      },
+      // Redirects for legacy URLs (menu moved under /opendid)
+      {
+        path: '/vp-policy-management/*',
+        loader: ({ params }) => {
+          const rest = params['*'] ?? '';
+          return redirect(`/opendid/vp-policy-management${rest ? `/${rest}` : ''}`);
+        },
+      },
+      {
+        path: '/zkp-policy-management/*',
+        loader: ({ params }) => {
+          const rest = params['*'] ?? '';
+          return redirect(`/opendid/zkp-policy-management${rest ? `/${rest}` : ''}`);
+        },
       },
       {
         path: '/sign-in',

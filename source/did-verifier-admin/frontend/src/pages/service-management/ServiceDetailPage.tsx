@@ -43,7 +43,7 @@ const ServiceDetailPage = (props: Props) => {
                     message: 'Invalid Path.', 
                     isModal: true 
                 },{
-                    onClose: async () => navigate('/vp-policy-management/service-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/service-management', { replace: true }),
                 });
                 return;
             }
@@ -202,10 +202,10 @@ const ServiceDetailPage = (props: Props) => {
                     </TableContainer>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/service-management')}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/service-management')}>
                             Back
                         </Button>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/service-management/service-edit/' + numericServiceId)}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/service-management/service-edit/' + numericServiceId)}>
                             Go to Edit
                         </Button>
                     </Box>

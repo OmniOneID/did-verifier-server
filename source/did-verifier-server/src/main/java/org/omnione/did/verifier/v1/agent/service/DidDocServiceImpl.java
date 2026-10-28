@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.data.model.did.DidDocument;
-import org.omnione.did.data.model.enums.did.ProofPurpose;
 import org.omnione.did.verifier.v1.common.service.StorageService;
 import org.springframework.stereotype.Service;
 
@@ -81,37 +80,6 @@ public class DidDocServiceImpl implements DidDocService {
         return didDoc;
     }
 
-    /**
-     * Get the verification method for a given proof purpose from the provided DID document.
-     * @param didDocument The DID document.
-     * @param proofPurpose The proof purpose for which the verification method is required.
-     * @return The verification method as a string.
-     * @throws OpenDidException if the proof purpose is invalid.
-     */
-    @Override
-    public String getVerificationMethod(DidDocument didDocument, ProofPurpose proofPurpose) {
-
-        String did = didDocument.getId();
-
-        if (ProofPurpose.ASSERTION_METHOD == proofPurpose) {
-            return did + "#" + "assert";
-        } else if (ProofPurpose.AUTHENTICATION == proofPurpose) {
-            return did + "#" + "auth";
-        } else if (ProofPurpose.KEY_AGREEMENT == proofPurpose) {
-            return did + "#" + "keyagree";
-        } else if (ProofPurpose.CAPABILITY_INVOCATION == proofPurpose) {
-            return did + "#" + "invoke";
-        }
-
-        throw new OpenDidException(ErrorCode.INVALID_PROOF_PURPOSE);
-    }
-    /**
-     * Fetche the DID Document from the source (e.g., blockchain).
-     *
-     */
-    private Object fetchDidDocument(String did) {
-        return new Object();
-    }
     /**
      * Update the DID Document in the cache for the given DID by fetching the latest version.
      * @param did The DID identifier.

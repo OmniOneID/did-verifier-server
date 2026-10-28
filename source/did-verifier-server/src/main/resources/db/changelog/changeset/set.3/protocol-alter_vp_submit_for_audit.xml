@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="vp-submit-allow-null-vp" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="vp_submit" columnName="vp"/>
+        </preConditions>
+        <dropNotNullConstraint tableName="vp_submit" columnName="vp"/>
+    </changeSet>
+
+    <changeSet id="vp-submit-allow-null-holder-did" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="vp_submit" columnName="holder_did"/>
+        </preConditions>
+        <dropNotNullConstraint
+                tableName="vp_submit"
+                columnName="holder_did"
+                columnDataType="varchar(100)"/>
+    </changeSet>
+
+    <changeSet id="vp-submit-add-error-code" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="vp_submit" columnName="error_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="vp_submit">
+            <column name="error_code" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

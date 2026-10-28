@@ -44,7 +44,6 @@ import org.omnione.did.verifier.v1.admin.service.VerifierInfoQueryService;
 import org.omnione.did.verifier.v1.agent.api.EnrollFeign;
 import org.omnione.did.verifier.v1.agent.api.dto.*;
 import org.omnione.did.verifier.v1.agent.dto.EnrollEntityResDto;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
 
 import java.security.interfaces.ECPrivateKey;

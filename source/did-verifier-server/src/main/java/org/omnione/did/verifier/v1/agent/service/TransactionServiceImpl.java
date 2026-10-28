@@ -132,6 +132,10 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws OpenDidException if the transaction is not found.
      */
     @Override
+    // Callers (e.g. OID4VPService.receiveResponse) are @Transactional methods that rethrow on failure,
+    // so sharing their transaction would roll back the status update (e.g. FAILED) as well. REQUIRES_NEW
+    // commits it independently, the same pattern as updateErrorTransactionStatus below.
+    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateTransactionStatus(Long id, TransactionStatus transactionStatus) {
         Optional<Transaction> optionalTransaction = transactionRepository.findById(id);
         if (optionalTransaction.isEmpty()) {

@@ -19,19 +19,18 @@ package org.omnione.did.verifier.v1.agent.service.sample;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
-import org.omnione.did.base.datamodel.enums.PresentMode;
 import org.omnione.did.common.exception.CommonSdkException;
+import org.omnione.did.verifier.v1.model.enums.PresentMode;
+import org.omnione.did.verifier.v1.model.data.VpOfferPayload;
 import org.omnione.did.common.util.JsonUtil;
 import org.omnione.did.verifier.v1.agent.dto.*;
-import org.omnione.did.verifier.v1.agent.service.VerifierService;
+import org.omnione.did.verifier.v1.agent.service.ApplicationVerifierService;
 
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashMap;
 
 /**
  * Verifier service implementation for handling Verifiable Presentations (VPs) and user verification
@@ -42,11 +41,11 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Slf4j
 @Profile("sample")
-public class VerifierServiceSample implements VerifierService {
+public class VerifierServiceSample implements ApplicationVerifierService {
 
     @Override
     public RequestOfferResDto requestVpOfferbyQR(RequestOfferReqDto requestOfferReqDto) {
-        VerifyOfferPayload payload = VerifyOfferPayload.builder()
+        VpOfferPayload payload = VpOfferPayload.builder()
                 .service("login")
                 .mode(PresentMode.DIRECT)
                 .device("WEB")
@@ -99,12 +98,12 @@ public class VerifierServiceSample implements VerifierService {
 
     @Override
     public ProofRequestResDto requestProofRequestProfile(RequestProfileReqDto requestProfileReqDto) {
-        return null;
+        throw new UnsupportedOperationException("ZKP proof request is not supported in sample mode.");
     }
 
     @Override
     public RequestVerifyResDto requestVerifyProof(RequestVerifyProofReqDto requestVerifyProofReqDto) {
-        return null;
+        throw new UnsupportedOperationException("ZKP proof verification is not supported in sample mode.");
     }
 
 }

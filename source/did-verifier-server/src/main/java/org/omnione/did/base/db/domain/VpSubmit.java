@@ -40,10 +40,14 @@ public class VpSubmit extends BaseEntity implements Serializable {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "vp", nullable = false)
+    @Column(name = "vp")
     private String vp;
-    @Column(name = "holder_did", nullable = false)
+    @Column(name = "holder_did")
     private String holderDid;
     @Column(name = "transaction_id", nullable = false)
     private Long transactionId;
+    @Column(name = "error_code")
+    private String errorCode;
+    @Column(name = "format", length = 50)
+    private String format;
 }

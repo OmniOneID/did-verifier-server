@@ -17,14 +17,9 @@
 package org.omnione.did.verifier.v1.agent.service;
 
 import org.omnione.did.data.model.did.DidDocument;
-import org.omnione.did.data.model.enums.did.ProofPurpose;
 
 /**
  * Service interface for handling DID documents and verification methods.
- *
- * Provides methods for:
- * - Retrieving a DID document by its DID identifier
- * - Obtaining a verification method based on the proof purpose from a DID document
  */
 public interface DidDocService {
 
@@ -35,13 +30,4 @@ public interface DidDocService {
      * @return The corresponding DID document.
      */
     DidDocument getDidDocument(String did);
-
-    /**
-     * Gets the verification method for a given proof purpose from the provided DID document.
-     *
-     * @param didDocument The DID document.
-     * @param proofPurpose The proof purpose for which the verification method is required.
-     * @return The verification method as a string.
-     */
-    String getVerificationMethod(DidDocument didDocument, ProofPurpose proofPurpose);
 }

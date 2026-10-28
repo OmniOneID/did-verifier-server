@@ -288,7 +288,7 @@ const ZkpPolicyRegistration = (props: Props) => {
                 message: 'Policy has been created successfully.', 
                 isModal: true 
             }, {
-                onClose: async () => navigate('/zkp-policy-management/zkp-policy-management', { replace: true }),
+                onClose: async () => navigate('/opendid/zkp-policy-management/zkp-policy-management', { replace: true }),
             });
         } catch (err) {
             console.error('Failed to create policy:', err);
@@ -439,7 +439,7 @@ const ZkpPolicyRegistration = (props: Props) => {
                         <Button 
                             variant="outlined" 
                             color="secondary" 
-                            onClick={() => navigate('/vp-policy-management/policy-management')}
+                            onClick={() => navigate('/opendid/vp-policy-management/policy-management')}
                         >
                             Cancel
                         </Button>

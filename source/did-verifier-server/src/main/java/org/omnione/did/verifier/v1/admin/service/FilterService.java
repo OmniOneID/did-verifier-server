@@ -49,13 +49,7 @@ public class FilterService {
                 .displayClaims(filterDTO.getDisplayClaims())
                 .present_all(filterDTO.isPresentAll())
                 .build();
-        try {
-            String serializeToFilter = JsonUtil.serializeToJson(filterDTO);
-            String value = BaseMultibaseUtil.encode(serializeToFilter.getBytes(StandardCharsets.UTF_8));
-            vpFilter.setValue(value);
-        } catch (CommonSdkException e) {
-            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
-        }
+        vpFilter.setValue(encodeFilterValue(filterDTO));
 
         vpFilterRepository.save(vpFilter);
     }
@@ -72,11 +66,34 @@ public class FilterService {
         existingFilter.setRequiredClaims(reqFilterDto.getRequiredClaims());
         existingFilter.setAllowedIssuers(reqFilterDto.getAllowedIssuers());
         existingFilter.setDisplayClaims(reqFilterDto.getDisplayClaims());
-        existingFilter.setValue(reqFilterDto.getValue());
+        existingFilter.setValue(encodeFilterValue(reqFilterDto));
         existingFilter.setPresent_all(reqFilterDto.isPresentAll());
 
 
         return FilterDTO.fromVpFilter(vpFilterRepository.save(existingFilter));
+    }
+
+    /**
+     * Builds the multibase snapshot stored in value by serializing only the filter definition fields,
+     * excluding filterId/value/createdAt. Including them would nest the previous value inside itself
+     * or change the shape on every save, so both saveFilter and updateFilter exclude them.
+     */
+    private String encodeFilterValue(FilterDTO filterDTO) {
+        FilterDTO snapshot = FilterDTO.builder()
+                .title(filterDTO.getTitle())
+                .id(filterDTO.getId())
+                .type(filterDTO.getType())
+                .requiredClaims(filterDTO.getRequiredClaims())
+                .allowedIssuers(filterDTO.getAllowedIssuers())
+                .displayClaims(filterDTO.getDisplayClaims())
+                .presentAll(filterDTO.isPresentAll())
+                .build();
+        try {
+            String serializeToFilter = JsonUtil.serializeToJson(snapshot);
+            return BaseMultibaseUtil.encode(serializeToFilter.getBytes(StandardCharsets.UTF_8));
+        } catch (CommonSdkException e) {
+            throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
+        }
     }
 
     public FilterDTO getFilterInfo(long filterId) {

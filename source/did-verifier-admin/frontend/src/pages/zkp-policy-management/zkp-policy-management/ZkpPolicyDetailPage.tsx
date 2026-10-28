@@ -39,7 +39,7 @@ const ZkpPolicyDetailPage = (props: Props) => {
           message: 'Invalid policy ID.', 
           isModal: true 
         }, {
-          onClose: async () => navigate('/zkp-policy-management/zkp-policy-management', { replace: true }),
+          onClose: async () => navigate('/opendid/zkp-policy-management/zkp-policy-management', { replace: true }),
         });
         return;
       }
@@ -69,22 +69,25 @@ const ZkpPolicyDetailPage = (props: Props) => {
           message: `Failed to fetch policy information: ${err}`, 
           isModal: true 
         }, {
-          onClose: async () => navigate('/zkp-policy-management/zkp-policy-management', { replace: true }),
+          onClose: async () => navigate('/opendid/zkp-policy-management/zkp-policy-management', { replace: true }),
         });
       }
     };
 
     fetchPolicyData();
-  }, [policyId, dialogs, navigate]);
+    // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+    // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [policyId, navigate]);
   
   const handleEdit = () => {
     if (policyData) {
-      navigate(`/zkp-policy-management/zkp-policy-management/zkp-policy-edit/${policyData.id}`);
+      navigate(`/opendid/zkp-policy-management/zkp-policy-management/zkp-policy-edit/${policyData.id}`);
     }
   };
   
   const handleBack = () => {
-    navigate('/zkp-policy-management/zkp-policy-management');
+    navigate('/opendid/zkp-policy-management/zkp-policy-management');
   };
 
   const handleViewPolicyOpen = async () => {

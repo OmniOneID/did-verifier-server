@@ -96,7 +96,7 @@ const PolicyEditPage = (props: Props) => {
           message: 'Invalid policy ID.', 
           isModal: true 
         }, {
-          onClose: async () => navigate('/vp-policy-management', { replace: true }),
+          onClose: async () => navigate('/opendid/vp-policy-management', { replace: true }),
         });
         return;
       }
@@ -127,13 +127,16 @@ const PolicyEditPage = (props: Props) => {
           message: `Failed to fetch policy information: ${err}`, 
           isModal: true 
         }, {
-          onClose: async () => navigate('/vp-policy-management', { replace: true }),
+          onClose: async () => navigate('/opendid/vp-policy-management', { replace: true }),
         });
       }
     };
 
     fetchPolicyData();
-  }, [policyId, dialogs, navigate]);
+    // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+    // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [policyId, navigate]);
   
   // Check if form data has changed
   useEffect(() => {
@@ -298,7 +301,7 @@ const PolicyEditPage = (props: Props) => {
   };
   
   const handleCancel = () => {    
-    navigate(`/vp-policy-management/policy-management/${policyId}`);
+    navigate(`/opendid/vp-policy-management/policy-management/${policyId}`);
   };
   
   const handleSubmit = async () => {
@@ -329,7 +332,7 @@ const PolicyEditPage = (props: Props) => {
         message: 'Policy has been updated successfully.', 
         isModal: true 
       }, {
-        onClose: async () => navigate(`/vp-policy-management/policy-management/${policyId}`, { replace: true }),
+        onClose: async () => navigate(`/opendid/vp-policy-management/policy-management/${policyId}`, { replace: true }),
       });
     } catch (err) {
       console.error('Failed to update policy:', err);
@@ -388,7 +391,10 @@ const PolicyEditPage = (props: Props) => {
     };
     
     loadInitialData();
-  }, [dialogs]);
+    // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+    // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

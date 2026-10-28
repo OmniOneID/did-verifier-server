@@ -164,7 +164,7 @@ const PolicyManagementPage = (props: Props) => {
                 <Link
                   component="button"
                   variant='body2'
-                  onClick={() => navigate(`/vp-policy-management/policy-management/${params.row.id}`)}
+                  onClick={() => navigate(`/opendid/vp-policy-management/policy-management/${params.row.id}`)}
                   sx={{ cursor: 'pointer', color: 'primary.main' }}
                 >
                   {params.value}
@@ -200,10 +200,10 @@ const PolicyManagementPage = (props: Props) => {
           onRefresh={getData}
           onEdit={() => {
             if (selectedRowData) {
-              navigate(`/vp-policy-management/policy-management/policy-edit/${selectedRowData.id}`);
+              navigate(`/opendid/vp-policy-management/policy-management/policy-edit/${selectedRowData.id}`);
             }
           }}
-          onRegister={() => navigate('/vp-policy-management/policy-management/policy-registration')}
+          onRegister={() => navigate('/opendid/vp-policy-management/policy-management/policy-registration')}
           onDelete={handleDelete}
           additionalButtons={[]}
           paginationMode="server"

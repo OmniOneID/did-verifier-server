@@ -97,6 +97,33 @@ public class FileWalletService {
             throw new OpenDidException(ErrorCode.WALLET_SIGNATURE_GENERATION_FAILED);
         }
     }
+
+    /**
+     * Generates a compact signature from an already hashed value (no rehashing).
+     * Used when the signing input is already SHA-256 hashed, e.g. for JWS (the hash passed by the SDK CompactSigner).
+     * generateCompactSignature is for plain text and hashes internally, which would double-hash the input.
+     *
+     * @param keyId Key ID.
+     * @param hash Already hashed signing input.
+     * @return Generated signature.
+     * @throws OpenDidException if signature generation fails.
+     */
+    public byte[] generateCompactSignatureFromHash(String keyId, byte[] hash) {
+        try {
+            if (!walletManager.isConnect()) {
+                log.info("Wallet manager disConnect. Connecting to wallet...");
+                connectToWallet();
+            }
+
+            byte[] signature = walletManager.generateCompactSignatureFromHash(keyId, hash);
+            log.info("Compact signature generated from hash for keyId: {}", keyId);
+            return signature;
+        } catch (OpenDidException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new OpenDidException(ErrorCode.WALLET_SIGNATURE_GENERATION_FAILED);
+        }
+    }
     public WalletManagerInterface initializeWalletWithKeys() {
         WalletManagerInterface walletManager = BaseWalletUtil.initializeWalletWithKeys(
                 walletProperty.getFilePath(),

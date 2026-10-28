@@ -21,5 +21,5 @@ package org.omnione.did.base.db.constant;
  */
 public enum TransactionType {
     VP_SUBMIT,
-
+    OID4VP,
 }

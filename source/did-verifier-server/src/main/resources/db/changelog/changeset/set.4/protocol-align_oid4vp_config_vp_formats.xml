@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- Aligns the advertised formats with the formats the server actually accepts.
+         This verifier accepts only DID-based credentials, so:
+           - mso_mdoc (x5chain-based) is removed. If it were advertised, wallets would send it but the server
+             would reject it with OID4VP_MDOC_X5C_NOT_SUPPORTED (SSRVVRF01316).
+           - mso_mdoc-did is added. It is the identifier used in DCQL and the only mdoc format actually accepted.
+           - For SD-JWT, only the kid (DID)-based dc+sd-jwt-did / vc+sd-jwt are kept.
+         Only the vpFormatsSupported key is replaced as a whole; the rest of the config such as baseUrl/clientId/crypto
+         is preserved (for the same reason as the oid4vp-config-add-sdjwt-did-format changeset). -->
+    <changeSet id="oid4vp-config-align-vp-formats" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP' AND config NOT LIKE '%mso_mdoc-did%'</sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE oid4vp_config
+            SET config = jsonb_set(
+                config::jsonb,
+                '{clientMetadata,vpFormatsSupported}',
+                '{"mso_mdoc-did":{"alg_values":["ES256"]},"dc+sd-jwt-did":{},"vc+sd-jwt":{},"opendid_vc":{}}'::jsonb,
+                true
+            )::text
+            WHERE type = 'OID4VP';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

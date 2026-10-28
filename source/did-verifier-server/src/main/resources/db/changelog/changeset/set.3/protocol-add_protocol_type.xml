@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="add-protocol-type-to-policy" author="jhkim6557">
+
+        <!-- Add the protocol_type column (DID_VP / OID4VP) -->
+        <addColumn tableName="policy">
+            <column name="protocol_type" type="varchar(20)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <update tableName="policy">
+            <column name="protocol_type" value="DID_VP" />
+            <where>protocol_type IS NULL</where>
+        </update>
+
+        <addNotNullConstraint
+                tableName="policy"
+                columnName="protocol_type"
+                columnDataType="varchar(20)" />
+
+        <!-- Add the scope column (references dcql_scope_mapping.scope for OID4VP) -->
+        <addColumn tableName="policy">
+            <column name="scope" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <!-- Make payload_id and policy_profile_id nullable (not used by OID4VP policies) -->
+        <dropNotNullConstraint
+                tableName="policy"
+                columnName="payload_id"
+                columnDataType="varchar(40)" />
+
+        <dropNotNullConstraint
+                tableName="policy"
+                columnName="policy_profile_id"
+                columnDataType="varchar(40)" />
+
+    </changeSet>
+
+</databaseChangeLog>

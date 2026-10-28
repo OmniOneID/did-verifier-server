@@ -173,7 +173,7 @@ const ZkpProfileManagementPage = () => {
                 <Link
                   component="button"
                   variant='body2'
-                  onClick={() => navigate(`/zkp-policy-management/zkp-profile-management/${params.row.id}`)}
+                  onClick={() => navigate(`/opendid/zkp-policy-management/zkp-profile-management/${params.row.id}`)}
                   sx={{ cursor: 'pointer', color: 'primary.main' }}
                 >
                   {params.value}
@@ -198,14 +198,14 @@ const ZkpProfileManagementPage = () => {
           ]}
           onSearch={handleSearch}
           onRefresh={getData}
-          onRegister={() => navigate('/zkp-policy-management/zkp-profile-management/zkp-profile-registration')}
+          onRegister={() => navigate('/opendid/zkp-policy-management/zkp-profile-management/zkp-profile-registration')}
           paginationMode="server"
           totalRows={totalRows}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           onEdit={() => {
             if (selectedRowData) {
-              navigate(`/zkp-policy-management/zkp-profile-management/profile-edit/${selectedRowData.id}`);
+              navigate(`/opendid/zkp-policy-management/zkp-profile-management/profile-edit/${selectedRowData.id}`);
             }
           }}
           onDelete={handleDelete}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- Add a per-scope-mapping clientId scheme column (NULL = determined automatically from the DCQL format) -->
+    <changeSet id="dcql-scope-mapping-add-client-id-scheme" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="dcql_scope_mapping" columnName="client_id_scheme"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="dcql_scope_mapping">
+            <column name="client_id_scheme" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

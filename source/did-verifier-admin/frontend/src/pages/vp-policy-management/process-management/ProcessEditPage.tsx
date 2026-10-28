@@ -113,7 +113,7 @@ const ProcessEditPage = (props: Props) => {
       }      
     };
     const handleCancel = () => {
-        navigate(`/vp-policy-management/process-management/${id}`);        
+        navigate(`/opendid/vp-policy-management/process-management/${id}`);        
     };
 
     const handleAddEndpoint = () => {
@@ -183,7 +183,7 @@ const ProcessEditPage = (props: Props) => {
               message: 'Process update completed.',
               isModal: true,
           }, {
-              onClose: async () => navigate('/vp-policy-management/process-management'),
+              onClose: async () => navigate('/opendid/vp-policy-management/process-management'),
           });
         } catch (error) {
           setIsLoading(false);
@@ -204,7 +204,7 @@ const ProcessEditPage = (props: Props) => {
                   message: 'Invalid Path.', 
                   isModal: true 
               }, {
-                  onClose: async () => navigate('/vp-policy-management/process-management', { replace: true }),
+                  onClose: async () => navigate('/opendid/vp-policy-management/process-management', { replace: true }),
               });
               return;
           }
@@ -247,7 +247,10 @@ const ProcessEditPage = (props: Props) => {
       };
 
       fetchData();
-    }, [processId, dialogs, navigate]);
+      // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+      // which would otherwise re-trigger this effect whenever any dialog opens elsewhere.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [processId, navigate]);
 
     useEffect(() => {
       if (!initialData) return;
@@ -438,7 +441,7 @@ const ProcessEditPage = (props: Props) => {
                     size="small"
                     value={newEndpoint}
                     onChange={(e) => setNewEndpoint(e.target.value)}
-                    placeholder="Enter endpoint" 
+                    placeholder="Enter Endpoint URL (ex: http://127.0.0.1:8092/verifier/api/v1)"
                     error={!!errors.endpoints}
                 />
                 <Button 

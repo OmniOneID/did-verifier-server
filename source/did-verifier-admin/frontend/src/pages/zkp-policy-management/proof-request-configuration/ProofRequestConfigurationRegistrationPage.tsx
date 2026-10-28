@@ -288,7 +288,7 @@ const ProofRequestConfigurationRegistrationPage = () => {
           message: 'Completed register Proof Request.',
           isModal: true,
         }, {
-          onClose: async () => navigate('/zkp-policy-management/proof-request-configuration'),
+          onClose: async () => navigate('/opendid/zkp-policy-management/proof-request-configuration'),
         });
       } catch (err) {
         setIsLoading(false);

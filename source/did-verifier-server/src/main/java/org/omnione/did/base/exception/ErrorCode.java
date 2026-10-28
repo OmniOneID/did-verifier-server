@@ -139,6 +139,39 @@ public enum ErrorCode {
     BLOCKCHAIN_GET_ZKP_CREDENTIAL_DEFINITION_FAILED("SSRVVRF01207", "Failed to retrieve ZKP credential definition on the blockchain.", 500),
     CREDENTIAL_SCHEMA_NOT_FOUND("SSRVVRF01208", "Failed to find credential schema : credential schema not found" , 400),
     PROOF_REQUEST_NOT_FOUND("SSRVVRF01209", "Failed to find proof request : proof request not found" , 400),
+
+    // Protocol Routing Errors (1300~1399)
+    UNSUPPORTED_PROTOCOL_TYPE("SSRVVRF01300", "Unsupported protocol type.", 400),
+    PROTOCOL_HANDLER_NOT_FOUND("SSRVVRF01301", "Protocol handler not found for the given protocol type.", 500),
+    FAILED_TO_INITIATE_VERIFICATION("SSRVVRF01302", "Failed to initiate verification.", 500),
+    DCQL_SCOPE_MAPPING_NOT_FOUND("SSRVVRF01303", "DCQL scope mapping not found.", 400),
+    OID4VP_CONFIG_NOT_FOUND("SSRVVRF01304", "OID4VP configuration not found.", 500),
+    OID4VP_INITIATION_FAILED("SSRVVRF01305", "Failed to initiate OID4VP verification.", 500),
+    OID4VP_SESSION_MAPPING_NOT_FOUND("SSRVVRF01306", "OID4VP session mapping not found.", 400),
+    OID4VP_AUTHORIZATION_REQUEST_FAILED("SSRVVRF01307", "Failed to retrieve OID4VP authorization request.", 500),
+    OID4VP_RESPONSE_PROCESSING_FAILED("SSRVVRF01308", "Failed to process OID4VP response.", 500),
+    OID4VP_ENC_KEY_GENERATION_FAILED("SSRVVRF01309", "Failed to generate OID4VP encryption key pair.", 500),
+    OID4VP_ENC_KEY_LOAD_FAILED("SSRVVRF01310", "Failed to load OID4VP encryption private key.", 500),
+    OID4VP_JWE_HEADER_PARSE_FAILED("SSRVVRF01311", "Failed to parse JWE header.", 400),
+    OID4VP_RESPONSE_DECRYPTION_FAILED("SSRVVRF01312", "Failed to decrypt OID4VP JWE response.", 400),
+    OID4VP_ENCRYPTION_ALGORITHM_NOT_SUPPORTED("SSRVVRF01313",
+            "OID4VP encryption alg/enc is fixed and cannot be changed to a different value.", 400),
+    OID4VP_ENCRYPTED_RESPONSE_REQUIRED("SSRVVRF01314",
+            "This session requires an encrypted (direct_post.jwt) response; plaintext submission is not accepted.", 400),
+    OID4VP_RESPONSE_MODE_NOT_SUPPORTED("SSRVVRF01315",
+            "OID4VP responseMode is fixed to direct_post.jwt and cannot be changed to a different value.", 400),
+    OID4VP_MDOC_X5C_NOT_SUPPORTED("SSRVVRF01316",
+            "This verifier only accepts DID-based (kid) mso_mdoc; x5chain-based mdoc is not supported.", 400),
+
+    // Status List Errors (1400~1499)
+    STATUS_LIST_FETCH_FAILED("SSRVVRF01401", "Failed to fetch status list token.", 500),
+    STATUS_LIST_TOKEN_INVALID("SSRVVRF01402", "Status list token validation failed.", 400),
+    STATUS_LIST_CREDENTIAL_INVALID("SSRVVRF01403", "Credential has been revoked.", 400),
+    STATUS_LIST_CREDENTIAL_SUSPENDED("SSRVVRF01404", "Credential is suspended.", 400),
+    STATUS_LIST_INDEX_OUT_OF_BOUNDS("SSRVVRF01405", "Status list index is out of bounds.", 400),
+    STATUS_LIST_CREDENTIAL_RESERVED("SSRVVRF01406", "Credential status is reserved and cannot be treated as valid.", 400),
+
+    // Server Configuration Errors
     SERVER_CONFIG_KEY_NOT_FOUND("SSRVVRF21501", "Server configuration key not found.", 400);
 
 

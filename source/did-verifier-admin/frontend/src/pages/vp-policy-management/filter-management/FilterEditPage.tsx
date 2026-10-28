@@ -62,7 +62,6 @@ interface ErrorState {
     allowedIssuers?: string;
     displayClaims?: string;
     presentAll?: string;
-    errorRequiredClaimsMessage?: string;
     errorAllowedIssuersMessage?: string;
     errorDisplayClaimsMessage?: string;
 }
@@ -197,10 +196,27 @@ const FilterEditPage = (props: Props) => {
         return claims;
     };
 
-    const handleChange = (field: keyof FilterFormData) => 
+    const handleChange = (field: keyof FilterFormData) =>
         (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const newValue = event.target.value;
         setFormData((prev) => ({ ...prev, [field]: newValue }));
+    };
+
+    const handlePresentAllChange = (event: SelectChangeEvent<string>) => {
+        const presentAll = event.target.value === 'true';
+        setFormData((prev) => ({ ...prev, presentAll }));
+    };
+
+    const handleRemoveRequiredClaim = (index: number) => {
+        const newClaims = [...formData.requiredClaims];
+        newClaims.splice(index, 1);
+        setFormData((prev) => ({ ...prev, requiredClaims: newClaims }));
+    };
+
+    const handleRemoveDisplayClaim = (index: number) => {
+        const newClaims = [...formData.displayClaims];
+        newClaims.splice(index, 1);
+        setFormData((prev) => ({ ...prev, displayClaims: newClaims }));
     };
 
     const handleReset = () => {
@@ -221,7 +237,7 @@ const FilterEditPage = (props: Props) => {
     };
 
     const handleCancel = () => {
-        navigate(`/vp-policy-management/filter-management/${id}`);        
+        navigate(`/opendid/vp-policy-management/filter-management/${id}`);        
     };
 
     // Open the schema selector dialog
@@ -283,10 +299,9 @@ const FilterEditPage = (props: Props) => {
         if (!formData.type.trim()) tempErrors.type = "Type is required.";                
 
         // Array validations
-        if (formData.requiredClaims.length === 0) {
-            tempErrors.errorRequiredClaimsMessage = "At least one required claim is needed.";
-        }
-
+        // requiredClaims may be empty — per spec, an unspecified/empty requiredClaims list
+        // means "no required claims", which is a valid state (e.g. presentAll=false with
+        // everything deselected).
         if (formData.allowedIssuers.length === 0) {
             tempErrors.errorAllowedIssuersMessage = "At least one allowed issuer is needed.";
         }
@@ -321,7 +336,7 @@ const FilterEditPage = (props: Props) => {
                     message: 'Filter update completed.',
                     isModal: true,
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/filter-management'),
+                    onClose: async () => navigate('/opendid/vp-policy-management/filter-management'),
                 });
             } catch (error) {
                 setIsLoading(false);
@@ -346,7 +361,7 @@ const FilterEditPage = (props: Props) => {
                     message: 'Invalid Path.', 
                     isModal: true 
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/filter-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/filter-management', { replace: true }),
                 });
                 return;
             }
@@ -355,10 +370,8 @@ const FilterEditPage = (props: Props) => {
 
             try {
                 const { data } = await getFilter(numericFilterId);
-                // Force presentAll to be true regardless of the data from server
-                const modifiedData = { ...data, presentAll: true };
-                setFormData(modifiedData);
-                setInitialData(modifiedData);
+                setFormData(data);
+                setInitialData(data);
                 setIsButtonDisabled(true);
                 setIsLoading(false);
                 
@@ -372,7 +385,13 @@ const FilterEditPage = (props: Props) => {
         };
 
         fetchData();
-    }, [numericFilterId, dialogs, navigate]);
+        // dialogs omitted: @toolpad/core's useDialogs() returns a new object identity whenever
+        // ANY dialog opens/closes anywhere in the app (its internal closeDialog callback depends
+        // on the dialog stack state). Keeping dialogs here re-triggers this effect every time
+        // fetchVcSchemas() shows an error dialog (e.g. TAS unreachable) — an infinite
+        // fetch → error dialog → refetch loop that stacks dialog backdrops (screen goes dark).
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [numericFilterId, navigate]);
 
     useEffect(() => {
         if (!initialData) return;
@@ -550,12 +569,13 @@ const FilterEditPage = (props: Props) => {
 
                     <FormControl fullWidth margin="normal" error={!!errors.presentAll}>
                         <InputLabel>Present All</InputLabel>
-                        <Select 
-                            value="true"
+                        <Select
+                            value={formData.presentAll ? 'true' : 'false'}
                             label="Present All"
-                            disabled
+                            onChange={handlePresentAllChange}
                         >
                             <MenuItem value="true">true</MenuItem>
+                            <MenuItem value="false">false</MenuItem>
                         </Select>
                         {errors.presentAll && <FormHelperText>{errors.presentAll}</FormHelperText>}
                     </FormControl>
@@ -564,23 +584,20 @@ const FilterEditPage = (props: Props) => {
                     <Typography variant="h6" sx={{ mt: 3 }}>Required Claims</Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Claims are automatically loaded when you select a VC schema.
+                        {!formData.presentAll && ' Remove claims to submit a subset.'}
                     </Typography>
-                    {errors.errorRequiredClaimsMessage && (
-                        <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
-                            {errors.errorRequiredClaimsMessage}
-                        </Typography>
-                    )}
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Required Claim</TableCell>
+                                    {!formData.presentAll && <TableCell>Delete</TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.requiredClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell align="center">
+                                        <TableCell colSpan={formData.presentAll ? 1 : 2} align="center">
                                             <Typography variant="body2">No required claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -588,6 +605,13 @@ const FilterEditPage = (props: Props) => {
                                     formData.requiredClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
+                                            {!formData.presentAll && (
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleRemoveRequiredClaim(index)} sx={{ color: '#FF8400' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))
                                 )}
@@ -595,19 +619,20 @@ const FilterEditPage = (props: Props) => {
                         </Table>
                     </TableContainer>
 
-                    {/* Display Claims Section - Now auto-populated but can be deleted separately */}
+                    {/* Display Claims Section - auto-populated, deletable when presentAll is false */}
                     <Typography variant="h6" sx={{ mt: 3 }}>Display Claims</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Display Claim</TableCell>
+                                    {!formData.presentAll && <TableCell>Delete</TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.displayClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell align="center">
+                                        <TableCell colSpan={formData.presentAll ? 1 : 2} align="center">
                                             <Typography variant="body2">No display claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -615,6 +640,13 @@ const FilterEditPage = (props: Props) => {
                                     formData.displayClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
+                                            {!formData.presentAll && (
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleRemoveDisplayClaim(index)} sx={{ color: '#FF8400' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))
                                 )}
@@ -635,7 +667,7 @@ const FilterEditPage = (props: Props) => {
                             size="small"
                             value={newAllowedIssuer}
                             onChange={(e) => setNewAllowedIssuer(e.target.value)}
-                            placeholder="Enter issuer" 
+                            placeholder="Enter Issuer DID (ex: did:omn:issuer)"
                         />
                         <Button 
                             variant="contained" 

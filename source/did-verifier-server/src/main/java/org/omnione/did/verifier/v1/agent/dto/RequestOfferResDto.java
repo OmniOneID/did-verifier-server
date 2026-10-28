@@ -17,7 +17,7 @@
 package org.omnione.did.verifier.v1.agent.dto;
 
 import lombok.*;
-import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
+import org.omnione.did.verifier.v1.model.data.VpOfferPayload;
 
 /**
  * DTO for VP Offer response.
@@ -30,5 +30,5 @@ import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
 @Builder
 public class RequestOfferResDto {
     private String txId;
-    private VerifyOfferPayload payload;
+    private VpOfferPayload payload;
 }

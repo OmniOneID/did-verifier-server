@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 OmniOne.
+ * Copyright 2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package org.omnione.did.verifier.v1.agent.dto;
+package org.omnione.did.verifier.v1.protocol.api.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
-/**
- * The EnrollEntityReqDto class represents the request data for enrolling an entity.
- */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Builder
-public class EnrollEntityReqDto {
+public class InitiateRequest {
+
+    @Schema(example = "policy-oid4vp-demo", description = "Policy ID")
+    @NotBlank(message = "policyId cannot be blank")
+    private String policyId;
 }

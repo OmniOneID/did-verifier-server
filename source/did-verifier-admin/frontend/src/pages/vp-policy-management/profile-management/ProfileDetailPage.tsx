@@ -63,7 +63,7 @@ const ProfileDetailData = (props: Props) => {
                     message: 'Invalid Path.', 
                     isModal: true 
                 },{
-                    onClose: async () => navigate('/vp-policy-management/profile-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/profile-management', { replace: true }),
                 });
                 return;
             }
@@ -322,10 +322,10 @@ const ProfileDetailData = (props: Props) => {
                     </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/profile-management')}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/profile-management')}>
                             Back
                         </Button>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/profile-management/profile-edit/' + id)}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/profile-management/profile-edit/' + id)}>
                             Go to Edit
                         </Button>
                     </Box>

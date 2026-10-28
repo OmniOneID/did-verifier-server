@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- OID4VP JWE response encryption: columns storing the per-transaction ephemeral enc key pair (kid + private key JWK) -->
+    <changeSet id="oid4vp-session-add-enc-key" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="oid4vp_session" columnName="enc_kid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="oid4vp_session">
+            <column name="enc_kid" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="enc_private_key_jwk" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

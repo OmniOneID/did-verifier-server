@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- Add the mso_mdoc format and the verification section to oid4vp_config -->
+    <changeSet id="oid4vp-config-add-mso-mdoc" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP'</sqlCheck>
+        </preConditions>
+        <update tableName="oid4vp_config">
+            <column name="config" value='{"baseUrl":"http://127.0.0.1:8092","clientName":"OpenDID Verifier","invocationScheme":"openid4vp://","clientId":{"scheme":"decentralized_identifier","value":"did:omn:verifier"},"session":{"sessionTtl":300000},"endpoints":{"response":"/oid4vp/response","request":"/oid4vp/request"},"clientMetadata":{"vpFormatsSupported":{"dc+sd-jwt":{},"opendid_vc":{},"mso_mdoc":{"alg_values":["ES256"]}}},"crypto":{"vpTokenEncryptionKey":"PcYKARaqs/LMVoIG3kzTV1BHDDDSJrmNJKn6mOTMhu8="},"verification":{"skipX5cChainValidation":false,"enforceClaimConstraints":false}}' />
+            <where>type = 'OID4VP'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

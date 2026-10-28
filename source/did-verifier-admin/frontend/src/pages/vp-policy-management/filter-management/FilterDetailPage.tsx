@@ -48,7 +48,7 @@ const FilterDetailData = (props: Props) => {
                     message: 'Invalid Path.', 
                     isModal: true 
                 },{
-                    onClose: async () => navigate('/vp-policy-management/filter-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/filter-management', { replace: true }),
                 });
                 return;
             }
@@ -202,10 +202,10 @@ const FilterDetailData = (props: Props) => {
                     </FormControl>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/filter-management')}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/filter-management')}>
                             Back
                         </Button>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/filter-management/filter-edit/' + filterId)}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/filter-management/filter-edit/' + filterId)}>
                             Go to Edit
                         </Button>
                     </Box>

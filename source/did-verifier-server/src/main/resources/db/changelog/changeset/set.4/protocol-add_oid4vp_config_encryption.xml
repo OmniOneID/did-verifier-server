@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- OID4VP JWE response encryption: backfills only the encryption (alg/enc) field into the existing oid4vp_config seed row.
+         Rows that already have an encryption key (e.g. already edited by an administrator) are left untouched.
+         A jsonb merge (||) adds only the encryption key, so all other fields that operators may have customized
+         (baseUrl/clientId/vpTokenEncryptionKey, etc.) keep their current values instead of being reset to defaults. -->
+    <changeSet id="oid4vp-config-add-encryption" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP' AND config NOT LIKE '%"encryption"%'</sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE oid4vp_config
+            SET config = (config::jsonb || '{"encryption":{"alg":"ECDH-ES","enc":"A256GCM"}}'::jsonb)::text
+            WHERE type = 'OID4VP';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -13,11 +13,14 @@ type Props = {}
 
 type VpSubmitRow = {
   id: string | number;
-  vp: string;
-  holderDID: string;
+  vp: string | null;
+  holderDID: string | null;
   transactionId: number;
   txId: string;
   transactionStatus: string;
+  errorCode: string | null;
+  format?: string | null;
+  protocol?: string | null;
   createdAt: string;
 };
 
@@ -180,6 +183,25 @@ const VpHistoryPage = (props: Props) => {
                 ),
               },
               {
+                field: 'protocol',
+                headerName: "Protocol",
+                width: 120,
+                renderCell: (params) => {
+                  const value = params.value as string | null;
+                  return (
+                    <Box sx={{
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      backgroundColor: value === 'OID4VP' ? '#e3f2fd' : value === 'OpenDID' ? '#f3e5f5' : '#f5f5f5',
+                      color: value === 'OID4VP' ? '#1565c0' : value === 'OpenDID' ? '#6a1b9a' : '#9e9e9e',
+                    }}>
+                      {value || '-'}
+                    </Box>
+                  );
+                },
+              },
+              {
                 field: 'txId',
                 headerName: "Transaction ID",
                 width: 200,
@@ -203,6 +225,28 @@ const VpHistoryPage = (props: Props) => {
                 field: 'holderDID',
                 headerName: "Holder DID",
                 width: 250,
+                renderCell: (params) => {
+                  const isEmpty = !params.value;
+                  return (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        color: isEmpty ? '#9e9e9e' : 'inherit',
+                        fontStyle: isEmpty ? 'italic' : 'normal',
+                      }}
+                    >
+                      {params.value || '-'}
+                    </Typography>
+                  );
+                },
+              },
+              {
+                field: 'errorCode',
+                headerName: "Error Code",
+                width: 180,
                 renderCell: (params) => (
                   <Typography
                     variant="body2"
@@ -210,13 +254,37 @@ const VpHistoryPage = (props: Props) => {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      color: params.value === 'N/A' ? '#9e9e9e' : 'inherit',
-                      fontStyle: params.value === 'N/A' ? 'italic' : 'normal',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      color: params.value ? '#c62828' : '#9e9e9e',
                     }}
                   >
-                    {params.value || 'N/A'}
+                    {params.value || '-'}
                   </Typography>
                 ),
+              },
+              {
+                field: 'format',
+                headerName: "Format",
+                width: 140,
+                renderCell: (params) => {
+                  const value = params.value as string | null;
+                  return (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontFamily: 'monospace',
+                        fontSize: '12px',
+                        color: value ? '#1565c0' : '#9e9e9e',
+                      }}
+                    >
+                      {value || '-'}
+                    </Typography>
+                  );
+                },
               },
               {
                 field: 'createdAt',

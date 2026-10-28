@@ -7,7 +7,7 @@ const VpPolicyManagementPage = (props: Props) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-      navigate('vp-policy-management/service-management');
+      navigate('/opendid/vp-policy-management/service-management');
     }, [navigate]);
   
     return null;

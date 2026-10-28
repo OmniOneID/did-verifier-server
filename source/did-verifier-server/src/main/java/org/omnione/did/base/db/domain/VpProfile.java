@@ -40,7 +40,7 @@ public class VpProfile extends BaseEntity implements Serializable {
     private Long id;
     @Column(name = "profile_id", nullable = false, length = 40)
     private String profileId;
-    @Column(name = "vp_profile", nullable = false)
+    @Column(name = "vp_profile", nullable = false, length = 4000)
     private String vpProfile;
     @Column(name = "transaction_id", nullable = false)
     private Long transactionId;

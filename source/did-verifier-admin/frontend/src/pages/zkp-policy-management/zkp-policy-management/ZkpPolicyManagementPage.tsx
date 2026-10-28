@@ -164,7 +164,7 @@ const ZkpPolicyManagementPage = (props: Props) => {
                 <Link
                   component="button"
                   variant='body2'
-                  onClick={() => navigate(`/zkp-policy-management/zkp-policy-management/${params.row.id}`)}
+                  onClick={() => navigate(`/opendid/zkp-policy-management/zkp-policy-management/${params.row.id}`)}
                   sx={{ cursor: 'pointer', color: 'primary.main' }}
                 >
                   {params.value}
@@ -200,10 +200,10 @@ const ZkpPolicyManagementPage = (props: Props) => {
           onRefresh={getData}
           onEdit={() => {
             if (selectedRowData) {
-              navigate(`/zkp-policy-management/zkp-policy-management/zkp-policy-edit/${selectedRowData.id}`);
+              navigate(`/opendid/zkp-policy-management/zkp-policy-management/zkp-policy-edit/${selectedRowData.id}`);
             }
           }}
-          onRegister={() => navigate('/zkp-policy-management/zkp-policy-management/zkp-policy-registration')}
+          onRegister={() => navigate('/opendid/zkp-policy-management/zkp-policy-management/zkp-policy-registration')}
           onDelete={handleDelete}
           additionalButtons={[]}
           paginationMode="server"

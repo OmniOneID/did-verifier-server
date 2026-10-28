@@ -52,13 +52,4 @@ public class ZkpPolicy extends BaseEntity implements Serializable {
 
     @Column(name = "profile_id", nullable = false, length = 40)
     private String profileId;
-
-
-    //@ManyToOne
-    //@JoinColumn(name = "payload_id", referencedColumnName = "payload_id", insertable = false, updatable = false)
-    //private Payload payload;
-
-    //@ManyToOne
-    //@JoinColumn(name = "profile_id", referencedColumnName = "zkp_profile_id", insertable = false, updatable = false)
-    //private ZkpPolicyProfile zkpPolicyProfile;
 }

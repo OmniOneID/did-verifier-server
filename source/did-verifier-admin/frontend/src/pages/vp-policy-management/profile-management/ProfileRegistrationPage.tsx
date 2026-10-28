@@ -154,7 +154,10 @@ const ProfileRegistration = (props: Props) => {
       };
       
       loadVerifierData();
-    }, [dialogs]); 
+      // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+      // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     
     useEffect(() => {
         const isModified = 
@@ -227,7 +230,10 @@ const ProfileRegistration = (props: Props) => {
       };
       
       loadInitialData();
-    }, [dialogs]);
+      // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+      // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     
     // Process 검색 함수
     const handleProcessSearch = async (searchTerm?: string) => {
@@ -472,7 +478,7 @@ const ProfileRegistration = (props: Props) => {
                 message: 'Profile has been created successfully.', 
                 isModal: true 
             }, {
-                onClose: async () => navigate('/vp-policy-management/profile-management', { replace: true }),
+                onClose: async () => navigate('/opendid/vp-policy-management/profile-management', { replace: true }),
             });
         } catch (err) {
             console.error('Failed to create profile:', err);
@@ -837,7 +843,7 @@ const ProfileRegistration = (props: Props) => {
                         <Button 
                             variant="outlined" 
                             color="secondary" 
-                            onClick={() => navigate('/vp-policy-management/profile-management')}
+                            onClick={() => navigate('/opendid/vp-policy-management/profile-management')}
                         >
                             Cancel
                         </Button>

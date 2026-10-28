@@ -22,6 +22,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.QPolicy;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,32 @@ public class PolicyRepositoryAdminImpl implements PolicyRepositoryAdmin {
         QPolicy qPolicy = QPolicy.policy;
 
         BooleanExpression predicate = buildPredicate(searchKey, searchValue, policyType);
+
+        long total = queryFactory
+                .select(qPolicy.count())
+                .from(qPolicy)
+                .where(predicate)
+                .fetchOne();
+
+        List<Policy> results = queryFactory
+                .selectFrom(qPolicy)
+                .where(predicate)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifier(pageable, qPolicy))
+                .fetch();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public Page<Policy> searchPolicyList(String searchKey, String searchValue, PolicyType policyType, ProtocolType protocolType, Pageable pageable) {
+        QPolicy qPolicy = QPolicy.policy;
+
+        BooleanExpression predicate = buildPredicate(searchKey, searchValue, policyType);
+        if (protocolType != null) {
+            predicate = predicate.and(qPolicy.protocolType.eq(protocolType));
+        }
 
         long total = queryFactory
                 .select(qPolicy.count())

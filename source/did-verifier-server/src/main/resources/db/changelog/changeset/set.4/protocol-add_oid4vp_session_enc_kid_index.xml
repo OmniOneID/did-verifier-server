@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- Add an index on enc_kid for lookups by findByEncKid -->
+    <changeSet id="oid4vp-session-add-enc-kid-index" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="oid4vp_session" indexName="idx_oid4vp_session_enc_kid"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="oid4vp_session" indexName="idx_oid4vp_session_enc_kid">
+            <column name="enc_kid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

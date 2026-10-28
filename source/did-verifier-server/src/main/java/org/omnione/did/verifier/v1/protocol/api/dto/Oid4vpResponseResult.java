@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 OmniOne.
+ * Copyright 2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package org.omnione.did.verifier.v1.agent.dto;
+package org.omnione.did.verifier.v1.protocol.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
-/**
- * DTO for DID Document response.
- *
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
-public class DidDocResDto {
-    String didDoc;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Oid4vpResponseResult {
+
+    private String sessionId;
+
+    private String status;
+
+    private String error;
+
+    private String errorDescription;
 }

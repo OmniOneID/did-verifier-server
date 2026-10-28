@@ -1,0 +1,29 @@
+/*
+ * Copyright 2026 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.omnione.did.base.db.repository;
+
+import org.omnione.did.base.db.domain.Oid4vpSession;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface Oid4vpSessionJpaRepository extends JpaRepository<Oid4vpSession, Long> {
+    Optional<Oid4vpSession> findByState(String state);
+    Optional<Oid4vpSession> findByRequestId(String requestId);
+    Optional<Oid4vpSession> findByTransactionId(String transactionId);
+    Optional<Oid4vpSession> findByEncKid(String encKid);
+}

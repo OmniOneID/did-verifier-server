@@ -125,7 +125,7 @@ const ProfileEdit = (props: Props) => {
                     message: 'Invalid profile ID.', 
                     isModal: true 
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/profile-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/profile-management', { replace: true }),
                 });
                 return;
             }
@@ -205,13 +205,16 @@ const ProfileEdit = (props: Props) => {
                     message: `Failed to fetch profile information: ${err}`, 
                     isModal: true 
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/profile-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/profile-management', { replace: true }),
                 });
             }
         };
 
         fetchProfileData();
-    }, [profileId, dialogs, navigate]);
+        // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+        // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [profileId, navigate]);
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -265,7 +268,10 @@ const ProfileEdit = (props: Props) => {
       };
       
       loadInitialData();
-    }, [dialogs]);
+      // dialogs omitted: useDialogs() returns a new ref on every dialog open/close app-wide,
+      // so keeping it here would re-trigger this effect each time dialogs.open() fires on error.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     
     // Check if form data has been modified compared to original data
     useEffect(() => {
@@ -510,7 +516,7 @@ const ProfileEdit = (props: Props) => {
     };
     
     const handleCancel = () => {
-        navigate(`/vp-policy-management/profile-management/${profileId}`);
+        navigate(`/opendid/vp-policy-management/profile-management/${profileId}`);
         
     };
     
@@ -581,7 +587,7 @@ const ProfileEdit = (props: Props) => {
                 message: 'Profile has been updated successfully.', 
                 isModal: true 
             }, {
-                onClose: async () => navigate(`/vp-policy-management/profile-management/${profileId}`, { replace: true }),
+                onClose: async () => navigate(`/opendid/vp-policy-management/profile-management/${profileId}`, { replace: true }),
             });
         } catch (err) {
             console.error('Failed to update profile:', err);

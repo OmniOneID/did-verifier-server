@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+  <changeSet id="protocol-create-oid4vp-session" author="omnione">
+    <preConditions onFail="MARK_RAN">
+      <not><tableExists tableName="oid4vp_session"/></not>
+    </preConditions>
+
+    <createTable tableName="oid4vp_session">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="transaction_id" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="state" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="nonce" type="varchar(200)"/>
+      <column name="dcql_query" type="text"/>
+      <column name="response_mode" type="varchar(50)"/>
+      <column name="request_id" type="varchar(100)"/>
+      <column name="status" type="varchar(30)" defaultValue="CREATED">
+        <constraints nullable="false"/>
+      </column>
+      <column name="client_metadata" type="text"/>
+      <column name="request_uri_fetched_at" type="bigint"/>
+      <column name="vp_token" type="text"/>
+      <column name="created_at" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="expires_at" type="bigint"/>
+      <column name="updated_at" type="bigint"/>
+    </createTable>
+
+    <createIndex tableName="oid4vp_session" indexName="idx_oid4vp_session_state" unique="true">
+      <column name="state"/>
+    </createIndex>
+    <createIndex tableName="oid4vp_session" indexName="idx_oid4vp_session_transaction_id">
+      <column name="transaction_id"/>
+    </createIndex>
+    <createIndex tableName="oid4vp_session" indexName="idx_oid4vp_session_request_id">
+      <column name="request_id"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

@@ -134,7 +134,7 @@ const handleSubmit = async () => {
         message: 'ZKP Profile registration completed.',
         isModal: true,
       }, {
-        onClose: async () => navigate('/zkp-policy-management/zkp-profile-management'),
+        onClose: async () => navigate('/opendid/zkp-policy-management/zkp-profile-management'),
       });
     } catch (error) {
       dialogs.open(CustomDialog, {

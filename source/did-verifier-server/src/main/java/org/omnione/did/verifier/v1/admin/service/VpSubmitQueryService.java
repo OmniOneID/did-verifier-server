@@ -1,6 +1,7 @@
 package org.omnione.did.verifier.v1.admin.service;
 
 import lombok.RequiredArgsConstructor;
+import org.omnione.did.base.db.constant.TransactionType;
 import org.omnione.did.base.db.domain.VpSubmit;
 import org.omnione.did.base.db.repository.TransactionRepository;
 import org.omnione.did.base.db.repository.VpSubmitRepository;
@@ -31,29 +32,26 @@ public class VpSubmitQueryService {
         return new PageImpl<>(vpSubmitDtos, pageable, vpSubmitPage.getTotalElements());
     }
     public VpSubmitDTO convertVpSubmitDTO(VpSubmit vpSubmit) {
-
-        String holderDID = vpSubmit.getHolderDid();
-        
-        // If holderDid is null, it means this is a failed/pending transaction
-        if (holderDID == null) {
-            holderDID = "N/A"; // or could be "Not Available" or "-"
-        }
-
         org.omnione.did.base.db.domain.Transaction transaction = transactionRepository.findById(vpSubmit.getTransactionId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.TRANSACTION_NOT_FOUND));
 
-        String transactionStatus = transaction.getStatus().toString();
-        String txId = transaction.getTxId(); // 실제 트랜잭션 ID 가져오기
-
         return VpSubmitDTO.builder()
                 .id(vpSubmit.getId())
-                .vp(vpSubmit.getVp()) // This can be null for failed/pending transactions
-                .holderDID(holderDID)
+                .vp(vpSubmit.getVp())
+                .holderDID(vpSubmit.getHolderDid())
                 .transactionId(vpSubmit.getTransactionId())
-                .txId(txId) // 실제 트랜잭션 ID 추가
-                .transactionStatus(transactionStatus)
+                .txId(transaction.getTxId())
+                .transactionStatus(transaction.getStatus().toString())
+                .errorCode(vpSubmit.getErrorCode())
+                .format(vpSubmit.getFormat())
+                .protocol(resolveProtocol(transaction.getType()))
                 .createdAt(VpSubmitDTO.formatInstant(vpSubmit.getCreatedAt(),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
+    }
+
+    /** Converts transaction.type into the protocol name shown to users. */
+    private String resolveProtocol(TransactionType type) {
+        return type == TransactionType.OID4VP ? "OID4VP" : "OpenDID";
     }
 }

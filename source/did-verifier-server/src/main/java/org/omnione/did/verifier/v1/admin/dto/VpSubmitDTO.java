@@ -22,6 +22,10 @@ public class VpSubmitDTO {
     private Long transactionId;
     private String txId;
     private String transactionStatus;
+    private String errorCode;
+    private String format;
+    /** Submission protocol, derived from transaction.type: "OID4VP" | "OpenDID" */
+    private String protocol;
     private String createdAt;
 
     public VpSubmitDTO Builder() {

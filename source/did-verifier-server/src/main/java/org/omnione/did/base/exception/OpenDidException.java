@@ -39,6 +39,17 @@ public class OpenDidException extends RuntimeException {
     }
 
     /**
+     * Constructs a new OpenDidException with the specified error code and root cause.
+     *
+     * @param errorCode The ErrorCode enum value representing the specific error.
+     * @param cause The underlying exception that caused this error.
+     */
+    public OpenDidException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
+    }
+
+    /**
      * Constructs a new OpenDidException with the specified error response.
      *
      * @param errorResponse The ErrorResponse object representing the specific error.

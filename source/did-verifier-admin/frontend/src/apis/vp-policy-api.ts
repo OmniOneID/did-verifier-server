@@ -6,6 +6,7 @@ export const fetchPolicies = async (page: number, size: number, searchKey: strin
     const params = new URLSearchParams({
         page: page.toString(),
         size: size.toString(),
+        protocolType: "DID_VP",
     });
 
     if (searchKey && searchValue) {

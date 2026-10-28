@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
 import org.omnione.did.verifier.v1.admin.service.PolicyService;
 import org.springframework.data.domain.Page;
@@ -30,7 +31,12 @@ public class PolicyController {
 
     @Operation(summary = "Get Policy List", description = "Get a list of policies by title (optional).")
     @GetMapping(UrlConstant.Verifier.GET_POLICY_LIST)
-    public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, @RequestParam(defaultValue = "VP") PolicyType policyType) {
+    public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable,
+            @RequestParam(defaultValue = "VP") PolicyType policyType,
+            @RequestParam(required = false) ProtocolType protocolType) {
+        if (protocolType != null) {
+            return policyService.searchPolicyList(searchKey, searchValue, pageable, policyType, protocolType);
+        }
         return policyService.searchPolicyList(searchKey, searchValue, pageable, policyType);
     }
 

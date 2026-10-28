@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- The issuer also issues SD-JWT credentials in the dc+sd-jwt-did format, so dc+sd-jwt-did is added to
+         client_metadata.vpFormatsSupported to advertise to wallets that this format is accepted as well.
+         jsonb_set backfills only that key and preserves all other fields such as baseUrl/crypto/existing formats
+         (for the same reason as the oid4vp-config-add-encryption changeset: the whole config is not overwritten with a literal). -->
+    <changeSet id="oid4vp-config-add-sdjwt-did-format" author="jhkim6557">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT COUNT(*) FROM oid4vp_config WHERE type = 'OID4VP' AND config NOT LIKE '%dc+sd-jwt-did%'</sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE oid4vp_config
+            SET config = jsonb_set(
+                config::jsonb,
+                '{clientMetadata,vpFormatsSupported,dc+sd-jwt-did}',
+                '{}'::jsonb,
+                true
+            )::text
+            WHERE type = 'OID4VP';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

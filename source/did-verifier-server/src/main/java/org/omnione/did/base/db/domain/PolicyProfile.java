@@ -35,7 +35,7 @@ public class PolicyProfile extends BaseEntity implements Serializable {
     private String format;
     @Column(name = "link", nullable = false, length = 40)
     private String link;
-    @Column(name = "value", nullable = false)
+    @Column(name = "\"value\"", nullable = false)
     private String value;
     @Column(name = "process_id", nullable = false)
     private Long processId;

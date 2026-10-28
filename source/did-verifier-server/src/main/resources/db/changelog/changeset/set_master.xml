@@ -33,5 +33,20 @@
   <include file="set.4/alter-table_admin_add_password_fields.xml" relativeToChangelogFile="true"/>
   <include file="set.4/update-password_reset_reason_admin.xml" relativeToChangelogFile="true"/>
   <include file="set.5/add-publishedCertificateUrl-column_verifier.xml" relativeToChangelogFile="true"/>
+  <include file="set.3/protocol-add_protocol_type.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-create_oid4vp_config.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-create_dcql_scope_mapping.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-create_oid4vp_session_mapping.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-seed_oid4vp_config.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-create_oid4vp_session.xml" relativeToChangelogFile="true" />
+  <include file="set.3/protocol-alter_vp_submit_for_audit.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-alter_vp_submit_for_mdoc.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-update_oid4vp_config_for_mdoc.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-add_scope_mapping_client_id_scheme.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-add_oid4vp_session_enc_key.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-add_oid4vp_session_enc_kid_index.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-add_oid4vp_config_encryption.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-add_oid4vp_config_sdjwt_did_format.xml" relativeToChangelogFile="true" />
+  <include file="set.4/protocol-align_oid4vp_config_vp_formats.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

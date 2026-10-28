@@ -23,9 +23,16 @@ import java.util.HashMap;
 
 
 /**
- * Verifier service interface for handling Verifiable Presentations (VPs) and user verification
+ * Application Verifier Service Interface
+ * 
+ * NOTE: Named ApplicationVerifierService to avoid a name clash with the SDK VerifierService.
+ * 
+ * Service interface for application-specific logic:
+ * - VP submission handling
+ * - User verification
+ * - Transaction management, etc.
  */
-public interface VerifierService {
+public interface ApplicationVerifierService {
 
     /**
      * Requests a VP offer via QR code.

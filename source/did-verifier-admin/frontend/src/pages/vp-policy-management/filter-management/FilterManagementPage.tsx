@@ -172,7 +172,7 @@ const FilterManagementPage = (props: Props) => {
                 <Link
                   component="button"
                   variant="body2"
-                  onClick={() => navigate(`/vp-policy-management/filter-management/${params.row.filterId}`)}
+                  onClick={() => navigate(`/opendid/vp-policy-management/filter-management/${params.row.filterId}`)}
                   sx={{ cursor: 'pointer', color: 'primary.main' }}
                 >
                   {params.value}
@@ -204,10 +204,10 @@ const FilterManagementPage = (props: Props) => {
           onRefresh={getData}
           onEdit={() => {
             if (selectedRowData) {
-              navigate(`/vp-policy-management/filter-management/filter-edit/${selectedRowData.filterId}`);
+              navigate(`/opendid/vp-policy-management/filter-management/filter-edit/${selectedRowData.filterId}`);
             }
           }}
-          onRegister={() => navigate('/vp-policy-management/filter-management/filter-registration')}
+          onRegister={() => navigate('/opendid/vp-policy-management/filter-management/filter-registration')}
           onDelete={handleDelete}
           additionalButtons={[]}
           paginationMode="server"

@@ -57,7 +57,6 @@ interface ErrorState {
     allowedIssuers?: string;
     displayClaims?: string;
     presentAll?: string;
-    errorRequiredClaimsMessage?: string;
     errorAllowedIssuersMessage?: string;
     errorDisplayClaimsMessage?: string;
 }
@@ -185,10 +184,27 @@ const FilterRegistrationPage = (props: Props) => {
         return claims;
     };
 
-    const handleChange = (field: keyof FilterFormData) => 
+    const handleChange = (field: keyof FilterFormData) =>
         (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const newValue = event.target.value;
         setFormData((prev) => ({ ...prev, [field]: newValue }));
+    };
+
+    const handlePresentAllChange = (event: SelectChangeEvent<string>) => {
+        const presentAll = event.target.value === 'true';
+        setFormData((prev) => ({ ...prev, presentAll }));
+    };
+
+    const handleRemoveRequiredClaim = (index: number) => {
+        const newClaims = [...formData.requiredClaims];
+        newClaims.splice(index, 1);
+        setFormData((prev) => ({ ...prev, requiredClaims: newClaims }));
+    };
+
+    const handleRemoveDisplayClaim = (index: number) => {
+        const newClaims = [...formData.displayClaims];
+        newClaims.splice(index, 1);
+        setFormData((prev) => ({ ...prev, displayClaims: newClaims }));
     };
 
     const handleReset = () => {
@@ -267,10 +283,9 @@ const FilterRegistrationPage = (props: Props) => {
         if (!formData.type.trim()) tempErrors.type = "Type is required.";                
 
         // Array validations
-        if (formData.requiredClaims.length === 0) {
-            tempErrors.errorRequiredClaimsMessage = "At least one required claim is needed.";
-        }
-
+        // requiredClaims may be empty — per spec, an unspecified/empty requiredClaims list
+        // means "no required claims", which is a valid state (e.g. presentAll=false with
+        // everything deselected).
         if (formData.allowedIssuers.length === 0) {
             tempErrors.errorAllowedIssuersMessage = "At least one allowed issuer is needed.";
         }
@@ -302,7 +317,7 @@ const FilterRegistrationPage = (props: Props) => {
                     message: 'Filter registration completed.',
                     isModal: true,
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/filter-management'),
+                    onClose: async () => navigate('/opendid/vp-policy-management/filter-management'),
                 });
             } catch (error) {
                 setIsLoading(false);
@@ -494,12 +509,13 @@ const FilterRegistrationPage = (props: Props) => {
 
                     <FormControl fullWidth margin="normal" error={!!errors.presentAll}>
                         <InputLabel>Present All</InputLabel>
-                        <Select 
-                            value="true"
+                        <Select
+                            value={formData.presentAll ? 'true' : 'false'}
                             label="Present All"
-                            disabled
+                            onChange={handlePresentAllChange}
                         >
                             <MenuItem value="true">true</MenuItem>
+                            <MenuItem value="false">false</MenuItem>
                         </Select>
                         {errors.presentAll && <FormHelperText>{errors.presentAll}</FormHelperText>}
                     </FormControl>
@@ -508,23 +524,20 @@ const FilterRegistrationPage = (props: Props) => {
                     <Typography variant="h6" sx={{ mt: 3 }}>Required Claims</Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Claims are automatically loaded when you select a VC schema.
+                        {!formData.presentAll && ' Remove claims to submit a subset.'}
                     </Typography>
-                    {errors.errorRequiredClaimsMessage && (
-                        <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
-                            {errors.errorRequiredClaimsMessage}
-                        </Typography>
-                    )}
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Required Claim</TableCell>
+                                    {!formData.presentAll && <TableCell>Delete</TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.requiredClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell align="center">
+                                        <TableCell colSpan={formData.presentAll ? 1 : 2} align="center">
                                             <Typography variant="body2">No required claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -532,6 +545,13 @@ const FilterRegistrationPage = (props: Props) => {
                                     formData.requiredClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
+                                            {!formData.presentAll && (
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleRemoveRequiredClaim(index)} sx={{ color: '#FF8400' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))
                                 )}
@@ -539,19 +559,20 @@ const FilterRegistrationPage = (props: Props) => {
                         </Table>
                     </TableContainer>
 
-                    {/* Display Claims Section - Now auto-populated but can be deleted separately */}
+                    {/* Display Claims Section - auto-populated, deletable when presentAll is false */}
                     <Typography variant="h6" sx={{ mt: 3 }}>Display Claims</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow sx={{backgroundColor: "#f5f5f5"}}>
                                     <TableCell>Display Claim</TableCell>
+                                    {!formData.presentAll && <TableCell>Delete</TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {formData.displayClaims.length === 0 ? (
                                     <TableRow>
-                                        <TableCell align="center">
+                                        <TableCell colSpan={formData.presentAll ? 1 : 2} align="center">
                                             <Typography variant="body2">No display claims added</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -559,6 +580,13 @@ const FilterRegistrationPage = (props: Props) => {
                                     formData.displayClaims.map((claim, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{claim}</TableCell>
+                                            {!formData.presentAll && (
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleRemoveDisplayClaim(index)} sx={{ color: '#FF8400' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))
                                 )}
@@ -579,7 +607,7 @@ const FilterRegistrationPage = (props: Props) => {
                             size="small"
                             value={newAllowedIssuer}
                             onChange={(e) => setNewAllowedIssuer(e.target.value)}
-                            placeholder="Enter issuer" 
+                            placeholder="Enter Issuer DID (ex: did:omn:issuer)"
                         />
                         <Button 
                             variant="contained" 
@@ -624,7 +652,7 @@ const FilterRegistrationPage = (props: Props) => {
                     <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
                         <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Register</Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/filter-management')}>
+                        <Button variant="outlined" color="secondary" onClick={() => navigate('/opendid/vp-policy-management/filter-management')}>
                             Cancel
                         </Button> 
                     </Box>

@@ -16,7 +16,13 @@
 
 package org.omnione.did.base.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 
 /**
  * The WebConfig class provides configuration for web settings in the application.
@@ -25,4 +31,24 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class WebConfig {
+
+    private static final int CONNECT_TIMEOUT_MS = 3000;
+    private static final int READ_TIMEOUT_MS = 5000;
+
+    @Bean
+    public RestTemplate restTemplate() {
+        // Used to call external hosts (e.g. Status List Token issuers), so timeouts and no redirect
+        // following are the defaults. This keeps an unresponsive host from holding a request thread
+        // indefinitely and prevents a 3xx response from redirecting the call to another host (SSRF).
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory() {
+            @Override
+            protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+                super.prepareConnection(connection, httpMethod);
+                connection.setInstanceFollowRedirects(false);
+            }
+        };
+        factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        factory.setReadTimeout(READ_TIMEOUT_MS);
+        return new RestTemplate(factory);
+    }
 }

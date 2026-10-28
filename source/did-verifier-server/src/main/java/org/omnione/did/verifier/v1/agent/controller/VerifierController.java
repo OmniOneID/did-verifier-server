@@ -22,7 +22,7 @@ import org.omnione.did.base.constants.UrlConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.verifier.v1.agent.dto.*;
-import org.omnione.did.verifier.v1.agent.service.VerifierService;
+import org.omnione.did.verifier.v1.agent.service.ApplicationVerifierService;
 
 import org.omnione.did.zkp.datamodel.util.GsonWrapper;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = UrlConstant.Verifier.V1)
 public class VerifierController {
-    private final VerifierService verifierService;
+    private final ApplicationVerifierService verifierService;
 
     /**
      * Requests a VP Offer QR code.

@@ -1,8 +1,8 @@
 package org.omnione.did.verifier.v1.admin.dto;
 
 import lombok.*;
-import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.base.db.domain.Policy;
 
 import java.time.Instant;
@@ -29,6 +29,8 @@ public class PolicyDTO {
     private String profileTitle;
     private String createdAt;
     private PolicyType policyType;
+    private ProtocolType protocolType;
+    private String scope;
 
 
     public static PolicyDTO toDTO(Policy policy) {
@@ -40,6 +42,8 @@ public class PolicyDTO {
                 .policyProfileId(policy.getPolicyProfileId())
                 .policyTitle(policy.getPolicyTitle())
                 .policyType(policy.getPolicyType())
+                .protocolType(policy.getProtocolType())
+                .scope(policy.getScope())
                 .createdAt(formatInstant(policy.getCreatedAt(), formatter))
                 .build();
     }
@@ -53,6 +57,8 @@ public class PolicyDTO {
                 .policyProfileId(policy.getPolicyProfileId())
                 .policyTitle(policy.getPolicyTitle())
                 .policyType(policy.getPolicyType())
+                .protocolType(policy.getProtocolType())
+                .scope(policy.getScope())
                 .payloadService(payloadService)
                 .profileTitle(profileTitle)
                 .createdAt(formatInstant(policy.getCreatedAt(), formatter))

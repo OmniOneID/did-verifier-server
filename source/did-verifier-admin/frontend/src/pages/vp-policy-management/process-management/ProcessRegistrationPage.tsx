@@ -185,7 +185,7 @@ const ProcessRegistrationPage = (props: Props) => {
                     message: 'Process registration completed.',
                     isModal: true,
                 }, {
-                    onClose: async () => navigate('/vp-policy-management/process-management'),
+                    onClose: async () => navigate('/opendid/vp-policy-management/process-management'),
                 });
             } catch (error) {
                 setIsLoading(false);
@@ -392,7 +392,7 @@ const ProcessRegistrationPage = (props: Props) => {
                             size="small"
                             value={newEndpoint}
                             onChange={(e) => setNewEndpoint(e.target.value)}
-                            placeholder="Enter endpoint" 
+                            placeholder="Enter Endpoint URL (ex: http://127.0.0.1:8092/verifier/api/v1)"
                             error={!!errors.endpoints}
                         />
                         <Button 
@@ -440,7 +440,7 @@ const ProcessRegistrationPage = (props: Props) => {
                     <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
                         <Button variant="contained" color="primary" disabled={isButtonDisabled} onClick={handleSubmit}>Register</Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/process-management')}>
+                        <Button variant="outlined" color="secondary" onClick={() => navigate('/opendid/vp-policy-management/process-management')}>
                             Cancel
                         </Button>
                         

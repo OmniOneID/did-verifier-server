@@ -1,5 +1,6 @@
 package org.omnione.did.base.db.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.omnione.did.base.db.converter.StringListConverter;
@@ -35,8 +36,9 @@ public class VpFilter extends BaseEntity implements Serializable {
     @Convert(converter = StringListConverter.class)
     @Column(name = "display_claims")
     private List<String> displayClaims;
-    @Column(name = "value", length = 2000)
+    @Column(name = "\"value\"", length = 2000)
     private String value;
+    @JsonProperty("presentAll")  // Serialized by Jackson under the "presentAll" key
     @Column(name = "present_all", nullable = false)
     private boolean present_all;
 

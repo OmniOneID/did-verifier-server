@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="create-oid4vp-session-mapping" author="jhkim6557">
+
+        <createTable tableName="oid4vp_session_mapping">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+
+            <column name="tx_id" type="varchar(40)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="oid4vp_transaction_id" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="oid4vp_request_id" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="state" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createIndex tableName="oid4vp_session_mapping" indexName="idx_oid4vp_mapping_tx_id">
+            <column name="tx_id" />
+        </createIndex>
+
+        <createIndex tableName="oid4vp_session_mapping" indexName="idx_oid4vp_mapping_state">
+            <column name="state" />
+        </createIndex>
+
+        <createIndex tableName="oid4vp_session_mapping" indexName="idx_oid4vp_mapping_request_id">
+            <column name="oid4vp_request_id" />
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

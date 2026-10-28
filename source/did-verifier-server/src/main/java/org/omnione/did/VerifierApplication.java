@@ -17,12 +17,24 @@
 package org.omnione.did;
 
 import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.oid4vc.formatter.oid4vp.verifier.impl.MDocVPVerifier;
+import org.omnione.did.oid4vc.formatter.oid4vp.verifier.impl.OpenDIDVPVerifier;
+import org.omnione.did.oid4vc.formatter.oid4vp.verifier.impl.SDJWTVPVerifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
+@ComponentScan(
+    basePackages = "org.omnione.did",
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = {OpenDIDVPVerifier.class, SDJWTVPVerifier.class, MDocVPVerifier.class}
+    )
+)
 @Slf4j
 public class VerifierApplication {
 

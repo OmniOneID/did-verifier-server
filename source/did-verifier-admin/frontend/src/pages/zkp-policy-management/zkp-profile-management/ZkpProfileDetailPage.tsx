@@ -165,7 +165,7 @@ const ZkpProfileDetailPage = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
               <Button variant="outlined" onClick={() => navigate(-1)}>Back</Button>
-              <Button variant="outlined" color="primary" onClick={() => navigate('/zkp-policy-management/zkp-profile-management/profile-edit/' + id)}>
+              <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/zkp-policy-management/zkp-profile-management/profile-edit/' + id)}>
                   Go to Edit
               </Button>
             </Box>

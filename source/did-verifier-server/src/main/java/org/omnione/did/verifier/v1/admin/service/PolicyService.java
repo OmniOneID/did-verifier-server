@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
@@ -41,6 +42,7 @@ import org.omnione.did.base.db.repository.ZkpProofRequestRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.verifier.v1.admin.dto.PolicyDTO;
+import org.omnione.did.verifier.v1.common.PolicyCacheService;
 import org.omnione.did.verifier.v1.admin.dto.VpSubmitDTO;
 import org.omnione.did.verifier.v1.agent.helper.PublishCertificateHelper;
 import org.springframework.data.domain.Page;
@@ -73,6 +75,7 @@ public class PolicyService {
     private final PolicyProfileRepository policyProfileRepository;
     private final PolicyQueryService policyQueryService;
     private final ZkpPolicyProfileRepository zkpPolicyProfileRepository;
+    private final PolicyCacheService policyCacheService;
     private final VpFilterRepository vpFilterRepository;
     private final VpProcessRepository vpProcessRepository;
     private final VerifierInfoQueryService verifierInfoQueryService;
@@ -86,25 +89,37 @@ public class PolicyService {
 
 
     public void savePolicy(PolicyDTO policyDTO, PolicyType policyType) {
+        ProtocolType protocolType = policyDTO.getProtocolType() != null
+                ? policyDTO.getProtocolType() : ProtocolType.DID_VP;
+
         Policy policy = Policy.builder()
                 .policyId(UUID.randomUUID().toString())
                 .payloadId(policyDTO.getPayloadId())
                 .policyProfileId(policyDTO.getPolicyProfileId())
                 .policyTitle(policyDTO.getPolicyTitle())
                 .policyType(policyType)
+                .protocolType(protocolType)
+                .scope(policyDTO.getScope())
                 .build();
 
         policyRepository.save(policy);
+        policyCacheService.evictAll();
     }
 
 
     public PolicyDTO updatePolicy(PolicyDTO policyDTO) {
         Policy findPolicy = policyRepository.findById(policyDTO.getId())
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
-            findPolicy.setPayloadId(policyDTO.getPayloadId());
-            findPolicy.setPolicyProfileId(policyDTO.getPolicyProfileId());
+            if (policyDTO.getPayloadId() != null) {
+                findPolicy.setPayloadId(policyDTO.getPayloadId());
+            }
+            if (policyDTO.getPolicyProfileId() != null) {
+                findPolicy.setPolicyProfileId(policyDTO.getPolicyProfileId());
+            }
             findPolicy.setPolicyTitle(policyDTO.getPolicyTitle());
+            findPolicy.setScope(policyDTO.getScope());
             Policy savedPolicy = policyRepository.save(findPolicy);
+            policyCacheService.evictAll();
             return PolicyDTO.toDTO(savedPolicy);
     }
 
@@ -112,6 +127,7 @@ public class PolicyService {
         Policy policy = policyRepository.findById(id)
                 .orElseThrow(() -> new OpenDidException(ErrorCode.VP_POLICY_PROFILE_NOT_FOUND));
         policyRepository.delete(policy);
+        policyCacheService.evictAll();
     }
 
     private PolicyDTO convertToPolicyDTO(Policy policy, PolicyType policyType) {
@@ -133,6 +149,9 @@ public class PolicyService {
                 .payloadId(policy.getPayloadId())
                 .policyProfileId(policy.getPolicyProfileId())
                 .policyTitle(policy.getPolicyTitle())
+                .policyType(policy.getPolicyType())
+                .protocolType(policy.getProtocolType())
+                .scope(policy.getScope())
                 .payloadService(payloadService)
                 .profileTitle(profileTitle)
                 .createdAt(formatInstant(policy.getCreatedAt(), formatter))
@@ -146,6 +165,10 @@ public class PolicyService {
 
     public Page<PolicyDTO> searchPolicyList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType) {
         return policyQueryService.searchPolicyProfileList(searchKey, searchValue, pageable, policyType);
+    }
+
+    public Page<PolicyDTO> searchPolicyList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType, ProtocolType protocolType) {
+        return policyQueryService.searchPolicyProfileList(searchKey, searchValue, pageable, policyType, protocolType);
     }
 
     public List<PolicyDTO> getAllPolicies() {

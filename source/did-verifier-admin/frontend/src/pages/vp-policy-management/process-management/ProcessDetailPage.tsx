@@ -77,7 +77,7 @@ const ProcessDetailPage = (props: Props) => {
                     message: 'Invalid Path.', 
                     isModal: true 
                 },{
-                    onClose: async () => navigate('/vp-policy-management/process-management', { replace: true }),
+                    onClose: async () => navigate('/opendid/vp-policy-management/process-management', { replace: true }),
                 });
                 return;
             }
@@ -107,7 +107,12 @@ const ProcessDetailPage = (props: Props) => {
         };
 
         fetchData();
-    }, [processId, dialogs, navigate]);
+        // dialogs is intentionally omitted: @toolpad/core's useDialogs() returns a new
+        // object identity whenever ANY dialog opens/closes anywhere in the app, so keeping
+        // it here re-triggers this effect every time dialogs.open() is called on error —
+        // an infinite fetch/error-dialog loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [processId, navigate]);
 
     const StyledContainer = useMemo(() => styled(Box)(({ theme }) => ({
         width: 500,
@@ -263,10 +268,10 @@ const ProcessDetailPage = (props: Props) => {
                     </TableContainer>
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/process-management')}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/process-management')}>
                             Back
                         </Button>
-                        <Button variant="outlined" color="primary" onClick={() => navigate('/vp-policy-management/process-management/process-edit/' + processId)}>
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/vp-policy-management/process-management/process-edit/' + processId)}>
                             Go to Edit
                         </Button>
                     </Box>

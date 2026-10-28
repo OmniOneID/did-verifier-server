@@ -127,7 +127,7 @@ const ServiceRegistrationPage = (props: Props) => {
                     message: 'Service registration completed.',
                     isModal: true,
                 },{
-                    onClose: async (result) =>  navigate('/vp-policy-management/service-management'),
+                    onClose: async (result) =>  navigate('/opendid/vp-policy-management/service-management'),
                 });
     
             }).catch((error) => {
@@ -361,7 +361,7 @@ const ServiceRegistrationPage = (props: Props) => {
                                 {formData.endpoints.map((endpoint, index) => (
                                     <TableRow key={index}>
                                         <TableCell sx={{ verticalAlign: 'top', width: '80%' }}>
-                                            <TextField fullWidth size="small" value={endpoint} onChange={(event) => handleEndpointChange(index, event)} error={!!errors.endpoints?.[index]} helperText={errors.endpoints?.[index]} />
+                                            <TextField fullWidth size="small" value={endpoint} onChange={(event) => handleEndpointChange(index, event)} error={!!errors.endpoints?.[index]} helperText={errors.endpoints?.[index]} placeholder="ex: http://127.0.0.1:8092/verifier/api/v1" />
                                         </TableCell>
                                         <TableCell sx={{ verticalAlign: 'top', width: '20%', textAlign: 'center' }}>
                                             <IconButton onClick={() => handleRemoveEndpoint(index)} sx={{ color: '#FF8400' }}>
@@ -377,7 +377,7 @@ const ServiceRegistrationPage = (props: Props) => {
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
                         <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isButtonDisabled}>Register</Button>
                         <Button variant="contained" color="secondary" onClick={handleReset}>Reset</Button>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/vp-policy-management/service-management')}>Cancel</Button>                        
+                        <Button variant="outlined" color="secondary" onClick={() => navigate('/opendid/vp-policy-management/service-management')}>Cancel</Button>                        
                     </Box>
                 </StyledInputArea>
             </StyledContainer>

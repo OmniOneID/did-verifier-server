@@ -173,7 +173,7 @@ const ProofRequestConfigurationPage = () => {
                   <Link
                     component="button"
                     variant='body2'
-                    onClick={() => navigate(`/zkp-policy-management/proof-request-configuration/${params.row.id}`)}
+                    onClick={() => navigate(`/opendid/zkp-policy-management/proof-request-configuration/${params.row.id}`)}
                     sx={{ cursor: 'pointer', color: 'primary.main' }}
                   >
                     {params.value}
@@ -198,14 +198,14 @@ const ProofRequestConfigurationPage = () => {
             ]}
             onSearch={handleSearch}
             onRefresh={getData}
-            onRegister={() => navigate('/zkp-policy-management/proof-request-configuration/proof-request-configuration-registration')}
+            onRegister={() => navigate('/opendid/zkp-policy-management/proof-request-configuration/proof-request-configuration-registration')}
             paginationMode="server"
             totalRows={totalRows}
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
             onEdit={() => {
               if (selectedRowData) {
-                navigate(`/zkp-policy-management/proof-request-configuration/proof-request-edit/${selectedRowData.id}`);
+                navigate(`/opendid/zkp-policy-management/proof-request-configuration/proof-request-edit/${selectedRowData.id}`);
               }
             }}
             onDelete={handleDelete}

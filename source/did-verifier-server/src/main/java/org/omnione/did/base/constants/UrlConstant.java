@@ -24,6 +24,8 @@ public class UrlConstant {
     public static class Verifier {
         public static final String V1 = "/verifier/api/v1";
         public static final String V2 = "/verifier/api/v2";
+        public static final String INITIATE = "/initiate";
+        public static final String STATUS = "/status/{sessionId}";
         public static final String REQUEST_OFFER_QR = "/request-offer-qr";
         public static final String REQUEST_VERIFY = "/request-verify";
         public static final String CONFIRM_VERIFY = "/confirm-verify";
@@ -105,7 +107,29 @@ public class UrlConstant {
         public static final String UPDATE_ZKP_PROFILE = "/zkp/profiles/{id}";
         public static final String DELETE_ZKP_PROFILE = "/zkp/profiles/{id}";
         public static final String GET_ZKP_POPUP_PROFILE_LIST = "/zkp/profiles/popups/{searchValue}";
+
+        // OID4VP Config
+        public static final String GET_OID4VP_CONFIG = "/oid4vp/config";
+        public static final String UPDATE_OID4VP_CONFIG = "/oid4vp/config";
+
+        // DCQL Scope Mapping
+        public static final String GET_SCOPE_MAPPING_LIST = "/oid4vp/scope-mappings";
+        public static final String SAVE_SCOPE_MAPPING = "/oid4vp/scope-mappings";
+        public static final String GET_SCOPE_MAPPING_INFO = "/oid4vp/scope-mappings/{id}";
+        public static final String UPDATE_SCOPE_MAPPING = "/oid4vp/scope-mappings/{id}";
+        public static final String DELETE_SCOPE_MAPPING = "/oid4vp/scope-mappings/{id}";
+        public static final String GET_POPUP_SCOPE_MAPPING_LIST = "/oid4vp/scope-mappings/popups/{searchValue}";
+
+        // TAS Credential Schema (for OID4VP opendid_vc format)
+        public static final String GET_TAS_CREDENTIAL_SCHEMAS = "/oid4vp/tas/credential-schemas";
     }
+
+    public static class Oid4vp {
+        public static final String BASE = "/oid4vp";
+        public static final String REQUEST = "/request/{requestId}";
+        public static final String RESPONSE = "/response";
+    }
+
     public static class Tas {
         public static final String ADMIN_V1 = "/tas/admin/v1";
         public static final String REGISTER_DID_PUBLIC = "/entities/register-did/public";

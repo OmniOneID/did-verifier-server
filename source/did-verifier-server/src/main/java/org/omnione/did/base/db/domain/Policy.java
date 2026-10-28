@@ -3,6 +3,7 @@ package org.omnione.did.base.db.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 
 import java.io.Serializable;
 
@@ -26,9 +27,9 @@ public class Policy extends BaseEntity implements Serializable {
     private Long id;
     @Column(name = "policy_id", nullable = false, length = 40)
     private String policyId;
-    @Column(name = "payload_id", nullable = false, length = 40)
+    @Column(name = "payload_id", length = 40)
     private String payloadId;
-    @Column(name = "policy_profile_id", nullable = false, length = 40)
+    @Column(name = "policy_profile_id", length = 40)
     private String policyProfileId;
     @Column(name = "policy_title", nullable = false, length = 255)
     private String policyTitle;
@@ -36,5 +37,11 @@ public class Policy extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PolicyType policyType = PolicyType.VP;
+    @Column(name = "protocol_type", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ProtocolType protocolType = ProtocolType.DID_VP;
+    @Column(name = "scope", length = 100)
+    private String scope;
 
 }

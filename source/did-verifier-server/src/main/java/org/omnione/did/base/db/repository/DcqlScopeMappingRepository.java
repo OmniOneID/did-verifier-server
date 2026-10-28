@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 OmniOne.
+ * Copyright 2026 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package org.omnione.did.verifier.v1.agent.dto;
+package org.omnione.did.base.db.repository;
 
-import lombok.*;
-import org.omnione.did.base.datamodel.data.VerifyOfferPayload;
+import org.omnione.did.base.db.domain.DcqlScopeMapping;
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
 
-/**
- * Represents the response for verifying an offer.
- */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-@Builder
-public class VerifyOfferResult {
-    private VerifyOfferPayload offerPayload;
-    private String vpPolicyId;
+public interface DcqlScopeMappingRepository extends JpaRepository<DcqlScopeMapping, Long> {
 
+    Optional<DcqlScopeMapping> findByScope(String scope);
+
+    List<DcqlScopeMapping> findAllByEnabledTrue();
 }

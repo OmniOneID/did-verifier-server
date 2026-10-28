@@ -21,6 +21,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration properties class for the Verifier.
@@ -38,4 +39,20 @@ public class VerifierProperty {
     private String domain;
     private String tasUrl;
     private ArrayList<String> verifierEndPoints = new ArrayList<>();
+
+    @Getter
+    @Setter
+    public static class StatusListProperties {
+        private boolean failOnFetchError = true;
+        private long maxCacheTtlSeconds = 86400;
+        private long minCacheTtlSeconds = 60;
+        // Maximum decompressed size in bytes. A status list with one million entries is about 125KB at bits=8,
+        // so 1MB comfortably accepts any legitimate status list while blocking decompression bombs.
+        private long maxDecompressedBytes = 1_048_576;
+        // Private-network/loopback hosts explicitly trusted by the deployer (exact host string match).
+        // Register a host only when a private status list host is expected, e.g. closed-network deployments or local development.
+        private List<String> allowedPrivateHosts = new ArrayList<>();
+    }
+
+    private StatusListProperties statusList = new StatusListProperties();
 }

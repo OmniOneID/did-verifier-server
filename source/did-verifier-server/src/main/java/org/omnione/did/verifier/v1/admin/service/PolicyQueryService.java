@@ -17,6 +17,7 @@ package org.omnione.did.verifier.v1.admin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.omnione.did.base.db.constant.PolicyType;
+import org.omnione.did.base.db.constant.ProtocolType;
 import org.omnione.did.base.db.domain.Payload;
 import org.omnione.did.base.db.domain.Policy;
 import org.omnione.did.base.db.domain.PolicyProfile;
@@ -44,6 +45,28 @@ public class PolicyQueryService {
 
     public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType) {
         Page<Policy> policies = policyRepository.searchPolicyList(searchKey, searchValue, policyType, pageable);
+
+        List<PolicyDTO> policyDTOs = policies.getContent().stream().map(policy -> {
+            String payloadService = payloadRepository.findByPayloadId(policy.getPayloadId())
+                    .map(Payload::getService)
+                    .orElse("Unknown Payload Service");
+
+            String profileTitle = (policyType == PolicyType.ZKP)
+                    ? zkpPolicyProfileRepository.findByProfileId(policy.getPolicyProfileId())
+                    .map(ZkpPolicyProfile::getTitle)
+                    .orElse("Unknown Profile Title")
+                    : policyProfileRepository.findByPolicyProfileId(policy.getPolicyProfileId())
+                            .map(PolicyProfile::getTitle)
+                            .orElse("Unknown Profile Title");
+
+            return PolicyDTO.toDTO(policy, payloadService, profileTitle);
+        }).toList();
+
+        return new PageImpl<>(policyDTOs, pageable, policies.getTotalElements());
+    }
+
+    public Page<PolicyDTO> searchPolicyProfileList(String searchKey, String searchValue, Pageable pageable, PolicyType policyType, ProtocolType protocolType) {
+        Page<Policy> policies = policyRepository.searchPolicyList(searchKey, searchValue, policyType, protocolType, pageable);
 
         List<PolicyDTO> policyDTOs = policies.getContent().stream().map(policy -> {
             String payloadService = payloadRepository.findByPayloadId(policy.getPayloadId())

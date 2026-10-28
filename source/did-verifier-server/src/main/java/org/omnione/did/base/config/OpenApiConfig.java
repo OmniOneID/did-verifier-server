@@ -54,18 +54,8 @@ public class OpenApiConfig {
         return new Info()
                 .title(buildProperties.getName() + " API")
                 .description(buildProperties.getName())
-                .version(buildProperties.getVersion());
-
-    }
-    /**
-     * Provides license information for the API.
-     *
-     * @TODO: Update this method once the license is finalized.
-     * @return a License object with the license details
-     */
-    private License getLicense() {
-        return new License().name("Apache 2.0")
-                .url("https://github.com/OmniOneID");
+                .version(buildProperties.getVersion())
+                .license(new License().name("Apache 2.0").url("https://github.com/OmniOneID"));
     }
 
 }

@@ -191,7 +191,7 @@ const ServiceManagementPage = (props: Props) => {
                   <Link
                     component="button"
                     variant='body2'
-                    onClick={() => navigate(`/vp-policy-management/service-management/${params.row.id}`)}
+                    onClick={() => navigate(`/opendid/vp-policy-management/service-management/${params.row.id}`)}
                     sx={{ cursor: 'pointer', color: 'primary.main' }}
                   >
                     {params.value}
@@ -232,10 +232,10 @@ const ServiceManagementPage = (props: Props) => {
             onRefresh={getData}
             onEdit={() => {
               if (selectedRowData) {
-                navigate(`/vp-policy-management/service-management/service-edit/${selectedRowData.id}`);
+                navigate(`/opendid/vp-policy-management/service-management/service-edit/${selectedRowData.id}`);
               }
             }}
-            onRegister={() => navigate('/vp-policy-management/service-management/service-registration')}
+            onRegister={() => navigate('/opendid/vp-policy-management/service-management/service-registration')}
             onDelete={handleDelete}
             additionalButtons={[]}
             paginationMode="server"

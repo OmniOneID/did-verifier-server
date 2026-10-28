@@ -1,45 +1,60 @@
 import { type Navigation } from '@toolpad/core/AppProvider';
 
-export const getNavigationByStatus = (serverStatus: string | null): Navigation=> {
+export const getNavigationByStatus = (serverStatus: string | null): Navigation => {
   if (serverStatus !== 'ACTIVATE') {
     return [
-      {kind: 'divider',},  
+      { kind: 'divider' },
       { segment: 'verifier-registration', title: 'Verifier Registration' },
-      {kind: 'divider',},
+      { kind: 'divider' },
     ];
-  } 
+  }
   return [
-    {kind: 'divider',},
-    { 
-      segment: 'verifier-management', 
-      title: 'Verifier Management', 
+    { kind: 'divider' },
+    {
+      segment: 'verifier-management',
+      title: 'Verifier Management',
     },
-    { 
-      segment: 'service-configuration', 
-      title: 'Service Configuration',
+    {
+      segment: 'service-configuration',
+      title: 'Service Management',
     },
-    { 
-      segment: 'vp-policy-management', 
-      title: 'VP Policy Management', 
-      children: [    
-        { segment: 'filter-management', title: 'Filter Management' },
-        { segment: 'process-management', title: 'Process Management' },
-        { segment: 'profile-management', title: 'Profile Management' },
-        { segment: 'policy-management', title: 'Policy Management' },
+    {
+      segment: 'opendid',
+      title: 'OpenDID',
+      children: [
+        {
+          segment: 'vp-policy-management',
+          title: 'VP',
+          children: [
+            { segment: 'filter-management', title: 'Filter Management' },
+            { segment: 'process-management', title: 'Process Management' },
+            { segment: 'profile-management', title: 'Profile Management' },
+            { segment: 'policy-management', title: 'Policy Management' },
+          ],
+        },
+        {
+          segment: 'zkp-policy-management',
+          title: 'ZKP',
+          children: [
+            { segment: 'proof-request-configuration', title: 'Proof Request Management' },
+            { segment: 'zkp-profile-management', title: 'Profile Management' },
+            { segment: 'zkp-policy-management', title: 'Policy Management' },
+          ],
+        },
       ],
     },
-    { 
-      segment: 'zkp-policy-management', 
-      title: 'ZKP Policy Management', 
-      children: [    
-        { segment: 'proof-request-configuration', title: 'Proof Request Configuration' },
-        { segment: 'zkp-profile-management', title: 'ZKP Profile Management' },
-        { segment: 'zkp-policy-management', title: 'ZKP Policy Management' },
+    {
+      segment: 'oid4vp-management',
+      title: 'OID4VP',
+      children: [
+        { segment: 'config', title: 'Configuration' },
+        { segment: 'scope-mapping', title: 'DCQL Scope Management' },
+        { segment: 'policy', title: 'Policy Management' },
       ],
     },
     {
       segment: 'vp-submission-management',
-      title: 'VP History Page', 
+      title: 'VP History',
     },
     {
       segment: 'server-configuration',
@@ -53,6 +68,6 @@ export const getNavigationByStatus = (serverStatus: string | null): Navigation=>
         { segment: 'password-policy', title: 'Password Policy Settings' },
       ],
     },
-    {kind: 'divider',},
+    { kind: 'divider' },
   ];
 };

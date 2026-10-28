@@ -27,7 +27,7 @@ const ProofRequestConfigurationDetailPage = () => {
           isModal: true,
         }, {
           onClose: async () =>
-            navigate("/zkp-policy-management/proof-request-configuration", { replace: true }),
+            navigate("/opendid/zkp-policy-management/proof-request-configuration", { replace: true }),
         });
         return;
       }
@@ -213,7 +213,7 @@ const ProofRequestConfigurationDetailPage = () => {
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
             <Button variant="contained" color="primary" onClick={() => navigate(-1)}>Back</Button>
-            <Button variant="outlined" color="primary" onClick={() => navigate('/zkp-policy-management/proof-request-configuration/proof-request-edit/' + numericId)}>
+            <Button variant="outlined" color="primary" onClick={() => navigate('/opendid/zkp-policy-management/proof-request-configuration/proof-request-edit/' + numericId)}>
                 Go to Edit
             </Button>
           </Box>
