@@ -299,7 +299,9 @@ public class VpProfileApplicationService {
             ProofRequestProfile sdkProfile) {
         try {
             String sdkProfileJson = new Gson().toJson(sdkProfile);
-            return objectMapper.readValue(sdkProfileJson,
+            // Read back with Gson too: the ZKP SDK models only carry Gson names (PredicateInfo pType/pValue),
+            // which Jackson maps to ptype/pvalue and silently drops
+            return new Gson().fromJson(sdkProfileJson,
                     org.omnione.did.base.datamodel.data.ProofRequestProfile.class);
         } catch (Exception e) {
             log.error("Failed to convert SDK ProofRequestProfile to Application DTO", e);
