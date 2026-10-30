@@ -1,5 +1,8 @@
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,7 @@ public class ProcessController {
     }
 
     @Operation(summary = "Save Process", description = "Save a new process.")
+    @ArticleLog(name = "[Process] Save Process", apiType = ApiType.ADMIN, targetType = "PROCESS", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_PROCESS_INFO)
     public ResponseEntity<Void> saveProcess(@RequestBody ProcessDTO processDTO) {
         processService.saveProcess(processDTO);
@@ -41,6 +45,7 @@ public class ProcessController {
     }
 
     @Operation(summary = "Update Process", description = "Update an existing process.")
+    @ArticleLog(name = "[Process] Update Process", apiType = ApiType.ADMIN, targetType = "PROCESS", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_PROCESS_INFO)
     public ResponseEntity<ProcessDTO> updateProcess(@RequestBody ProcessDTO processDTO) {
         ProcessDTO updatedProcessDTO = processService.updateProcess(processDTO);
@@ -48,6 +53,7 @@ public class ProcessController {
     }
 
     @Operation(summary = "Delete Process", description = "Delete a process by ID.")
+    @ArticleLog(name = "[Process] Delete Process", apiType = ApiType.ADMIN, targetType = "PROCESS", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_PROCESS_INFO)
     public ResponseEntity<Void> deleteProcess(@PathVariable Long id) {
         processService.deleteProcess(id);

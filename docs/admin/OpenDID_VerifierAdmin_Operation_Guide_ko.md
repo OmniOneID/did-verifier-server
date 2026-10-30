@@ -18,8 +18,8 @@ puppeteer:
 Open DID Verifier Admin Operation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-10-30
+- Version: v3.0.0
 
 개정 이력
 ==
@@ -28,6 +28,7 @@ Open DID Verifier Admin Operation Guide
 | v1.0.0 | 2025-03-31 | 최초 작성                  |
 | v1.0.1 | 2025-04-25 | `3.1. Verifier Registration` 장 추가 |
 | v2.0.0 | 2025-05-30 | ZKP 검증관련 메뉴 추가 및 기능 변경 반영 |
+| v3.0.0 | 2026-10-30 | 현재 사이드 메뉴, OID4VP, API Log, 설정 화면 및 캡처 갱신 |
 
 목차
 ==
@@ -50,8 +51,8 @@ Open DID Verifier Admin Operation Guide
     - [3.1.1. Verifier 등록 프로세스](#311-verifier-등록-프로세스)
     - [3.1.2. 등록된 Verifier 정보 관리](#312-등록된-verifier-정보-관리)
     - [3.1.3. 문제 해결 가이드](#313-문제-해결-가이드)
-  - [3.2. Service Configuration](#32-service-configuration)
-    - [3.2.1. Service Configuration 개요](#321-service-configuration-개요)
+  - [3.2. Service Management](#32-service-management)
+    - [3.2.1. Service Management 개요](#321-service-management-개요)
     - [3.2.2. 서비스 등록 / 수정](#322-서비스-등록--수정)
   - [3.3. VP Policy Management](#33-vp-policy-management)
     - [3.3.1. Filter Management](#331-filter-management)
@@ -73,10 +74,14 @@ Open DID Verifier Admin Operation Guide
       - [3.4.2.1. ZKP Profile Register](#3421-zkp-profile-register)
     - [3.4.3. ZKP Policy Management](#343-zkp-policy-management)
       - [3.4.3.1. ZKP Policy Register](#3431-zkp-policy-register)
-  - [3.5. VP History Page](#35-vp-history-page)
+  - [3.5. VP History](#35-vp-history)
   - [3.6. Admin Management](#36-admin-management)
     - [3.6.1. Admin 목록 조회](#361-admin-목록-조회)
     - [3.6.2. Admin 등록](#362-admin-등록)
+  - [3.7. OID4VP Management](#37-oid4vp-management)
+  - [3.8. Log Management](#38-log-management)
+  - [3.9. Server Configuration](#39-server-configuration)
+  - [3.10. Password Policy Settings](#310-password-policy-settings)
 
 ## 1.1. 개요
 
@@ -105,8 +110,14 @@ Admin Console은 다음과 같은 주요 기능을 제공합니다:
   - Proof Request 등록 및 관리
   - ZKP Profile 등록 및 관리
   - ZKP 정책(Policy) 설정
+- **OID4VP 관리**
+  - 클라이언트 설정, DCQL Scope 및 검증 정책 관리
+- **API 로그 관리**
+  - Agent API 호출과 관리자 작업 기록 조회
 - **VP 이력**
   - VP 검증 이력 확인
+- **서버 설정 및 비밀번호 정책 관리**
+  - 외부 서버 연동과 관리자 비밀번호 규칙 설정
 - **관리자 계정 관리**
   - Admin Console 계정 관리
 
@@ -138,7 +149,9 @@ Admin Console에 접속하려면 다음 단계를 따르세요:
 
 로그인 후 표시되는 메인 화면은 다음과 같은 요소로 구성됩니다:
 
-<img src="./images/main_screen.jpg" width="450"/>
+<img src="./images/api-log-api-example.png" width="800"/>
+
+> 예시 데이터로 렌더링한 화면입니다.
 
 | 번호 | 영역 | 설명 |
 |------|------|------|
@@ -165,20 +178,25 @@ Verifier 서버가 아직 등록되지 않은 초기 상태에서는 메뉴에 *
 
 Verifier 등록이 완료되면 전체 관리 기능이 활성화되며, 사이드바 메뉴는 다음과 같이 구성됩니다:
 
-<img src="./images/menu_structure.jpg" width="260"/>
+<img src="./images/menu_structure.jpg" width="800"/>
 
-| 번호 | 메뉴 명칭 | 기능 설명 | 설정 순서 |
-|------|-----------|-----------|-----------|
-| 1 | **Verifier Management** | 등록된 검증자 정보를 조회하고 관리합니다. DID Document 조회 및 상태 확인이 가능합니다. | ✅ 완료 |
-| 2 | **Service Configuration** | VP 및 ZKP 정책에서 사용할 서비스 정보를 관리합니다. 검증 유형(VP/ZKP) 및 제출 모드를 설정합니다. | 🥇 1단계 |
-| 3 | **VP Policy Management** | 일반 VP 검증을 위한 정책을 관리하는 상위 메뉴입니다. | 🥈 2단계 |
-| 4 | **ZKP Policy Management** | ZKP(영지식 증명) 검증을 위한 정책을 관리하는 상위 메뉴입니다. | 🥉 3단계 |
-| 5 | **VP History Page** | 사용자들이 제출한 VP 및 ZKP 검증 이력을 조회합니다. | 📊 모니터링 |
-| 6 | **Admin Management** | Admin Console 접근 권한을 가진 관리자 계정을 관리합니다. | 🔐 권한 관리 |
+| 메뉴 | 하위 메뉴 | 기능 |
+|------|-----------|------|
+| Verifier Management | — | 등록된 Verifier 정보 조회 |
+| Service Management | — | 검증 서비스 목록과 설정 관리 |
+| OpenDID > VP | Filter, Process, Profile, Policy Management | VP 검증 정책 설정 |
+| OpenDID > ZKP | Proof Request, Profile, Policy Management | ZKP 검증 정책 설정 |
+| OID4VP | Configuration, DCQL Scope Management, Policy Management | OID4VP 설정과 정책 관리 |
+| VP History | — | VP 제출 및 검증 이력 조회 |
+| Log Management | API Log, Audit API Log | Agent API 호출과 관리자 작업 기록 조회 |
+| Server Configuration | — | 서버 연동 설정 조회 및 관리 |
+| Admin Management | Admin Management, Password Policy Settings | 관리자 계정과 비밀번호 정책 관리 |
+
+> `OpenDID`의 VP/ZKP 항목과 `OID4VP`, `Log Management`, `Admin Management`는 펼침 메뉴입니다. 등록 전에는 `Verifier Registration`만 표시됩니다.
 
 ### 2.3.3. VP Policy Management 하위 메뉴
 
-VP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
+`OpenDID > VP`를 펼치면 다음 하위 메뉴가 표시됩니다:
 
 | 하위 메뉴 | 기능 설명 | 설정 순서 |
 |-----------|-----------|-----------|
@@ -189,7 +207,7 @@ VP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
 
 ### 2.3.4. ZKP Policy Management 하위 메뉴
 
-ZKP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
+`OpenDID > ZKP`를 펼치면 다음 하위 메뉴가 표시됩니다:
 
 | 하위 메뉴 | 기능 설명 | 설정 순서 |
 |-----------|-----------|-----------|
@@ -203,7 +221,7 @@ ZKP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
 
 #### **1단계: 기본 설정**
 1. **Verifier Registration** - Verifier 서버 등록 및 DID Document 생성
-2. **Service Configuration** - 검증 서비스 기본 정보 등록
+2. **Service Management** - 검증 서비스 기본 정보 등록
 
 #### **2단계: VP 정책 설정** (일반 VP 검증용)
 1. **Filter Management** - VC 스키마 및 클레임 조건 정의
@@ -217,7 +235,7 @@ ZKP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
 3. **ZKP Policy Management** - Service + ZKP Profile 연결
 
 #### **4단계: 운영 및 관리**
-- **VP History Page** - 검증 이력 모니터링
+- **VP History** - 검증 이력 모니터링
 - **Admin Management** - 관리자 계정 관리
 
 > **참고**: VP와 ZKP는 서로 다른 검증 방식이므로, 서비스 요구사항에 따라 필요한 정책만 설정하셔도 됩니다.
@@ -243,6 +261,8 @@ ZKP Policy Management를 클릭하면 다음 하위 메뉴가 표시됩니다:
 <br/>
 
 # 3. 기능별 상세 메뉴얼
+
+> 등록 완료 후 관리 화면은 현재 사이드 메뉴와 예시 데이터로 캡처했습니다. 실제 데이터는 환경에 따라 달라집니다.
 
 이 장에서는 Open DID Verifier Admin Console의 주요 기능에 대한 상세 사용 방법을 안내합니다.
 
@@ -413,15 +433,15 @@ Verifier 등록이 완료되면 **Verifier Management** 메뉴에서 등록된 V
 
 > **중요**: Verifier 등록 과정에서 문제가 발생하면 처음부터 다시 진행해야 할 수 있습니다. 각 단계를 신중하게 수행하시기 바랍니다.
 
-## 3.2. Service Configuration
+## 3.2. Service Management
 
-Service Configuration은 VP 및 ZKP 검증 정책에서 사용할 서비스 정보를 정의하고 관리하는 기능입니다. 
+Service Management은 VP 및 ZKP 검증 정책에서 사용할 서비스 정보를 정의하고 관리하는 기능입니다.
 
 서비스는 **검증 요청의 목적과 방식을 정의하는 핵심 구성 요소**로서, 사용자에게 어떤 유형의 검증이 요구되는지 알려주고, 검증 완료 후 결과를 처리할 엔드포인트를 제공합니다. 모든 VP 및 ZKP 정책은 반드시 하나의 서비스와 연결되어야 하므로, 정책 설정 전에 우선적으로 구성해야 합니다.
 
-### 3.2.1. Service Configuration 개요
+### 3.2.1. Service Management 개요
 
-Service Configuration 메뉴에서는 서비스의 전체 생명주기를 관리할 수 있습니다.
+Service Management 메뉴에서는 서비스의 전체 생명주기를 관리할 수 있습니다.
 
 <img src="./images/service_configuration.jpg" width="800"/>
 
@@ -505,6 +525,8 @@ Service Configuration 메뉴에서는 서비스의 전체 생명주기를 관리
 
 ---
 ## 3.3. VP Policy Management
+
+현재 메뉴 경로는 `OpenDID > VP`입니다.
 
 VP Policy Management는 일반적인 VP(Verifiable Presentation) 검증을 위한 정책을 구성하고 관리하는 기능입니다. VP 정책은 **Filter → Process → Profile → Policy** 순서로 단계적으로 구성되며, 각 단계의 설정이 다음 단계의 기반이 됩니다.
 
@@ -864,6 +886,8 @@ Policy에 연결할 Service를 선택합니다.
 
 ## 3.4. ZKP Policy Management
 
+현재 메뉴 경로는 `OpenDID > ZKP`입니다.
+
 ZKP Policy Management는 ZKP(Zero-Knowledge Proof) 정책을 관리하기 위한 메뉴입니다. 여러 하위 메뉴로 구성되어 있으며, 각 메뉴는 ZKP 정책의 특정 측면을 관리합니다.
 
 ### 3.4.1. Proof Request Configuration
@@ -965,23 +989,23 @@ ZKP 정책 등록 시 필요한 주요 구성 요소는 다음과 같습니다:
 
 <br/>
 
-### 3.5. VP History Page
+### 3.5. VP History
 
-VP History Page 메뉴에서는 사용자들이 제출한 VP(Verifiable Presentation)에 대한 이력을 조회할 수 있습니다. 이 화면에서는 각 VP 제출 시도의 상태와 세부 정보를 확인할 수 있으며, 성공한 제출뿐만 아니라 실패하거나 진행 중인 요청도 모두 추적할 수 있습니다.
+VP History 메뉴에서는 사용자들이 제출한 VP(Verifiable Presentation)에 대한 이력을 조회할 수 있습니다. 이 화면에서는 각 VP 제출 시도의 상태와 세부 정보를 확인할 수 있으며, 성공한 제출뿐만 아니라 실패하거나 진행 중인 요청도 모두 추적할 수 있습니다.
 
 <img src="./images/vp_history.jpg" width="800"/>
 
-VP History Page는 다음과 같은 주요 기능과 정보를 제공합니다:
+VP History는 다음과 같은 주요 기능과 정보를 제공합니다:
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
 | 1 | VP Submit List | VP 제출 목록 제목입니다. |
 | 2 | Transaction Status 필터 | 드롭다운 메뉴를 통해 특정 상태(All, Completed, Pending, Failed)의 VP 제출 건만 필터링할 수 있습니다. |
-| 3 | 목록 헤더 | Transaction Status, Transaction ID, Holder DID, Created At 등 VP 제출 정보의 헤더입니다. |
+| 3 | 목록 헤더 | Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, Format 등 VP 제출 정보의 헤더입니다. |
 | 4 | 상태 표시 | VP 제출 건의 상태를 색상으로 구분합니다. 완료된 건은 녹색 배경의 'Completed', 처리 중인 건은 노란색 배경의 'Pending', 실패한 건은 빨간색 배경의 'Failed'로 표시됩니다. |
 | 5 | Transaction ID | 각 VP 제출 시도의 고유 트랜잭션 식별자가 표시됩니다. 이를 통해 모든 상태의 요청을 추적할 수 있습니다. |
 | 6 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. Pending이나 Failed 상태의 경우 "N/A"로 표시됩니다. |
-| 7 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 예시에서는 총 87건 중 1-10건이 표시되고 있습니다. |
+| 7 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 캡처는 빈 예시 목록이며 실제 건수는 환경에 따라 다릅니다. |
 
 VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습니다:
 - 특정 상태(Completed, Pending, Failed)의 VP 제출 현황 파악
@@ -1046,5 +1070,61 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 | 8    | **CANCEL 버튼**             | 등록을 취소하고 이전 화면으로 돌아갑니다.                           |
 
 
+
+## 3.7. OID4VP Management
+
+`OID4VP` 메뉴에서 OpenID4VP 검증 설정을 관리합니다.
+
+### 3.7.1. Configuration
+
+<img src="./images/oid4vp-config.png" width="800"/>
+
+`OID4VP > Configuration`에서는 Verifier의 Base URL과 Client Name, Client ID 방식 및 값, 세션 유효 시간, 호출 스킴, 암호화 설정과 검증 옵션을 확인하고 설정합니다. 설정을 저장하기 전에 Wallet과 연동할 값이 일치하는지 확인하세요.
+
+### 3.7.2. DCQL Scope Management
+
+<img src="./images/oid4vp-scope.png" width="800"/>
+
+`OID4VP > DCQL Scope Management`에서는 요청할 자격증명 범위를 등록하고 목록에서 조회·수정합니다. 목록의 항목을 선택하면 상세 설정을 확인할 수 있습니다.
+
+### 3.7.3. Policy Management
+
+<img src="./images/oid4vp-policy.png" width="800"/>
+
+`OID4VP > Policy Management`에서는 DCQL Scope와 연결되는 검증 정책을 등록하고 관리합니다.
+
+## 3.8. Log Management
+
+Verifier 등록이 완료되면 `Log Management`에서 API 호출 기록을 조회할 수 있습니다. 두 목록은 최신 기록부터 페이지별로 표시되며, 검색과 새로고침을 지원합니다. `Called At`을 클릭하면 상세 창이 열립니다. 로그는 조회 전용입니다.
+
+### 3.8.1. API Log
+
+<img src="./images/api-log-api-example.png" width="800"/>
+
+`Log Management > API Log`는 Verifier Agent 및 프로토콜 API 호출을 보여줍니다. 목록에는 호출 시각, HTTP 메서드, URI, 상태 코드, 결과(`SUCCESS` 또는 `FAIL`), 요청자 ID가 표시됩니다. `URI` 또는 `Result`로 검색할 수 있습니다. 상세 창에서는 처리 시간, 클라이언트 IP, User Agent, 오류 메시지가 기록된 경우 함께 확인할 수 있습니다. 경로는 `/logs/api`입니다.
+
+<img src="./images/api-log-api-detail-example.png" width="800"/>
+
+### 3.8.2. Audit API Log
+
+<img src="./images/api-log-audit-example.png" width="800"/>
+
+`Log Management > Audit API Log`는 Admin API의 관리자 작업 기록을 보여줍니다. 작업 유형(`CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`), 대상 유형, 결과, 요청자 ID로 검색할 수 있습니다. 상세 창에는 대상 ID, 작업 설명, 클라이언트 IP와 오류 메시지가 기록된 경우 표시됩니다. 경로는 `/logs/audit`입니다.
+
+<img src="./images/api-log-audit-detail-example.png" width="800"/>
+
+> 로그는 서버의 `@ArticleLog`가 적용된 API 호출에서 생성됩니다. 예시 화면의 로그와 계정 정보는 실제 환경과 다릅니다.
+
+## 3.9. Server Configuration
+
+<img src="./images/server-configuration.png" width="800"/>
+
+`Server Configuration`에서 외부 서버와의 연동 설정을 확인하고 관리합니다. 변경한 값은 연결 대상 서버의 설정과 일치해야 합니다.
+
+## 3.10. Password Policy Settings
+
+<img src="./images/password-policy.png" width="800"/>
+
+`Admin Management > Password Policy Settings`에서 관리자 계정의 비밀번호 정책을 조회하고 변경합니다. 계정 등록과 비밀번호 변경 시 적용되는 규칙을 확인하세요.
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md

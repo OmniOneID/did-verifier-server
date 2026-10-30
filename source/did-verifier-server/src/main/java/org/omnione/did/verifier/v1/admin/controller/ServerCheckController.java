@@ -15,6 +15,9 @@
  */
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
@@ -35,6 +38,7 @@ public class ServerCheckController {
 
     private final UrlPingChecker urlPingChecker;
 
+    @ArticleLog(name = "[ServerCheck] Verify Server Url", apiType = ApiType.ADMIN, targetType = "SERVER_CHECK", actionType = ActionType.VERIFY)
     @PostMapping(value = "/servers/ping")
     public VerifyServerUrlResDto verifyServerUrl(@RequestBody VerifyServerUrlReqDto verifyServerUrlReqDto) {
         return urlPingChecker.isUrlReachable(verifyServerUrlReqDto);

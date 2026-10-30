@@ -18,6 +18,10 @@ package org.omnione.did.base.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import lombok.RequiredArgsConstructor;
+import org.omnione.did.base.aop.ApiLogInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,7 +34,11 @@ import java.net.HttpURLConnection;
  * It can be extended to include additional web-related configurations as needed.
  */
 @Configuration
-public class WebConfig {
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+    private final ApiLogInterceptor apiLogInterceptor;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) { registry.addInterceptor(apiLogInterceptor); }
 
     private static final int CONNECT_TIMEOUT_MS = 3000;
     private static final int READ_TIMEOUT_MS = 5000;

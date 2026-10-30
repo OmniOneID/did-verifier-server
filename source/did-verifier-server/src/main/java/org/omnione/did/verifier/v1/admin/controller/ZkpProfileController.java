@@ -15,6 +15,9 @@
  */
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +55,7 @@ public class ZkpProfileController {
     }
 
     @Operation(summary = "Save ZKP Profile", description = "Save a new zkp profile")
+    @ArticleLog(name = "[ZkpProfile] Create Zkp Profile", apiType = ApiType.ADMIN, targetType = "ZKP_PROFILE", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_ZKP_PROFILE)
     public ResponseEntity<EmptyResDto> createZkpProfile(@RequestBody ZkpPolicyProfileDto zkpPolicyProfileDto) {
         return ResponseEntity.ok(zkpProfileService.createZkpProfile(zkpPolicyProfileDto));
@@ -64,12 +68,14 @@ public class ZkpProfileController {
     }
 
     @Operation(summary = "Update ZKP Profile", description = "Update a zkp profile")
+    @ArticleLog(name = "[ZkpProfile] Update Zkp Profile", apiType = ApiType.ADMIN, targetType = "ZKP_PROFILE", actionType = ActionType.UPDATE)
     @PutMapping(Verifier.UPDATE_ZKP_PROFILE)
     public ResponseEntity<EmptyResDto> updateZkpProfile(@RequestBody ZkpPolicyProfileDto zkpPolicyProfileDto) {
         return ResponseEntity.ok(zkpProfileService.updateZkpProfile(zkpPolicyProfileDto));
     }
 
     @Operation(summary = "Delete ZKP Profile", description = "Delete a zkp profile")
+    @ArticleLog(name = "[ZkpProfile] Delete Zkp Profile", apiType = ApiType.ADMIN, targetType = "ZKP_PROFILE", actionType = ActionType.DELETE)
     @DeleteMapping(Verifier.DELETE_ZKP_PROFILE)
     public ResponseEntity<EmptyResDto> deleteZkpProfile(@PathVariable Long id) {
         return ResponseEntity.ok(zkpProfileService.deleteZkpProfile(id));

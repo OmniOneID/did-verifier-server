@@ -15,6 +15,9 @@
  */
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +65,7 @@ public class ProofRequestController {
     }
 
     @Operation(summary = "Save Proof Request", description = "Save a new proof request")
+    @ArticleLog(name = "[ProofRequest] Create Proof Request", apiType = ApiType.ADMIN, targetType = "PROOF_REQUEST", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_PROOF_REQUEST)
     public ResponseEntity<EmptyResDto> createProofRequest(@RequestBody ProofRequestDto request) {
         return ResponseEntity.ok(proofRequestService.createProofRequest(request));
@@ -80,12 +84,14 @@ public class ProofRequestController {
     }
 
     @Operation(summary = "Update Proof Request", description = "Update a proof request")
+    @ArticleLog(name = "[ProofRequest] Update Proof Request", apiType = ApiType.ADMIN, targetType = "PROOF_REQUEST", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_PROOF_REQUEST)
     public ResponseEntity<EmptyResDto> updateProofRequest(@RequestBody ProofRequestDto request) {
         return ResponseEntity.ok(proofRequestService.updateProofRequest(request));
     }
 
     @Operation(summary = "Delete Proof Request", description = "Delete a proof request")
+    @ArticleLog(name = "[ProofRequest] Delete Proof Request", apiType = ApiType.ADMIN, targetType = "PROOF_REQUEST", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_PROOF_REQUEST)
     public ResponseEntity<EmptyResDto> deleteProofRequest(@PathVariable Long id) {
         return ResponseEntity.ok(proofRequestService.deleteProofRequest(id));

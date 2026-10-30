@@ -1,5 +1,8 @@
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +42,7 @@ public class FilterController {
     }
 
     @Operation(summary = "Save Filter", description = "Save a new filter.")
+    @ArticleLog(name = "[Filter] Save Filter", apiType = ApiType.ADMIN, targetType = "FILTER", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_FILTER_INFO)
     public ResponseEntity<Void> saveFilter(@RequestBody FilterDTO filterDTO) {
         filterService.saveFilter(filterDTO);
@@ -46,6 +50,7 @@ public class FilterController {
     }
 
     @Operation(summary = "Update Filter", description = "Update an existing filter.")
+    @ArticleLog(name = "[Filter] Update Filter", apiType = ApiType.ADMIN, targetType = "FILTER", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_FILTER_INFO)
     public ResponseEntity<FilterDTO> updateFilter(@RequestBody FilterDTO filterDTO) {
         FilterDTO updatedFilterDTO = filterService.updateFilter(filterDTO);
@@ -53,6 +58,7 @@ public class FilterController {
     }
 
     @Operation(summary = "Delete Filter", description = "Delete a filter by ID.")
+    @ArticleLog(name = "[Filter] Delete Filter", apiType = ApiType.ADMIN, targetType = "FILTER", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_FILTER_INFO)
     public ResponseEntity<Void> deleteFilter(@PathVariable Long filterId) {
         filterService.deleteFilter(filterId);

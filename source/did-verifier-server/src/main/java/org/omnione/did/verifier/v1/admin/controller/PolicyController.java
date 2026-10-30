@@ -1,5 +1,8 @@
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,7 @@ public class PolicyController {
     }
 
     @Operation(summary = "Save Policy", description = "Save a new policy.")
+    @ArticleLog(name = "[Policy] Save Policy", apiType = ApiType.ADMIN, targetType = "POLICY", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_POLICY_INFO)
     public ResponseEntity<Void> savePolicy(@RequestBody PolicyDTO policyDTO, @RequestParam(defaultValue = "VP") PolicyType policyType) {
         policyService.savePolicy(policyDTO, policyType);
@@ -54,6 +58,7 @@ public class PolicyController {
     }
 
     @Operation(summary = "Update Policy", description = "Update an existing policy.")
+    @ArticleLog(name = "[Policy] Update Policy", apiType = ApiType.ADMIN, targetType = "POLICY", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_POLICY_INFO)
     public ResponseEntity<PolicyDTO> updatePolicy(@RequestBody PolicyDTO policyDTO, @RequestParam(defaultValue = "VP") PolicyType policyType) {
         PolicyDTO updatedPolicyDTO = policyService.updatePolicy(policyDTO);
@@ -61,6 +66,7 @@ public class PolicyController {
     }
 
     @Operation(summary = "Delete Policy", description = "Delete a policy by ID.")
+    @ArticleLog(name = "[Policy] Delete Policy", apiType = ApiType.ADMIN, targetType = "POLICY", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_POLICY_INFO)
     public ResponseEntity<Void> deletePolicy(@PathVariable Long id) {
         policyService.deletePolicy(id);

@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.protocol.api;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,6 +44,7 @@ public class VerificationController {
 
     @Operation(summary = "Initiate Verification",
             description = "Initiates verification based on policy's protocol type (DID VP or OID4VP)")
+    @ArticleLog(name = "[Verification] Initiate", apiType = ApiType.AGENT, targetType = "VERIFICATION", actionType = ActionType.NONE)
     @PostMapping(UrlConstant.Verifier.INITIATE)
     public InitiateResponse initiate(@RequestBody @Valid InitiateRequest request) {
         return verificationOrchestrator.initiate(request);

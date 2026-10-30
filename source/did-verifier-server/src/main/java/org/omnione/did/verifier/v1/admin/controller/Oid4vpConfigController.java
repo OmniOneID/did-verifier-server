@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,7 @@ public class Oid4vpConfigController {
     }
 
     @Operation(summary = "Update OID4VP Config", description = "Update OID4VP configuration and reload SDK cache.")
+    @ArticleLog(name = "[Oid4vpConfig] Update Config", apiType = ApiType.ADMIN, targetType = "OID4VP_CONFIG", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_OID4VP_CONFIG)
     public ResponseEntity<Void> updateConfig(@RequestBody Map<String, Object> configMap) {
         oid4vpConfigService.saveConfig(configMap);

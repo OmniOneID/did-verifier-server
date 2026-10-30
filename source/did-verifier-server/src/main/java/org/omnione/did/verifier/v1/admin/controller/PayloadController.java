@@ -1,5 +1,8 @@
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,7 @@ public class PayloadController {
     }
 
     @Operation(summary = "Save Payload", description = "Save Payload")
+    @ArticleLog(name = "[Payload] Save Payload", apiType = ApiType.ADMIN, targetType = "PAYLOAD", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_PAYLOAD_INFO)
     public  ResponseEntity<Void> savePayload(@RequestBody PayloadDTO reqPayloadDto){
         payloadService.savePayload(reqPayloadDto);
@@ -47,6 +51,7 @@ public class PayloadController {
     }
 
     @Operation(summary = "Delete Payload", description = "Delete Payload")
+    @ArticleLog(name = "[Payload] Delete Payload", apiType = ApiType.ADMIN, targetType = "PAYLOAD", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_PAYLOAD_INFO)
     public ResponseEntity<Void> deletePayload(@PathVariable Long id) {
         payloadService.deletePayload(id);
@@ -55,6 +60,7 @@ public class PayloadController {
 
 
     @Operation(summary = "Update Payload", description = "Update Payload")
+    @ArticleLog(name = "[Payload] Update Payload", apiType = ApiType.ADMIN, targetType = "PAYLOAD", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_PAYLOAD_INFO)
     public ResponseEntity<PayloadDTO> updatePayload(@RequestBody PayloadDTO reqPayloadDto) {
         log.info("Updating Payload: {}", reqPayloadDto);

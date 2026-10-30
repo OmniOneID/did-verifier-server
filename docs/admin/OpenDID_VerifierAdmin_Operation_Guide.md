@@ -18,8 +18,8 @@ puppeteer:
 Open DID Verifier Admin Operation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-10-30
+- Version: v3.0.0
 
 Revision History
 ==
@@ -28,6 +28,7 @@ Revision History
 | v1.0.0  | 2025-03-31 | Initial creation                          |
 | v1.0.1  | 2025-04-25 | Added `3.1. Verifier Registration` section |
 | v2.0.0  | 2025-05-30 | Added ZKP verification-related menus and functional changes |
+| v3.0.0  | 2026-10-30 | Updated navigation, OID4VP, API logs, settings, and screenshots |
 
 Table of Contents
 ==
@@ -50,8 +51,8 @@ Table of Contents
     - [3.1.1. Verifier Registration Process](#311-verifier-registration-process)
     - [3.1.2. Registered Verifier Information Management](#312-registered-verifier-information-management)
     - [3.1.3. Troubleshooting Guide](#313-troubleshooting-guide)
-  - [3.2. Service Configuration](#32-service-configuration)
-    - [3.2.1. Service Configuration Overview](#321-service-configuration-overview)
+  - [3.2. Service Management](#32-service-management)
+    - [3.2.1. Service Management Overview](#321-service-management-overview)
     - [3.2.2. Service Registration / Modification](#322-service-registration--modification)
   - [3.3. VP Policy Management](#33-vp-policy-management)
     - [3.3.1. Filter Management](#331-filter-management)
@@ -73,10 +74,14 @@ Table of Contents
       - [3.4.2.1. ZKP Profile Register](#3421-zkp-profile-register)
     - [3.4.3. ZKP Policy Management](#343-zkp-policy-management)
       - [3.4.3.1. ZKP Policy Register](#3431-zkp-policy-register)
-  - [3.5. VP History Page](#35-vp-history-page)
+  - [3.5. VP History](#35-vp-history)
   - [3.6. Admin Management](#36-admin-management)
     - [3.6.1. Admin List View](#361-admin-list-view)
     - [3.6.2. Admin Registration](#362-admin-registration)
+  - [3.7. OID4VP Management](#37-oid4vp-management)
+  - [3.8. Log Management](#38-log-management)
+  - [3.9. Server Configuration](#39-server-configuration)
+  - [3.10. Password Policy Settings](#310-password-policy-settings)
 
 ## 1.1. Overview
 
@@ -105,8 +110,14 @@ The Admin Console provides the following key features:
   - Proof Request registration and management
   - ZKP Profile registration and management
   - ZKP Policy setup
+- **OID4VP Management**
+  - Client configuration, DCQL scopes, and verification policies
+- **API Log Management**
+  - Agent API calls and administrator action history
 - **VP History**
   - VP verification history checking
+- **Server and Password Policy Settings**
+  - External server integration and administrator password rules
 - **Administrator Account Management**
   - Admin Console account management
 
@@ -138,7 +149,9 @@ To access the Admin Console, follow these steps:
 
 The main screen displayed after login consists of the following elements:
 
-<img src="./images/main_screen.jpg" width="450"/>
+<img src="./images/api-log-api-example.png" width="800"/>
+
+> Screen rendered with example data.
 
 | Number | Area | Description |
 |--------|------|-------------|
@@ -165,20 +178,25 @@ In the initial state where the Verifier server is not yet registered, only the *
 
 Once Verifier registration is complete, all management functions are activated, and the sidebar menu is configured as follows:
 
-<img src="./images/menu_structure.jpg" width="260"/>
+<img src="./images/menu_structure.jpg" width="800"/>
 
-| Number | Menu Name | Function Description | Setup Order |
-|--------|-----------|---------------------|-------------|
-| 1 | **Verifier Management** | View and manage registered verifier information. DID Document viewing and status checking available. | ✅ Complete |
-| 2 | **Service Configuration** | Manage service information to be used in VP and ZKP policies. Set verification type (VP/ZKP) and submission mode. | 🥇 Step 1 |
-| 3 | **VP Policy Management** | Parent menu for managing policies for general VP verification. | 🥈 Step 2 |
-| 4 | **ZKP Policy Management** | Parent menu for managing policies for ZKP (Zero-Knowledge Proof) verification. | 🥉 Step 3 |
-| 5 | **VP History Page** | View VP and ZKP verification history submitted by users. | 📊 Monitoring |
-| 6 | **Admin Management** | Manage administrator accounts with Admin Console access rights. | 🔐 Access Control |
+| Menu | Submenus | Function |
+|------|----------|----------|
+| Verifier Management | — | View registered Verifier information |
+| Service Management | — | Manage verification services |
+| OpenDID > VP | Filter, Process, Profile, Policy Management | Configure VP verification policies |
+| OpenDID > ZKP | Proof Request, Profile, Policy Management | Configure ZKP verification policies |
+| OID4VP | Configuration, DCQL Scope Management, Policy Management | Manage OID4VP settings and policies |
+| VP History | — | Review VP submissions and verification history |
+| Log Management | API Log, Audit API Log | Review Agent API calls and admin actions |
+| Server Configuration | — | Review and manage server integration settings |
+| Admin Management | Admin Management, Password Policy Settings | Manage admin accounts and password rules |
+
+> `OpenDID` VP/ZKP, `OID4VP`, `Log Management`, and `Admin Management` expand to show submenus. Before registration, only `Verifier Registration` appears.
 
 ### 2.3.3. VP Policy Management Sub-menus
 
-When you click VP Policy Management, the following sub-menus are displayed:
+Expand `OpenDID > VP` to see these submenus:
 
 | Sub-menu | Function Description | Setup Order |
 |----------|---------------------|-------------|
@@ -189,7 +207,7 @@ When you click VP Policy Management, the following sub-menus are displayed:
 
 ### 2.3.4. ZKP Policy Management Sub-menus
 
-When you click ZKP Policy Management, the following sub-menus are displayed:
+Expand `OpenDID > ZKP` to see these submenus:
 
 | Sub-menu | Function Description | Setup Order |
 |----------|---------------------|-------------|
@@ -203,7 +221,7 @@ For efficient system configuration, we recommend setting up in the following ord
 
 #### **Step 1: Basic Setup**
 1. **Verifier Registration** - Register Verifier server and generate DID Document
-2. **Service Configuration** - Register basic verification service information
+2. **Service Management** - Register basic verification service information
 
 #### **Step 2: VP Policy Setup** (For general VP verification)
 1. **Filter Management** - Define VC schema and claim conditions
@@ -217,7 +235,7 @@ For efficient system configuration, we recommend setting up in the following ord
 3. **ZKP Policy Management** - Connect Service + ZKP Profile
 
 #### **Step 4: Operation and Management**
-- **VP History Page** - Monitor verification history
+- **VP History** - Monitor verification history
 - **Admin Management** - Manage administrator accounts
 
 > **Note**: VP and ZKP are different verification methods, so you can set up only the policies needed according to your service requirements.
@@ -243,6 +261,8 @@ User password changes can be performed through the following steps:
 <br/>
 
 # 3. Detailed Feature Manual
+
+> Screens after registration show the current sidebar with example data. Actual data varies by environment.
 
 This chapter provides detailed usage instructions for the main features of the Open DID Verifier Admin Console.
 
@@ -413,15 +433,15 @@ Click the **VIEW DID DOCUMENT** button to view the complete DID Document registe
 
 > **Important**: If problems occur during the Verifier registration process, you may need to start over from the beginning. Please perform each step carefully.
 
-## 3.2. Service Configuration
+## 3.2. Service Management
 
-Service Configuration is a function that defines and manages service information to be used in VP and ZKP verification policies.
+Service Management is a function that defines and manages service information to be used in VP and ZKP verification policies.
 
 Service is **a core component that defines the purpose and method of verification requests**, telling users what type of verification is required and providing endpoints to process results after verification completion. All VP and ZKP policies must be connected to one service, so it must be configured first before setting up policies.
 
-### 3.2.1. Service Configuration Overview
+### 3.2.1. Service Management Overview
 
-The Service Configuration menu allows you to manage the entire lifecycle of services.
+The Service Management menu allows you to manage the entire lifecycle of services.
 
 <img src="./images/service_configuration.jpg" width="800"/>
 
@@ -504,6 +524,8 @@ Section for managing endpoint URLs to be connected with the service.
 ---
 
 ## 3.3. VP Policy Management
+
+The current menu path is `OpenDID > VP`.
 
 VP Policy Management is a function that configures and manages policies for general VP (Verifiable Presentation) verification. VP policies are configured step by step in the order **Filter → Process → Profile → Policy**, with each step's settings forming the foundation for the next step.
 
@@ -858,6 +880,8 @@ Once all information input is complete, use the following buttons to finalize re
 
 ## 3.4. ZKP Policy Management
 
+The current menu path is `OpenDID > ZKP`.
+
 ZKP Policy Management is a menu for managing ZKP (Zero-Knowledge Proof) policies. It consists of multiple sub-menus, each managing specific aspects of ZKP policy.
 
 ### 3.4.1. Proof Request Configuration
@@ -959,23 +983,23 @@ Main components required for ZKP policy registration are as follows:
 
 <br/>
 
-### 3.5. VP History Page
+### 3.5. VP History
 
-The VP History Page menu allows you to view the history of VP (Verifiable Presentation) submitted by users. In this screen, you can check the status and detailed information of each VP submission attempt, and track not only successful submissions but also failed or ongoing requests.
+The VP History menu allows you to view the history of VP (Verifiable Presentation) submitted by users. In this screen, you can check the status and detailed information of each VP submission attempt, and track not only successful submissions but also failed or ongoing requests.
 
 <img src="./images/vp_history.jpg" width="800"/>
 
-VP History Page provides the following main functions and information:
+VP History provides the following main functions and information:
 
 | Number | Item | Description |
 |--------|------|-------------|
 | 1 | VP Submit List | Title of VP submission list. |
 | 2 | Transaction Status Filter | Filter only VP submissions of specific status (All, Completed, Pending, Failed) through dropdown menu. |
-| 3 | List Header | Headers for VP submission information such as Transaction Status, Transaction ID, Holder DID, Created At. |
+| 3 | List Header | Headers for VP submission information such as Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, and Format. |
 | 4 | Status Display | Distinguish VP submission status by color. Completed cases are displayed as green background 'Completed', pending cases as yellow background 'Pending', failed cases as red background 'Failed'. |
 | 5 | Transaction ID | Unique transaction identifier for each VP submission attempt is displayed. All status requests can be tracked through this. |
 | 6 | DID Information | Holder DID (DID of user who submitted VP) and submission time (Created At) for each VP submission case are displayed. For ZKP, this value is entered as an arbitrary value of "ZKP holder DID". For Pending or Failed status, it is displayed as "N/A". |
-| 7 | Pagination | Select the number of rows to display per page and navigate between pages. In the example, 1-10 out of 87 total cases are displayed. |
+| 7 | Pagination | Select the number of rows to display per page and navigate between pages. The screenshot shows an empty example list; actual totals vary by environment. |
 
 Through VP history, administrators can perform the following tasks:
 - Understanding VP submission status of specific status (Completed, Pending, Failed)
@@ -1034,5 +1058,61 @@ Click the **REGISTER** button in the `Admin Management` screen to navigate to th
 | 6      | **REGISTER Button**         | Register administrator account based on entered information.               |
 | 7      | **RESET Button**            | Initialize all input values.                                              |
 | 8      | **CANCEL Button**           | Cancel registration and return to previous screen.                        |
+
+## 3.7. OID4VP Management
+
+The `OID4VP` menu manages OpenID4VP verification settings.
+
+### 3.7.1. Configuration
+
+<img src="./images/oid4vp-config.png" width="800"/>
+
+`OID4VP > Configuration` contains the Verifier base URL and client name, client ID scheme and value, session lifetime, invocation scheme, encryption settings, and verification options. Check that values match the connected Wallet before saving.
+
+### 3.7.2. DCQL Scope Management
+
+<img src="./images/oid4vp-scope.png" width="800"/>
+
+`OID4VP > DCQL Scope Management` registers, lists, and updates the credential scopes to request. Select a list item to inspect its details.
+
+### 3.7.3. Policy Management
+
+<img src="./images/oid4vp-policy.png" width="800"/>
+
+`OID4VP > Policy Management` registers and manages verification policies linked to DCQL scopes.
+
+## 3.8. Log Management
+
+After Verifier registration, `Log Management` shows API calls in newest first order with search, pagination, and refresh. Select `Called At` to open a detail dialog. Logs are read only.
+
+### 3.8.1. API Log
+
+<img src="./images/api-log-api-example.png" width="800"/>
+
+`Log Management > API Log` shows Verifier Agent and protocol API calls. The list displays call time, HTTP method, URI, status code, result (`SUCCESS` or `FAIL`), and requester ID. Search by `URI` or `Result`. The detail dialog also shows duration, client IP, user agent, and any recorded error message. The path is `/logs/api`.
+
+<img src="./images/api-log-api-detail-example.png" width="800"/>
+
+### 3.8.2. Audit API Log
+
+<img src="./images/api-log-audit-example.png" width="800"/>
+
+`Log Management > Audit API Log` shows administrator actions through Admin APIs. Search by action type (`CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`), target type, result, or requester ID. The detail dialog shows target ID, action description, client IP, and any recorded error message. The path is `/logs/audit`.
+
+<img src="./images/api-log-audit-detail-example.png" width="800"/>
+
+> Records are created for API calls annotated with `@ArticleLog`. The screens use example logs and accounts.
+
+## 3.9. Server Configuration
+
+<img src="./images/server-configuration.png" width="800"/>
+
+Use `Server Configuration` to view and manage external server integration settings. Changed values must match the connected servers.
+
+## 3.10. Password Policy Settings
+
+<img src="./images/password-policy.png" width="800"/>
+
+Use `Admin Management > Password Policy Settings` to view and update password rules for administrator accounts. Check the rules when creating accounts or changing passwords.
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md

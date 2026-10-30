@@ -55,6 +55,8 @@ import Oid4vpPolicyManagementPage from './pages/oid4vp-management/policy/Oid4vpP
 import Oid4vpPolicyRegistrationPage from './pages/oid4vp-management/policy/Oid4vpPolicyRegistrationPage';
 import Oid4vpPolicyDetailPage from './pages/oid4vp-management/policy/Oid4vpPolicyDetailPage';
 import Oid4vpPolicyEditPage from './pages/oid4vp-management/policy/Oid4vpPolicyEditPage';
+import ApiLogManagementPage from './pages/log/ApiLogManagementPage';
+import AuditApiLogManagementPage from './pages/log/AuditApiLogManagementPage';
 import ServerConfigurationPage from './pages/server-configuration/ServerConfigurationPage';
 import PasswordPolicyManagementPage from './pages/admins/password-policy/PasswordPolicyManagementPage';
 
@@ -174,6 +176,14 @@ const router = createBrowserRouter([
             Component: VpHistoryPage,
           },
           // Server Configuration
+          {
+            path: '/logs/api',
+            Component: ApiLogManagementPage,
+          },
+          {
+            path: '/logs/audit',
+            Component: AuditApiLogManagementPage,
+          },
           {
             path: 'server-configuration',
             Component: ServerConfigurationPage,

@@ -22,10 +22,12 @@ import org.omnione.did.oid4vc.formatter.oid4vp.verifier.impl.OpenDIDVPVerifier;
 import org.omnione.did.oid4vc.formatter.oid4vp.verifier.impl.SDJWTVPVerifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
+@EnableAsync
 @SpringBootApplication
 @ConfigurationPropertiesScan(basePackages = "org.omnione.did.base.property")
 @ComponentScan(

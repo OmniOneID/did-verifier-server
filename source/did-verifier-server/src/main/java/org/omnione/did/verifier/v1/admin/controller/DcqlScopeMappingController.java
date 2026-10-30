@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +56,7 @@ public class DcqlScopeMappingController {
     }
 
     @Operation(summary = "Save Scope Mapping", description = "Create a new DCQL scope mapping.")
+    @ArticleLog(name = "[DcqlScopeMapping] Save Scope Mapping", apiType = ApiType.ADMIN, targetType = "DCQL_SCOPE_MAPPING", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_SCOPE_MAPPING)
     public ResponseEntity<Void> saveScopeMapping(@RequestBody DcqlScopeMappingDTO dto) {
         dcqlScopeMappingService.saveScopeMapping(dto);
@@ -60,6 +64,7 @@ public class DcqlScopeMappingController {
     }
 
     @Operation(summary = "Update Scope Mapping", description = "Update an existing DCQL scope mapping.")
+    @ArticleLog(name = "[DcqlScopeMapping] Update Scope Mapping", apiType = ApiType.ADMIN, targetType = "DCQL_SCOPE_MAPPING", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_SCOPE_MAPPING)
     public ResponseEntity<DcqlScopeMappingDTO> updateScopeMapping(
             @PathVariable Long id, @RequestBody DcqlScopeMappingDTO dto) {
@@ -68,6 +73,7 @@ public class DcqlScopeMappingController {
     }
 
     @Operation(summary = "Delete Scope Mapping", description = "Delete a DCQL scope mapping.")
+    @ArticleLog(name = "[DcqlScopeMapping] Delete Scope Mapping", apiType = ApiType.ADMIN, targetType = "DCQL_SCOPE_MAPPING", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_SCOPE_MAPPING)
     public ResponseEntity<Void> deleteScopeMapping(@PathVariable Long id) {
         dcqlScopeMappingService.deleteScopeMapping(id);

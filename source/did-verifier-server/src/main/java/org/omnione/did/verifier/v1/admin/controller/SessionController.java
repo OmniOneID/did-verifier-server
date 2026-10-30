@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ public class SessionController {
 
     private final SessionService sessionService;
 
+    @ArticleLog(name = "[Session] Request Admin Login", apiType = ApiType.ADMIN, targetType = "SESSION", actionType = ActionType.LOGIN)
     @PostMapping(UrlConstant.Verifier.LOGIN)
     public AdminDto requestAdminLogin(@Valid @RequestBody RequestAdminLoginReqDto requestAdminLoginReqDto) {
         return sessionService.requestAdminLogin(requestAdminLoginReqDto);

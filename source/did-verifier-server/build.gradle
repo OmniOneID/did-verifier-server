@@ -46,6 +46,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
@@ -201,4 +202,8 @@ tasks.named('processResources') {
         dependsOn('npm_build', 'copyFrontResources')
     }
 
+}
+// ArticleLog targetId expressions refer to controller argument names.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-parameters']
 }

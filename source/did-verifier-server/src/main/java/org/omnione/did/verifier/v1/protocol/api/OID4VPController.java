@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.protocol.api;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +59,7 @@ public class OID4VPController {
 
     @Operation(summary = "Receive VP Token Response",
             description = "Wallet submits VP Token via direct_post(.jwt) response mode")
+    @ArticleLog(name = "[OID4VP] Receive Response", apiType = ApiType.AGENT, targetType = "O_I_D4_V_P", actionType = ActionType.NONE)
     @PostMapping(UrlConstant.Oid4vp.RESPONSE)
     public ResponseEntity<Oid4vpResponseResult> receiveResponse(
             @RequestParam(value = "vp_token", required = false) String vpToken,

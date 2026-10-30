@@ -16,6 +16,9 @@
 
 package org.omnione.did.verifier.v1.agent.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.omnione.did.base.constants.UrlConstant;
@@ -47,6 +50,7 @@ public class VerifierController {
      * @return RequestOfferResDto The response containing the VP Offer QR code
      */
     @Operation(summary = "Request VP Offer QR", description = "Creates a VP Offer QR code")
+    @ArticleLog(name = "[Verifier] Request VP Offer by QR", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.NONE)
     @PostMapping(UrlConstant.Verifier.REQUEST_OFFER_QR)
     public RequestOfferResDto requestVpOfferbyQR(@RequestBody @Valid RequestOfferReqDto requestOfferReqDto) {
         return verifierService.requestVpOfferbyQR(requestOfferReqDto);
@@ -58,6 +62,7 @@ public class VerifierController {
      * @param requestProfileReqDto The request data for VP Profile
      * @return RequestProfileResDto The response containing the requested VP Profile
      */
+    @ArticleLog(name = "[Verifier] Request Profile", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.NONE)
     @PostMapping(value = UrlConstant.Verifier.REQUEST_PROFILE)
     @Operation(summary = "Request VP Profile", description = "Request the profile from the VP")
     public RequestProfileResDto requestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto) {
@@ -70,6 +75,7 @@ public class VerifierController {
      * @param requestVerifyReqDto The request data for verification
      * @return RequestVerifyResDto The response containing the verification result
      */
+    @ArticleLog(name = "[Verifier] Request Verify", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.VERIFY)
     @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY)
     @Operation(summary = "Request Verify", description = "Requesting verification from the VP")
     public RequestVerifyResDto requestVerify(@RequestBody @Valid RequestVerifyReqDto requestVerifyReqDto) {
@@ -82,6 +88,7 @@ public class VerifierController {
      * @param confirmVerifyReqDto The request data for confirming verification
      * @return ConfirmVerifyResDto The response containing the confirmation result
      */
+    @ArticleLog(name = "[Verifier] Confirm Verify", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.VERIFY)
     @PostMapping(value = UrlConstant.Verifier.CONFIRM_VERIFY)
     @Operation(summary = "Request Verify confirm", description = "Request confirmation of verification from the VP")
     public ConfirmVerifyResDto confirmVerify(@RequestBody @Valid ConfirmVerifyReqDto confirmVerifyReqDto) {
@@ -94,11 +101,13 @@ public class VerifierController {
      * @return String The response containing the requested ProofProfile
      */
     @Operation(summary = "Request Proof Request Profile", description = "Requesting proof request profile from the VP")
+    @ArticleLog(name = "[Verifier] Request Proof Request Profile", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.VERIFY)
     @PostMapping(value = UrlConstant.Verifier.REQUEST_PROOF_REQUEST_PROFILE)
     public String requestProofRequestProfile(@RequestBody @Valid RequestProfileReqDto requestProfileReqDto){
         return GsonWrapper.getGson().toJson(verifierService.requestProofRequestProfile(requestProfileReqDto));
     }
 
+    @ArticleLog(name = "[Verifier] Request Verify Proof", apiType = ApiType.AGENT, targetType = "VERIFIER", actionType = ActionType.VERIFY)
     @PostMapping(value = UrlConstant.Verifier.REQUEST_VERIFY_PROOF)
     @Operation(summary = "Request Verify Proof", description = "Requesting verification proof from the VP")
     public RequestVerifyResDto requestVerifyProof(@RequestBody @Valid RequestVerifyProofReqDto requestVerifyProofReqDto) {

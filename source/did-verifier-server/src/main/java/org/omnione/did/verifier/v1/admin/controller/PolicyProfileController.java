@@ -1,5 +1,8 @@
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ public class PolicyProfileController {
     }
 
     @Operation(summary = "Save Profile", description = "Save a new profile.")
+    @ArticleLog(name = "[PolicyProfile] Save Profile", apiType = ApiType.ADMIN, targetType = "POLICY_PROFILE", actionType = ActionType.CREATE)
     @PostMapping(UrlConstant.Verifier.SAVE_PROFILE_INFO)
     public ResponseEntity<Void> saveProfile(@RequestBody PolicyProfileDTO policyProfileDTO) {
         policyProfileService.saveProfile(policyProfileDTO);
@@ -45,6 +49,7 @@ public class PolicyProfileController {
     }
 
     @Operation(summary = "Update Profile", description = "Update an existing profile.")
+    @ArticleLog(name = "[PolicyProfile] Update Profile", apiType = ApiType.ADMIN, targetType = "POLICY_PROFILE", actionType = ActionType.UPDATE)
     @PutMapping(UrlConstant.Verifier.UPDATE_PROFILE_INFO)
     public ResponseEntity<PolicyProfileDTO> updateProfile(@RequestBody PolicyProfileDTO policyProfileDTO) {
         PolicyProfileDTO updatedPolicyProfileDTO = policyProfileService.updateProfile(policyProfileDTO);
@@ -52,6 +57,7 @@ public class PolicyProfileController {
     }
 
     @Operation(summary = "Delete Profile", description = "Delete a profile by ID.")
+    @ArticleLog(name = "[PolicyProfile] Delete Profile", apiType = ApiType.ADMIN, targetType = "POLICY_PROFILE", actionType = ActionType.DELETE)
     @DeleteMapping(UrlConstant.Verifier.DELETE_PROFILE_INFO)
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         policyProfileService.deleteProfile(id);

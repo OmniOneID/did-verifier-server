@@ -15,6 +15,9 @@
  */
 package org.omnione.did.verifier.v1.admin.controller;
 
+import org.omnione.did.base.annotation.ArticleLog;
+import org.omnione.did.base.constants.ActionType;
+import org.omnione.did.base.constants.ApiType;
 import org.omnione.did.base.constants.UrlConstant;
 import org.omnione.did.verifier.v1.admin.dto.serverconfig.ServerConfigDto;
 import org.omnione.did.verifier.v1.admin.dto.serverconfig.UpdateServerConfigReqDto;
@@ -48,6 +51,7 @@ public class ServerConfigManagementController {
         return serverConfigManagementService.getServerConfigByKey(configKey);
     }
 
+    @ArticleLog(name = "[ServerConfigManagement] Update Server Configs", apiType = ApiType.ADMIN, targetType = "SERVER_CONFIG_MANAGEMENT", actionType = ActionType.UPDATE)
     @PutMapping(value = "/server-configs")
     public UpdateServerConfigResDto updateServerConfigs(
             @Valid @RequestBody UpdateServerConfigReqDto updateServerConfigReqDto) {
