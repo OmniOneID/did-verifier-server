@@ -31,7 +31,7 @@ import org.omnione.did.base.db.repository.Oid4vpSessionJpaRepository;
 import org.omnione.did.base.db.repository.Oid4vpSessionMappingRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseCoreDidUtil;
+import org.omnione.did.common.util.did.BaseCoreDidUtil;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.did.VerificationMethod;
 import org.omnione.did.oid4vc.formatter.oid4vp.verifier.dto.IdentifierResult;

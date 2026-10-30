@@ -34,12 +34,11 @@ import org.omnione.did.base.db.repository.VpProfileRepository;
 import org.omnione.did.base.db.repository.VpSubmitRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseCryptoUtil;
-import org.omnione.did.base.util.BaseDigestUtil;
-import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.common.util.crypto.BaseCryptoUtil;
+import org.omnione.did.common.util.digest.BaseDigestUtil;
 import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.did.Proof;
@@ -328,9 +327,14 @@ public class VpVerificationApplicationService {
             accE2e.setProof(tmpProof);
 
             String accE2eString = JsonUtil.serializeAndSort(accE2e);
-            BaseCryptoUtil.verifySignature(publicKeyByKeyId.getPublicKeyMultibase(), proof.getProofValue(),
-                    BaseDigestUtil.generateHash(accE2eString.getBytes(StandardCharsets.UTF_8)),
-                    EccCurveType.SECP_256_R1);
+            try {
+                BaseCryptoUtil.verifySignature(publicKeyByKeyId.getPublicKeyMultibase(), proof.getProofValue(),
+                        BaseDigestUtil.generateHash(accE2eString.getBytes(StandardCharsets.UTF_8)),
+                        EccCurveType.SECP_256_R1.toCommonSdkEccCurveType());
+            } catch (CommonSdkException e) {
+                // Hash/signature failures were reported as ACC_E2E_ERROR, not JSON_PARSE_ERROR
+                throw new OpenDidException(ErrorCode.ACC_E2E_ERROR);
+            }
 
         } catch (CommonSdkException e) {
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);

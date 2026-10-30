@@ -19,9 +19,12 @@ package org.omnione.did.verifier.v1.agent.adapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
+import org.omnione.did.base.datamodel.enums.EccCurveType;
 import org.omnione.did.base.db.domain.E2e;
 import org.omnione.did.base.db.repository.E2eRepository;
 import org.omnione.did.base.exception.OpenDidException;
+import org.omnione.did.common.exception.CommonSdkException;
+import org.omnione.did.common.util.crypto.BaseCryptoUtil;
 import org.omnione.did.verifier.v1.agent.config.E2eProperty;
 import org.omnione.did.verifier.v1.agent.service.E2EQueryService;
 import org.omnione.did.verifier.v1.provider.CryptoHelper;
@@ -185,11 +188,10 @@ public class EcdhSessionProviderImpl implements EcdhSessionProvider {
             // 3. Convert to ReqE2e and return
             // Note: sessionKey holds the private key, so it must be converted to a public key
             // BaseCryptoUtil.compressPublicKey restores the public key from the private key
-            // Uses the existing utility rather than CryptoHelper for legacy compatibility
             byte[] privateKeyBytes = cryptoHelper.decodeMultibase(e2e.getSessionKey());
-            byte[] publicKeyBytes = org.omnione.did.base.util.BaseCryptoUtil.compressPublicKey(
+            byte[] publicKeyBytes = BaseCryptoUtil.compressPublicKey(
                     privateKeyBytes,
-                    org.omnione.did.base.datamodel.enums.EccCurveType.fromValue(e2e.getCurve())
+                    EccCurveType.fromValue(e2e.getCurve()).toCommonSdkEccCurveType()
             );
             String publicKey = cryptoHelper.encodeMultibase(publicKeyBytes);
 
@@ -201,7 +203,7 @@ public class EcdhSessionProviderImpl implements EcdhSessionProvider {
                     .padding(e2e.getPadding())
                     .build();
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to get E2E session for txId: {}", txId, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_E2E_SESSION_NOT_FOUND,

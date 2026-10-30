@@ -10,9 +10,9 @@ import org.omnione.did.base.db.repository.PolicyProfileRepository;
 import org.omnione.did.base.db.repository.VpFilterRepository;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.common.util.multibase.BaseMultibaseUtil;
 import org.omnione.did.verifier.v1.admin.api.ListFeign;
 import org.omnione.did.verifier.v1.admin.dto.FilterDTO;
 import org.omnione.did.verifier.v1.admin.dto.VcSchemaListResDto;
@@ -92,6 +92,9 @@ public class FilterService {
             String serializeToFilter = JsonUtil.serializeToJson(snapshot);
             return BaseMultibaseUtil.encode(serializeToFilter.getBytes(StandardCharsets.UTF_8));
         } catch (CommonSdkException e) {
+            if (e.getErrorCode() == org.omnione.did.common.exception.ErrorCode.ENCODING_FAILED) {
+                throw new OpenDidException(ErrorCode.ENCODING_FAILED);
+            }
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }

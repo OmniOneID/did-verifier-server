@@ -16,8 +16,11 @@
 
 package org.omnione.did.verifier.v1.agent.adapter;
 
-import org.omnione.did.base.util.BaseCryptoUtil;
-import org.omnione.did.base.util.BaseMultibaseUtil;
+import org.omnione.did.base.exception.ErrorCode;
+import org.omnione.did.base.exception.OpenDidException;
+import org.omnione.did.common.exception.CommonSdkException;
+import org.omnione.did.common.util.crypto.BaseCryptoUtil;
+import org.omnione.did.common.util.multibase.BaseMultibaseUtil;
 import org.omnione.did.crypto.enums.MultiBaseType;
 import org.omnione.did.verifier.v1.provider.NonceGenerator;
 import org.springframework.stereotype.Component;
@@ -37,8 +40,18 @@ public class NonceGeneratorImpl implements NonceGenerator {
      */
     @Override
     public String generateNonce(int length) {
-        byte[] nonceBytes = BaseCryptoUtil.generateNonce(length);
-        return BaseMultibaseUtil.encode(nonceBytes, MultiBaseType.base64);
+        final byte[] nonceBytes;
+        try {
+            nonceBytes = BaseCryptoUtil.generateNonce(length);
+        } catch (CommonSdkException e) {
+            throw new OpenDidException(ErrorCode.GENERATE_NONCE_FAILED);
+        }
+
+        try {
+            return BaseMultibaseUtil.encode(nonceBytes, MultiBaseType.base64);
+        } catch (CommonSdkException e) {
+            throw new OpenDidException(ErrorCode.ENCODING_FAILED);
+        }
     }
 
     /**

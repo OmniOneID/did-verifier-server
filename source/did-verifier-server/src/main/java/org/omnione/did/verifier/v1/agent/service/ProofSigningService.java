@@ -22,11 +22,11 @@ import org.omnione.did.base.datamodel.enums.ProofPurpose;
 import org.omnione.did.base.db.domain.VerifierInfo;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseCoreDidUtil;
-import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.exception.CommonSdkException;
 import org.omnione.did.common.util.DateTimeUtil;
 import org.omnione.did.common.util.JsonUtil;
+import org.omnione.did.common.util.did.BaseCoreDidUtil;
+import org.omnione.did.common.util.multibase.BaseMultibaseUtil;
 import org.omnione.did.crypto.enums.MultiBaseType;
 import org.omnione.did.data.model.did.DidDocument;
 import org.omnione.did.data.model.did.Proof;
@@ -110,6 +110,9 @@ public class ProofSigningService {
             proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
             return proof;
         } catch (CommonSdkException e) {
+            if (e.getErrorCode() == org.omnione.did.common.exception.ErrorCode.ENCODING_FAILED) {
+                throw new OpenDidException(ErrorCode.ENCODING_FAILED);
+            }
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
@@ -133,6 +136,9 @@ public class ProofSigningService {
             proof.setProofValue(BaseMultibaseUtil.encode(signatureBytes, MultiBaseType.base58btc));
             return proof;
         } catch (CommonSdkException e) {
+            if (e.getErrorCode() == org.omnione.did.common.exception.ErrorCode.ENCODING_FAILED) {
+                throw new OpenDidException(ErrorCode.ENCODING_FAILED);
+            }
             throw new OpenDidException(ErrorCode.JSON_PARSE_ERROR);
         }
     }

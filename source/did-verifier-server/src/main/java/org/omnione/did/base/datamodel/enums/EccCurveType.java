@@ -75,6 +75,15 @@ public enum EccCurveType {
         }
     }
 
+    public org.omnione.did.common.datamodel.enums.crypto.EccCurveType toCommonSdkEccCurveType() {
+        return switch (this) {
+            case SECP_256_K1 ->
+                    org.omnione.did.common.datamodel.enums.crypto.EccCurveType.SECP256K1;
+            case SECP_256_R1 ->
+                    org.omnione.did.common.datamodel.enums.crypto.EccCurveType.SECP256R1;
+        };
+    }
+
     /**
      * Converts this EccCurveType to the corresponding Omnione DidKeyType.
      *

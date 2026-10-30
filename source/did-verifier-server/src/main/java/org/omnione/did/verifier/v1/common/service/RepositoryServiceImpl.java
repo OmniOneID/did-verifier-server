@@ -22,9 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseCoreDidUtil;
-
-import org.omnione.did.base.util.BaseMultibaseUtil;
 import org.omnione.did.common.util.DidUtil;
 import org.omnione.did.core.manager.DidManager;
 import org.omnione.did.data.model.did.DidDocument;
@@ -62,7 +59,9 @@ public class RepositoryServiceImpl implements StorageService {
         try {
             String didDocument = repositoryFeign.getDid(didKeyUrl);
 
-            DidManager didManager = BaseCoreDidUtil.parseDidDoc(didDocument);
+            // Parse with the core SDK directly, as the removed local util did (no exception wrapping)
+            DidManager didManager = new DidManager();
+            didManager.parse(didDocument);
 
             return didManager.getDocument();
         } catch (OpenDidException e) {

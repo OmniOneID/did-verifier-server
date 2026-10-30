@@ -22,9 +22,10 @@ import org.omnione.did.base.datamodel.enums.SymmetricCipherType;
 import org.omnione.did.base.datamodel.enums.SymmetricPaddingType;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
-import org.omnione.did.base.util.BaseCryptoUtil;
-import org.omnione.did.base.util.BaseDigestUtil;
-import org.omnione.did.base.util.BaseMultibaseUtil;
+import org.omnione.did.common.exception.CommonSdkException;
+import org.omnione.did.common.util.crypto.BaseCryptoUtil;
+import org.omnione.did.common.util.digest.BaseDigestUtil;
+import org.omnione.did.common.util.multibase.BaseMultibaseUtil;
 import org.omnione.did.crypto.keypair.KeyPairInterface;
 import org.omnione.did.verifier.v1.provider.CryptoHelper;
 import org.omnione.did.verifier.v1.model.data.KeyPairInfo;
@@ -124,13 +125,13 @@ public class CryptoHelperImpl implements CryptoHelper {
             EccCurveType curveType = EccCurveType.fromValue(curve);
 
             // 2. Generate key pair
-            KeyPairInterface keyPair = BaseCryptoUtil.generateKeyPair(curveType);
+            KeyPairInterface keyPair = BaseCryptoUtil.generateKeyPair(curveType.toCommonSdkEccCurveType());
 
             // 3. Compress public key (extract EC point)
             // getEncoded() returns a DER-encoded X.509 SubjectPublicKeyInfo (starts with 0x30)
             // compressPublicKey() extracts only the EC point and compresses it (starts with 0x02 or 0x03)
             byte[] publicKeyBytes = keyPair.getPublicKey().getEncoded();
-            byte[] compressedPublicKey = BaseCryptoUtil.compressPublicKey(publicKeyBytes, curveType);
+            byte[] compressedPublicKey = BaseCryptoUtil.compressPublicKey(publicKeyBytes, curveType.toCommonSdkEccCurveType());
 
             // 4. Extract private key
             byte[] privateKeyBytes = keyPair.getPrivateKey().getEncoded();
@@ -146,7 +147,7 @@ public class CryptoHelperImpl implements CryptoHelper {
                     .privateKey(privateKey)
                     .build();
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to generate key pair with curve: {}", curve, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_KEY_GENERATION_FAILED,
@@ -173,7 +174,7 @@ public class CryptoHelperImpl implements CryptoHelper {
             log.debug("Nonce generated successfully");
             return nonce;
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to generate nonce with length: {}", length, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_NONCE_GENERATION_FAILED,
@@ -210,14 +211,14 @@ public class CryptoHelperImpl implements CryptoHelper {
             byte[] sharedSecret = BaseCryptoUtil.generateSharedSecret(
                     holderPublicKey,
                     verifierPrivateKey,
-                    curveType
+                    curveType.toCommonSdkEccCurveType()
             );
 
             log.debug("ECDH shared secret generated successfully: {}", sharedSecret);
 
             return sharedSecret;
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to generate shared secret with curve: {}", curve, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_ECDH_KEY_AGREEMENT_FAILED,
@@ -242,14 +243,14 @@ public class CryptoHelperImpl implements CryptoHelper {
             byte[] sessionKey = BaseCryptoUtil.mergeSharedSecretAndNonce(
                     sharedSecret,
                     nonce,
-                    symmetricCipherType
+                    symmetricCipherType.toCommonSdkSymmetricCipherType()
             );
 
             log.debug("Session key derived successfully" + ": {}", Arrays.toString(sessionKey));
 
             return sessionKey;
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to derive session key with cipher type: {}", cipherType, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_KEY_GENERATION_FAILED,
@@ -276,14 +277,14 @@ public class CryptoHelperImpl implements CryptoHelper {
                     encData,
                     sessionKey,
                     iv,
-                    symmetricCipherType,
-                    symmetricPaddingType
+                    symmetricCipherType.toCommonSdkSymmetricCipherType(),
+                    symmetricPaddingType.toCommonSdkSymmetricPaddingType()
             );
 
             log.debug("Data decrypted successfully");
             return decryptedData;
 
-        } catch (OpenDidException e) {
+        } catch (OpenDidException | CommonSdkException e) {
             log.error("Failed to decrypt data with cipher: {}, padding: {}", cipherType, paddingType, e);
             throw new VerifierSdkException(
                     VerifierSdkErrorCode.SDK_DECRYPTION_FAILED,
