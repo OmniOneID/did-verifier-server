@@ -98,7 +98,7 @@ public enum ErrorCode {
     VERIFIER_DID_DOCUMENT_ALREADY_REGISTERED("SSRVVRF00604", "Failed to register Verifier DID Document: document is already registered.", 400),
     DIDDOC_GENERATION_FAILED("SSRVVRF00605", "Failed to generate DID document.", 500),
     FAILED_TO_REGISTER_VERIFIER_DID_DOCUMENT("SSRVVRF00606", "Failed to register Verifier DID Document.", 500),
-    VERIFIER_DID_DOCUMENT_NOT_FOUND("SSRVVRF00607", "Failed to find Verifier DID Document: o registration request has been made.", 400),
+    VERIFIER_DID_DOCUMENT_NOT_FOUND("SSRVVRF00607", "Failed to find Verifier DID Document: no registration request has been made.", 400),
     VERIFIER_DID_DOCUMENT_ALREADY_REQUESTED("SSRVVRF00608", "Failed to register Verifier DID Document: document is already requested.", 400),
     INVALID_CERTIFICATE_VC_JSON_FORMAT("SSRVVRF00609", "Failed to process certificate VC: invalid JSON format.", 500),
 

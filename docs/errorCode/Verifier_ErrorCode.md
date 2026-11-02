@@ -18,13 +18,14 @@ puppeteer:
 Verifier Server Error
 ==
 
-- Date: 2025-05-28
-- Version: v2.0.0
+- Date: 2026-11-02
+- Version: v3.0.0
 
 | Version | Date       | Changes                 |
 |---------|------------|-------------------------|
 | v1.0.0  | 2024-09-03 | Initial version         |
 | v2.0.0  | 2025-05-28 | ADD ZKP & ADMIN ERROR   |
+| v3.0.0  | 2026-11-02 | Added protocol/OID4VP, status list, and server configuration errors |
 
 
 <div style="page-break-after: always;"></div>
@@ -45,6 +46,9 @@ Verifier Server Error
   - [1-10. Verifier Errors (1000-1099)](#1-10-verifier-errors-1000-1099)
   - [1-11. Admin Errors (1100-1199)](#1-11-admin-errors-1100-1199)
   - [1-12. ZKP Errors (1200-1299)](#1-12-zkp-errors-1200-1299)
+  - [1-13. Protocol and OID4VP Errors (1300-1399)](#1-13-protocol-and-oid4vp-errors-1300-1399)
+  - [1-14. Status List Errors (1400-1499)](#1-14-status-list-errors-1400-1499)
+  - [1-15. Server Configuration Errors (21500-21599)](#1-15-server-configuration-errors-21500-21599)
 
 # Model
 ## Error Response
@@ -171,7 +175,7 @@ public class ErrorResponse {
 | SSRVVRF00604 | Failed to register Verifier DID Document: document is already registered. | 400 | Use existing document or update registration. |
 | SSRVVRF00605 | Failed to generate DID document.               | 500         | Check DID document generation process.         |
 | SSRVVRF00606 | Failed to register Verifier DID Document.      | 500         | Verify registration process and requirements.  |
-| SSRVVRF00607 | Failed to find Verifier DID Document: o registration request has been made. | 400 | Complete registration process first. |
+| SSRVVRF00607 | Failed to find Verifier DID Document: no registration request has been made. | 400 | Complete registration process first. |
 | SSRVVRF00608 | Failed to register Verifier DID Document: document is already requested. | 400 | Wait for existing request to complete. |
 | SSRVVRF00609 | Failed to process certificate VC: invalid JSON format. | 500 | Check certificate VC JSON format and structure. |
 
@@ -192,7 +196,7 @@ public class ErrorResponse {
 | Error Code   | Error Message                  | HTTP Status | Action Required                                |
 |--------------|--------------------------------|-------------|------------------------------------------------|
 | SSRVVRF00800 | Certificate VC data not found. | 500         | Check certificate VC data existence and storage. |
-| SSRVVRF00801 | VC Status is not valid.        | 400         | Status of the issued VC is invalid. Please check the VC status |
+| SSRVVRF00801 | VC Status is not valid         | 400         | Status of the issued VC is invalid. Please check the VC status |
 
 <br>
 
@@ -242,3 +246,48 @@ public class ErrorResponse {
 | SSRVVRF01207 | Failed to retrieve ZKP credential definition on the blockchain. | 500 | Verify blockchain connection and credential definition. |
 | SSRVVRF01208 | Failed to find credential schema : credential schema not found | 400 | Check credential schema existence and format.   |
 | SSRVVRF01209 | Failed to find proof request : proof request not found | 400         | Verify proof request data and configuration.    |
+
+<br>
+
+## 1-13. Protocol and OID4VP Errors (1300-1399)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF01300 | Unsupported protocol type. | 400 | Use a supported protocol type (DID_VP or OID4VP). |
+| SSRVVRF01301 | Protocol handler not found for the given protocol type. | 500 | Check the protocol type configured in the policy. |
+| SSRVVRF01302 | Failed to initiate verification. | 500 | Check the policy and OID4VP configuration, then check the server logs. |
+| SSRVVRF01303 | DCQL scope mapping not found. | 400 | Register an enabled DCQL scope mapping for the policy scope in the admin console. |
+| SSRVVRF01304 | OID4VP configuration not found. | 500 | Check that the OID4VP configuration is registered. |
+| SSRVVRF01305 | Failed to initiate OID4VP verification. | 500 | Check the OID4VP configuration and the DCQL query of the scope mapping. |
+| SSRVVRF01306 | OID4VP session mapping not found. | 400 | Check that the transaction or state is valid and has not expired. |
+| SSRVVRF01307 | Failed to retrieve OID4VP authorization request. | 500 | Check that the request ID is valid and has not expired. |
+| SSRVVRF01308 | Failed to process OID4VP response. | 500 | Check the submitted vp_token and the server logs. |
+| SSRVVRF01309 | Failed to generate OID4VP encryption key pair. | 500 | Check the server cryptography environment and the server logs. |
+| SSRVVRF01310 | Failed to load OID4VP encryption private key. | 500 | Check vpTokenEncryptionKey in the OID4VP configuration. Sessions created before the key was changed cannot be decrypted. |
+| SSRVVRF01311 | Failed to parse JWE header. | 400 | Check that the response is a valid compact JWE with a kid header. |
+| SSRVVRF01312 | Failed to decrypt OID4VP JWE response. | 400 | Check that the wallet encrypted the response with the key in the request's client_metadata. |
+| SSRVVRF01313 | OID4VP encryption alg/enc is fixed and cannot be changed to a different value. | 400 | Keep the encryption values as alg ECDH-ES and enc A256GCM when saving the OID4VP configuration. |
+| SSRVVRF01314 | This session requires an encrypted (direct_post.jwt) response; plaintext submission is not accepted. | 400 | Submit the response encrypted as a JWE (direct_post.jwt). |
+| SSRVVRF01315 | OID4VP responseMode is fixed to direct_post.jwt and cannot be changed to a different value. | 400 | Keep responseMode as direct_post.jwt when saving the OID4VP configuration. |
+| SSRVVRF01316 | This verifier only accepts DID-based (kid) mso_mdoc; x5chain-based mdoc is not supported. | 400 | Submit an mso_mdoc credential signed with a DID key (kid). |
+
+<br>
+
+## 1-14. Status List Errors (1400-1499)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF01401 | Failed to fetch status list token. | 500 | Check that the status list URI (http or https) is reachable. For a private-network or loopback host, add it to verifier.status-list.allowed-private-hosts. |
+| SSRVVRF01402 | Status list token validation failed. | 400 | Check the status list token issued by the issuer (signature, format, and expiry). |
+| SSRVVRF01403 | Credential has been revoked. | 400 | The credential is revoked. Request a new credential from the issuer. |
+| SSRVVRF01404 | Credential is suspended. | 400 | The credential is suspended. Contact the issuer. |
+| SSRVVRF01405 | Status list index is out of bounds. | 400 | Check the status list index in the credential. |
+| SSRVVRF01406 | Credential status is reserved and cannot be treated as valid. | 400 | Check the credential status with the issuer. |
+
+<br>
+
+## 1-15. Server Configuration Errors (21500-21599)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF21501 | Server configuration key not found. | 400 | Register the key (for example, API_KEY_LSS) in Server Configuration of the admin console. |

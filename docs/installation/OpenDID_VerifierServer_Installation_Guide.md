@@ -18,8 +18,8 @@ puppeteer:
 Open DID Verifier Server Installation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-11-02
+- Version: v3.0.0
 
 Table of Contents
 ==
@@ -72,10 +72,14 @@ Table of Contents
     - [5.7.1. Blockchain Integration Configuration](#571-blockchain-integration-configuration)
       - [EVM Network Configuration](#evm-network-configuration)
       - [EVM Contract Configuration](#evm-contract-configuration)
+  - [5.8. application-verifier.yml (Status List)](#58-application-verifieryml-status-list)
+  - [5.9. application-lss.yml](#59-application-lssyml)
+  - [5.10. OID4VP Configuration](#510-oid4vp-configuration)
 - [6. Profile Configuration and Usage](#6-profile-configuration-and-usage)
-  - [6.1. Profile Overview (`sample`, `dev`)](#61-profile-overview-sample-dev)
+  - [6.1. Profile Overview (`sample`, `dev`, `lss`)](#61-profile-overview-sample-dev-lss)
     - [6.1.1. `sample` Profile](#611-sample-profile)
     - [6.1.2. `dev` Profile](#612-dev-profile)
+    - [6.1.3. `lss` Profile](#613-lss-profile)
   - [6.2. Profile Configuration Methods](#62-profile-configuration-methods)
     - [6.2.1. When Running Server with IDE](#621-when-running-server-with-ide)
     - [6.2.2. When Running Server with Console Commands](#622-when-running-server-with-console-commands)
@@ -207,37 +211,44 @@ did-verifier-server
 ├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
+├── README_ko.md
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│   └── admin
-│       └── Open DID Verifier Admin Console Guide.md
-│       └── Open DID Verifier Admin Console Guide_ko.md
-│   └── api
-│       └── Verifier_API_ko.md
-│   └── errorCode
-│       └── Verifier_ErrorCode.md
+│   ├── admin
+│   │   ├── OpenDID_VerifierAdmin_Operation_Guide.md
+│   │   └── OpenDID_VerifierAdmin_Operation_Guide_ko.md
+│   ├── api
+│   │   ├── Verifier_API.md
+│   │   └── Verifier_API_ko.md
+│   ├── db
+│   │   ├── OpenDID_TableDefinition_Verifier.md
+│   │   └── OpenDID_TableDefinition_Verifier_ko.md
+│   ├── errorCode
+│   │   ├── Verifier_ErrorCode.md
+│   │   └── Verifier_ErrorCode_ko.md
 │   └── installation
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
-│   └── db
-│       └── OpenDID_TableDefinition_Verifier.md
+│       ├── OpenDID_VerifierServer_Installation_Guide.md
+│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
 └── source
+    ├── Dockerfile
+    ├── did-verifier-admin
     └── did-verifier-server
         ├── gradle
         ├── libs
-            └── did-sdk-common-2.0.0.jar
-            └── did-blockchain-sdk-server-2.0.0.jar
-            └── did-core-sdk-server-2.0.0.jar
-            └── did-crypto-sdk-server-2.0.0.jar
-            └── did-datamodel-server-2.0.0.jar
-            └── did-wallet-sdk-server-2.0.0.jar
-            └── did-zkp-sdk-server-2.0.0.jar
+        │   ├── did-blockchain-sdk-server-2.0.0.jar
+        │   ├── did-common-sdk-server-3.0.0.jar
+        │   ├── did-core-sdk-server-2.0.0.jar
+        │   ├── did-crypto-sdk-server-2.0.0.jar
+        │   ├── did-datamodel-sdk-server-2.0.0.jar
+        │   ├── did-oid4vp-sdk-server-3.0.0.jar
+        │   ├── did-verifier-sdk-server-1.0.0.jar
+        │   ├── did-wallet-sdk-server-2.0.0.jar
+        │   └── did-zkp-sdk-server-2.0.1.jar
         ├── sample
-        └── src
-        └── build.gradle
+        ├── src
+        ├── build.gradle
         └── README.md
-    └── did-verifier-admin 
 ```
 
 | Name                    | Description                              |
@@ -381,7 +392,7 @@ This section guides you through running the Open DID server using console comman
       cd build/libs
       ls
     ```
-- This command generates the `did-verifier-server-2.0.0.jar` file.
+- This command generates the `did-verifier-server-3.0.0.jar` file.
 
 <br/>
 
@@ -460,7 +471,8 @@ The Verifier service communicates with the TAS server. Set the address value of 
 
 - `tas.url`:  
   - URL of the TAS (Trust Anchor Service) service. Can be used for authentication or trust verification.
-  - Example: `http://localhost:8090/tas`
+  - The server adds `/tas` to this address.
+  - Example: `http://localhost:8090`
 
 <br/>
 
@@ -661,9 +673,58 @@ logging:
   - Example: 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63
 <br/>
 
+
+## 5.8. application-verifier.yml (Status List)
+
+- Role: Configures the credential status check that uses an IETF Token Status List (SD-JWT VC and mso_mdoc credentials submitted through OID4VP).
+
+- Location: External configuration file. The `dev` profile group includes the `verifier` profile, so create `application-verifier.yml` in the configuration directory only when you need to change the defaults below.
+
+- `verifier.status-list.fail-on-fetch-error`:
+  - Whether to reject the submission when the status list cannot be fetched. If `false`, the status check is skipped and verification continues. (Default Value: true)
+  - Example: true
+
+- `verifier.status-list.max-cache-ttl-seconds`, `verifier.status-list.min-cache-ttl-seconds`:
+  - Upper and lower bounds of the cache time for a fetched status list token. The `ttl` claim of the token is used within these bounds. (Default Values: 86400, 60)
+  - Example: 86400, 60
+
+- `verifier.status-list.max-decompressed-bytes`:
+  - Maximum size of a decompressed status list. Larger lists are rejected. (Default Value: 1048576)
+  - Example: 1048576
+
+- `verifier.status-list.allowed-private-hosts`:
+  - The status list URI must use `http` or `https`, and a host that resolves to a loopback, private, or link-local address is rejected. List hosts on a closed network or a local development server here (exact host match). (Default Value: empty)
+  - Example: `[192.168.0.10, localhost]`
+
+## 5.9. application-lss.yml
+
+- Role: Configures integration with the LSS (Ledger Service Server). When the `lss` profile is active, the Verifier reads DID Documents from LSS instead of the blockchain.
+
+- Location: `src/main/resources/config`
+
+- `lss.url`:
+  - LSS server address.
+  - Example: `http://127.0.0.1:8098`
+
+- LSS API Key:
+  - The Verifier sends the LSS API key in the `X-API-Key` header. Register the key issued by LSS as `API_KEY_LSS` in Server Configuration of the Admin Console. If it is not registered, LSS calls fail with `SSRVVRF21501`.
+
+## 5.10. OID4VP Configuration
+
+- Role: The OID4VP configuration is stored in the `oid4vp_config` table, not in a yml file, and is managed in the Admin Console. The scope used by an `OID4VP` policy is mapped to a DCQL query in DCQL Scope Mapping of the Admin Console.
+
+- `crypto.vpTokenEncryptionKey`:
+  - AES-256 key (Base64, 32 bytes) that encrypts the stored VP Token and the per-session response decryption key. The initial data contains a sample key, so **replace it before operation**. Example of generating a key: `openssl rand -base64 32`
+  - Sessions created before the key is replaced cannot be decrypted (`SSRVVRF01310`). Replace it when no verification is in progress.
+  - The Admin API `GET /verifier/admin/v1/oid4vp/config` returns the configuration including this key in plaintext (the Admin Console screen masks it). Restrict access to the Admin Console.
+
+- Fixed values:
+  - `responseMode` is fixed to `direct_post.jwt`, and response encryption is fixed to `alg` ECDH-ES and `enc` A256GCM. Saving other values fails (`SSRVVRF01315`, `SSRVVRF01313`).
+
+
 # 6. Profile Configuration and Usage
 
-## 6.1. Profile Overview (`sample`, `dev`)
+## 6.1. Profile Overview (`sample`, `dev`, `lss`)
 
 The Verifier server supports two profiles, `dev` and `sample`, to run in various environments.
 
@@ -681,6 +742,10 @@ The `sample` profile is designed to run the server independently without integra
 
 The `dev` profile includes configurations suitable for development environments and is used on development servers. To use this profile, configuration for development environment databases and blockchain nodes is required.
 
+### 6.1.3. `lss` Profile
+
+The `lss` profile is used together with `dev` (for example, `dev,lss`). The Verifier reads DID Documents from LSS instead of the blockchain, so blockchain configuration is not required. Set `lss.url` (5.9) and register `API_KEY_LSS` in the Admin Console.
+
 ## 6.2. Profile Configuration Methods
 
 This section explains how to change profiles for each running method.
@@ -697,7 +762,7 @@ This section explains how to change profiles for each running method.
 - **Profile Specification:** Add the `--spring.profiles.active={profile}` option to the server running command to activate the desired profile.
   
   ```bash
-  java -jar build/libs/did-verifier-server-2.0.0.jar --spring.profiles.active={profile}
+  java -jar build/libs/did-verifier-server-3.0.0.jar --spring.profiles.active={profile}
   ```
 
 - **Configuration Application:** The corresponding configuration file is applied according to the activated profile.
@@ -842,5 +907,5 @@ docker-compose up -d
 This command runs the PostgreSQL container in the background. The PostgreSQL server runs according to the configured environment variables, and the database is prepared. You can then proceed with integration settings to use this database in your application.
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-Orchestrator-V2.0.0.0.md
-[Open DID Admin Console Guide]: ../admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
+[Open DID Admin Console Guide]: ../admin/OpenDID_VerifierAdmin_Operation_Guide.md
 [DID Besu Contract]: https://github.com/OmniOneID/did-besu-contract

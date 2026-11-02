@@ -45,8 +45,8 @@ did-verifier-server
 │       ├── OpenDID_TableDefinition_Verifier.md
 │       └── OpenDID_TableDefinition_Verifier_ko.md
 │   └── installation
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
+│       └── OpenDID_VerifierServer_Installation_Guide.md
+│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
 └── source
     └── did-verifier-admin
         ├── frontend
@@ -81,16 +81,16 @@ Below is a description of each folder and file in the directory:
 
 ## Installation And Operation Guide
 
-For detailed instructions on installing the Issuer Server, please refer to the guide below:
+For detailed instructions on installing the Verifier Server, please refer to the guide below:
 - [OpenDID Verifier Server Installation Guide](docs/installation/OpenDID_VerifierServer_Installation_Guide.md)  
 
 For detailed instructions on operating the Verifier Admin Console, please refer to the guide below:  
-- [OpenDID Verifier Admin Console Operation Guide](docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md)
+- [OpenDID Verifier Admin Console Operation Guide](docs/admin/OpenDID_VerifierAdmin_Operation_Guide.md)
 
 ## API Reference
 
 - **Verifier API**: Detailed reference for the Verifier Server's API endpoints and usage.
-  - [Verifier API Reference](docs/api/Verifier_API_ko.md)
+  - [Verifier API Reference](docs/api/Verifier_API.md)
 
 ## Change Log
 

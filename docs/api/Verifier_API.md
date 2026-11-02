@@ -18,8 +18,8 @@ puppeteer:
 Verifier API
 ==
 
-- Date: 2024-08-19
-- Version: v1.0.0
+- Date: 2026-11-02
+- Version: v3.0.0
 
 ## Revision History
 
@@ -27,7 +27,8 @@ Verifier API
 | ----------- | ---------- | ---------------------------------------------------------------- |
 | 1.0.0       | 2024-09-03 | Initial release                                                  |
 | 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] Request data modified (added policyId, removed device, service, mode) |
-| 1.0.2 (dev) | 2024-XX-XX | [5. P311 - ZKP Proof Submission Protocol] Added                 |
+| 2.0.0       | 2025-05-30 | [5. P311 - ZKP Proof Submission Protocol] Added                 |
+| 3.0.0       | 2026-11-02 | [7. Protocol-Agnostic Verification API (v2)] and [8. OID4VP API] added |
 
 <!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
@@ -38,6 +39,8 @@ Table of Contents
   - [3. API List](#3-api-list)
     - [3.1. Sequential API](#31-sequential-api)
     - [3.2. Single Call API](#32-single-call-api)
+    - [3.3. Protocol-Agnostic Verification API (v2)](#33-protocol-agnostic-verification-api-v2)
+    - [3.4. OID4VP API](#34-oid4vp-api)
   - [4. P310 - VP Submission Protocol](#4-p310---vp-submission-protocol)
     - [4.1. Request Offer (QR)](#41-request-offer-qr)
     - [4.2. Request Profile](#42-request-profile)
@@ -49,6 +52,12 @@ Table of Contents
   - [6. Single Call API](#6-single-call-api)
     - [6.1. Issue Certificate VC](#61-issue-certificate-vc)
     - [6.2. Get Certificate Vc](#62-get-certificate-vc)
+  - [7. Protocol-Agnostic Verification API (v2)](#7-protocol-agnostic-verification-api-v2)
+    - [7.1. Initiate](#71-initiate)
+    - [7.2. Get Status](#72-get-status)
+  - [8. OID4VP API](#8-oid4vp-api)
+    - [8.1. Get Authorization Request](#81-get-authorization-request)
+    - [8.2. Receive Response](#82-receive-response)
 
 
 ## 1. Overview
@@ -106,6 +115,22 @@ This document defines the APIs provided by the Verifier Service.
 | ---------------------- | ---------------------- | ---------------------- | ------------ |
 | `issue-certificate-vc` | /api/v1/certificate-vc | Entity registration request | N |
 | `get-certificate-vc`   | /api/v1/certificate-vc | Certificate inquiry    | N |
+
+### 3.3. Protocol-Agnostic Verification API (v2)
+
+| API | URL | Description | Standard API |
+| --- | --- | --- | --- |
+| `initiate` | /api/v2/initiate | Start verification for a VP policy (DID_VP or OID4VP) | N |
+| `status` | /api/v2/status/{sessionId} | Verification status inquiry | N |
+
+### 3.4. OID4VP API
+
+| API | URL | Description | Standard API |
+| --- | --- | --- | --- |
+| `oid4vp-request` | /oid4vp/request/{requestId} | Authorization request (request object) inquiry | Y |
+| `oid4vp-response` | /oid4vp/response | VP Token response submission (direct_post.jwt) | Y |
+
+> The OID4VP API is not under the `/verifier` prefix. The wallet calls it through `request_uri` and `response_uri` in the authorization request.
 
 <div style="page-break-after: always; margin-top: 50px;"></div>
 
@@ -1271,3 +1296,455 @@ Content-Type: application/json;charset=utf-8
 }
 ```
 
+<div style="page-break-after: always; margin-top: 50px;"></div>
+
+## 7. Protocol-Agnostic Verification API (v2)
+
+Starts verification without knowing the protocol in advance. The Verifier reads the protocol type (`DID_VP` or `OID4VP`) from the VP policy and starts that protocol.
+
+- `DID_VP`: works the same as `request-offer-qr` of P310. The wallet then calls `request-profile`, `request-verify`, and `confirm-verify`.
+- `OID4VP`: returns an OID4VP authorization request URI. The wallet gets the request object from `/oid4vp/request/{requestId}` and submits its response to `/oid4vp/response` (Chapter 8).
+- The service checks the result with `status`.
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+### 7.1. Initiate
+
+Starts verification for a VP policy.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `POST` | |
+| Path | `/api/v2/initiate` |  |
+| Authorization | - | |
+
+#### 7.1.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` | |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+```c#
+def object Initiate: "Initiate verification request"
+{
+    + string "policyId": "VP policy ID"
+}
+```
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.1.2. Response
+
+**■ Process**
+1. Retrieve the VP policy by policyId and read its protocol type
+1. `DID_VP`: create a verify offer (same as `request-offer-qr`)
+1. `OID4VP`: find the DCQL query mapped to the policy scope, generate a response encryption key, create an OID4VP session, and build the authorization request URI
+
+**■ Status 200 - Success**
+
+```c#
+def object _Initiate: "Initiate verification response"
+{
+    + string "protocol"            : "protocol type", value(DID_VP, OID4VP)
+    + uuid   "sessionId"           : "transaction id (txId)"
+    - VerifyOfferPayload "payload" : "VP offer payload. DID_VP only" // Refer to data specification
+    - string "authorizationRequest": "OID4VP authorization request URI. OID4VP only"
+    + object "nextEndpoints"       : "next API paths of the protocol"
+}
+```
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00201 | VP_POLICY is not found. |
+| SSRVVRF01303 | DCQL scope mapping not found. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01301 | Protocol handler not found for the given protocol type. |
+| SSRVVRF01302 | Failed to initiate verification. |
+| SSRVVRF01305 | Failed to initiate OID4VP verification. |
+| SSRVVRF01309 | Failed to generate OID4VP encryption key pair. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.1.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/verifier/api/v2/initiate" \
+-H "Content-Type: application/json;charset=utf-8" \
+-d '{"policyId": "f1a2b3c4-d5e6-7890-1234-56789abcdef0"}'
+```
+
+**■ Response (DID_VP)**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "protocol": "DID_VP",
+  "sessionId": "70e22f4e-ca60-48d3-88ee-a43d42ad3313",
+  "payload": {
+    "offerId": "3bf6a1a0-beca-4450-a01e-4e2166819504",
+    "type": "VerifyOffer",
+    "mode": "Direct",
+    "device": "WEB",
+    "service": "login",
+    "endpoints": [
+      "http://127.0.0.1:8092/verifier/api/v1/request-verify"
+    ],
+    "validUntil": "2024-01-01T08:44:58.048519445Z",
+    "locked": false
+  },
+  "nextEndpoints": {
+    "requestProfile": "/verifier/api/v1/request-profile",
+    "requestVerify": "/verifier/api/v1/request-verify",
+    "confirmVerify": "/verifier/api/v1/confirm-verify"
+  }
+}
+```
+
+**■ Response (OID4VP)**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "protocol": "OID4VP",
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "authorizationRequest": "openid4vp://?request_uri=http%3A%2F%2F127.0.0.1%3A8092%2Foid4vp%2Frequest%2Fa1b2c3d4&client_id=decentralized_identifier%3Adid%3Aomn%3Averifier",
+  "nextEndpoints": {
+    "authorizationRequest": "/oid4vp/request/a1b2c3d4",
+    "response": "/oid4vp/response"
+  }
+}
+```
+
+### 7.2. Get Status
+
+Retrieves the status of a verification session.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `GET` | |
+| Path | `/api/v2/status/{sessionId}` |  |
+| Authorization | - | |
+
+#### 7.2.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` | |
+
+**■ Path Parameters**
+
+| Parameter | Description | Remarks |
+| --------- | ----------- | ------- |
+| + `sessionId` | transaction id (txId) returned by `initiate` | |
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.2.2. Response
+
+**■ Process**
+1. Retrieve the transaction by sessionId
+1. If the transaction is `PENDING` and has expired, return `EXPIRED`
+1. For a completed OID4VP submission, return the credential format and the claims of the submitted credential
+
+**■ Status 200 - Success**
+
+```c#
+def object _Status: "Verification status response"
+{
+    + uuid   "sessionId": "transaction id (txId)"
+    + string "protocol" : "protocol type", value(DID_VP, OID4VP)
+    + string "status"   : "status", value(PENDING, COMPLETED, FAILED, CANCELED, EXPIRED)
+    - string "format"   : "submitted credential format. Completed OID4VP only"
+    - array object "claims": "submitted claims. Completed OID4VP only"
+    {
+        + string "caption": "claim name"
+        + string "value"  : "claim value"
+    }
+}
+```
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00300 | Transaction not found. |
+
+**■ Status 500 - Server error**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.2.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X GET "http://${Host}:${Port}/verifier/api/v2/status/5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67"
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "protocol": "OID4VP",
+  "status": "COMPLETED",
+  "format": "dc+sd-jwt",
+  "claims": [
+    { "caption": "name", "value": "Hong Gildong" },
+    { "caption": "birth_date", "value": "1990-01-01" }
+  ]
+}
+```
+
+<div style="page-break-after: always; margin-top: 50px;"></div>
+
+## 8. OID4VP API
+
+APIs that a wallet calls for OpenID for Verifiable Presentations (OID4VP). Verification starts with `initiate` (7.1) of a policy whose protocol type is `OID4VP`.
+
+- The response mode is fixed to `direct_post.jwt`. The wallet must encrypt its response as a JWE with the key in `client_metadata` of the request object (ECDH-ES, A256GCM).
+- Supported credential formats are those registered in the OID4VP configuration (for example `opendid_vc`, `dc+sd-jwt`, `mso_mdoc`). For `mso_mdoc`, only DID-based (`kid`) credentials are accepted.
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+### 8.1. Get Authorization Request
+
+The wallet retrieves the signed authorization request (request object) through `request_uri`.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `GET` | |
+| Path | `/oid4vp/request/{requestId}` | Not under `/verifier` |
+| Authorization | - | |
+
+#### 8.1.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Accept` | `application/oauth-authz-req+jwt` | |
+
+**■ Path Parameters**
+
+| Parameter | Description | Remarks |
+| --------- | ----------- | ------- |
+| + `requestId` | request id in `request_uri` | |
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.1.2. Response
+
+**■ Process**
+1. Retrieve the OID4VP session by requestId and check that the transaction is valid
+1. Build the authorization request and sign it with the Verifier `assert` key (ES256)
+
+**■ Status 200 - Success**
+
+The body is the request object, a compact JWS signed with ES256.
+
+- Header: `alg` ES256, `typ` oauth-authz-req+jwt, `kid` (Verifier `assert` key), `jwk`
+- Payload: `response_type` (vp_token), `client_id`, `response_mode` (direct_post.jwt), `nonce`, `state`, `response_uri`, `dcql_query`, `client_metadata` (response encryption key `jwks` and `encrypted_response_enc_values_supported`), `iat`
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00300 | Transaction not found. |
+| SSRVVRF00301 | Transaction status is not pending. |
+| SSRVVRF00302 | Transaction has expired. |
+| SSRVVRF01306 | OID4VP session mapping not found. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01307 | Failed to retrieve OID4VP authorization request. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.1.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X GET "http://${Host}:${Port}/oid4vp/request/a1b2c3d4"
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/oauth-authz-req+jwt
+
+eyJhbGciOiJFUzI1NiIsInR5cCI6Im9hdXRoLWF1dGh6LXJlcStqd3QiLCJraWQiOiJkaWQ6b21uOnZlcmlmaWVyP3ZlcnNpb25JZD0xI2Fzc2VydCJ9.eyJyZXNwb25zZV90eXBlIjoidnBfdG9rZW4ifQ.c2lnbmF0dXJl
+```
+
+Decoded payload (abbreviated):
+
+```json
+{
+  "response_type": "vp_token",
+  "client_id": "decentralized_identifier:did:omn:verifier",
+  "response_mode": "direct_post.jwt",
+  "nonce": "mRk9...",
+  "state": "8f3c...",
+  "response_uri": "http://127.0.0.1:8092/oid4vp/response",
+  "dcql_query": { "credentials": [ { "id": "pid", "format": "dc+sd-jwt" } ] },
+  "client_metadata": {
+    "jwks": { "keys": [ { "kty": "EC", "crv": "P-256", "kid": "...", "x": "...", "y": "..." } ] },
+    "encrypted_response_enc_values_supported": [ "A256GCM" ]
+  },
+  "iat": 1730000000
+}
+```
+
+### 8.2. Receive Response
+
+The wallet submits the VP Token through `response_uri`.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `POST` | |
+| Path | `/oid4vp/response` | Not under `/verifier` |
+| Authorization | - | |
+
+#### 8.2.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/x-www-form-urlencoded` | |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+```c#
+def object Oid4vpResponse: "VP Token response (application/x-www-form-urlencoded)"
+{
+    - string "response"               : "JWE (direct_post.jwt). Contains vp_token and state"
+    - string "vp_token"               : "VP Token (plaintext). Rejected when the session requires direct_post.jwt"
+    - string "state"                  : "state of the authorization request (plaintext)"
+    - string "presentation_submission": "presentation submission"
+    - string "error"                  : "error code from the wallet"
+    - string "error_description"      : "error description from the wallet"
+}
+```
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.2.2. Response
+
+**■ Process**
+1. If `response` (JWE) is present, find the session by the JWE `kid` and decrypt it with the session private key
+1. Check the `state` and verify the VP Token (signature, holder binding, nonce, credential status)
+1. Save the submission result (VP History) and update the transaction status
+
+**■ Status 200 - Success**
+
+```c#
+def object _Oid4vpResponse: "VP Token response result"
+{
+    + uuid   "sessionId"       : "transaction id (txId)"
+    + string "status"          : "result", value(COMPLETED, FAILED)
+    - string "error"           : "error code. FAILED only"
+    - string "errorDescription": "error description. FAILED only"
+}
+```
+
+**■ Status 400 - Client error**
+
+A failed verification returns `_Oid4vpResponse` with `status` `FAILED`.
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01306 | OID4VP session mapping not found. |
+| SSRVVRF01311 | Failed to parse JWE header. |
+| SSRVVRF01312 | Failed to decrypt OID4VP JWE response. |
+| SSRVVRF01314 | This session requires an encrypted (direct_post.jwt) response; plaintext submission is not accepted. |
+| SSRVVRF01316 | This verifier only accepts DID-based (kid) mso_mdoc; x5chain-based mdoc is not supported. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01310 | Failed to load OID4VP encryption private key. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.2.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/oid4vp/response" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "response=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImtpZCI6Ii4uLiJ9..."
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "status": "COMPLETED"
+}
+```

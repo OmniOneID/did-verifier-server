@@ -18,8 +18,8 @@ puppeteer:
 Open DID Verifier Server Installation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-11-02
+- Version: v3.0.0
 
 목차
 ==
@@ -73,10 +73,14 @@ Open DID Verifier Server Installation Guide
     - [5.7.1. 블록체인 연동 설정](#571-블록체인-연동-설정)
       - [EVM Network Configuration](#evm-network-configuration)
       - [EVM Contract Configuration](#evm-contract-configuration)
+  - [5.8. application-verifier.yml (Status List)](#58-application-verifieryml-status-list)
+  - [5.9. application-lss.yml](#59-application-lssyml)
+  - [5.10. OID4VP 설정](#510-oid4vp-설정)
 - [6. 프로파일 설정 및 사용](#6-프로파일-설정-및-사용)
-  - [6.1. 프로파일 개요 (`sample`, `dev`)](#61-프로파일-개요-sample-dev)
+  - [6.1. 프로파일 개요 (`sample`, `dev`, `lss`)](#61-프로파일-개요-sample-dev-lss)
     - [6.1.1. `sample` 프로파일](#611-sample-프로파일)
     - [6.1.2. `dev` 프로파일](#612-dev-프로파일)
+    - [6.1.3. `lss` 프로파일](#613-lss-프로파일)
   - [6.2. 프로파일 설정 방법](#62-프로파일-설정-방법)
     - [6.2.1. IDE를 사용한 서버 구동 시](#621-ide를-사용한-서버-구동-시)
     - [6.2.2. 콘솔 명령어를 사용한 서버 구동 시](#622-콘솔-명령어를-사용한-서버-구동-시)
@@ -211,37 +215,44 @@ did-verifier-server
 ├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
+├── README_ko.md
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│   └── admin
-│       └── Open DID Verifier Admin Console Guide.md
-│       └── Open DID Verifier Admin Console Guide_ko.md
-│   └── api
-│       └── Verifier_API_ko.md
-│   └── errorCode
-│       └── Verifier_ErrorCode.md
-│   └── installation
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
-│   └── db
-│       └── OpenDID_TableDefinition_Verifier.md
+│   ├── admin
+│   │   ├── OpenDID_VerifierAdmin_Operation_Guide.md
+│   │   └── OpenDID_VerifierAdmin_Operation_Guide_ko.md
+│   ├── api
+│   │   ├── Verifier_API.md
+│   │   └── Verifier_API_ko.md
+│   ├── db
+│   │   ├── OpenDID_TableDefinition_Verifier.md
+│   │   └── OpenDID_TableDefinition_Verifier_ko.md
+│   ├── errorCode
+│   │   ├── Verifier_ErrorCode.md
+│   │   └── Verifier_ErrorCode_ko.md
+│   └── installation
+│       ├── OpenDID_VerifierServer_Installation_Guide.md
+│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
 └── source
+    ├── Dockerfile
+    ├── did-verifier-admin
     └── did-verifier-server
         ├── gradle
         ├── libs
-            └── did-sdk-common-2.0.0.jar
-            └── did-blockchain-sdk-server-2.0.0.jar
-            └── did-core-sdk-server-2.0.0.jar
-            └── did-crypto-sdk-server-2.0.0.jar
-            └── did-datamodel-server-2.0.0.jar
-            └── did-wallet-sdk-server-2.0.0.jar
-            └── did-zkp-sdk-server-2.0.0.jar
+        │   ├── did-blockchain-sdk-server-2.0.0.jar
+        │   ├── did-common-sdk-server-3.0.0.jar
+        │   ├── did-core-sdk-server-2.0.0.jar
+        │   ├── did-crypto-sdk-server-2.0.0.jar
+        │   ├── did-datamodel-sdk-server-2.0.0.jar
+        │   ├── did-oid4vp-sdk-server-3.0.0.jar
+        │   ├── did-verifier-sdk-server-1.0.0.jar
+        │   ├── did-wallet-sdk-server-2.0.0.jar
+        │   └── did-zkp-sdk-server-2.0.1.jar
         ├── sample
-        └── src
-        └── build.gradle
+        ├── src
+        ├── build.gradle
         └── README.md
-    └── did-verifier-admin 
 ```
 
 | Name                    | Description                              |
@@ -387,7 +398,7 @@ npm run dev
       cd build/libs
       ls
     ```
-- 이 명령어는 `did-verifier-server-2.0.0.jar` 파일을 생성합니다.
+- 이 명령어는 `did-verifier-server-3.0.0.jar` 파일을 생성합니다.
 
 <br/>
 
@@ -466,7 +477,8 @@ Verifier 서비스는 TAS 서버와 통신을 합니다. 직접 구축한 TAS서
 
 - `tas.url`:  
   - TAS(Trust Anchor Service) 서비스의 URL입니다. 인증이나 신뢰 검증에 사용될 수 있습니다.
-  - 예시: `http://localhost:8090/tas`
+  - 서버가 이 주소 뒤에 `/tas`를 붙입니다.
+  - 예시: `http://localhost:8090`
 
 <br/>
 
@@ -637,23 +649,23 @@ logging:
 #### EVM Network Configuration
 
 - `evm.network.url`:
-  - EVM Network 주소, 클라이언트와 동일한 로컬에 Besu를 구동하는 경우 해당 값은 고정 사용합니다. (Defalt Port : 8545)
+  - EVM Network 주소, 클라이언트와 동일한 로컬에 Besu를 구동하는 경우 해당 값은 고정 사용합니다. (Default Port : 8545)
   - 예시: http://localhost:8545
 
 - `evm.chainId`:
-  - Chain ID 식별자입니다. 현재는 1337의 고정값을 사용중입니다.(Defalt Value : 1337)
+  - Chain ID 식별자입니다. 현재는 1337의 고정값을 사용중입니다.(Default Value : 1337)
   - 예시: 1337
 
 - `evm.gas.limit`:
-  - Hyperledger Besu EVM 트랜잭션에서 최대로 허용되는 가스 한도, 현재는 Free Gas로서 고정으로 사용합니다. (Defalt Value : 100000000)
+  - Hyperledger Besu EVM 트랜잭션에서 최대로 허용되는 가스 한도, 현재는 Free Gas로서 고정으로 사용합니다. (Default Value : 100000000)
   - 예시: 100000000
 
 - `evm.gas.price`:
-  - 유닛 단위 가스 가격, 현재는 Free Gas로서 0으로  고정으로 사용합니다.(Defalt Value : 0)
+  - 유닛 단위 가스 가격, 현재는 Free Gas로서 0으로  고정으로 사용합니다.(Default Value : 0)
   - 예시: 0
 
 - `evm.connection.timeout`: 
-  - 네트워크 커넥션 타임아웃 값(milliseconds), 현재는 권장 값인 10000으로 고정 사용합니다. (Defalt Value : 10000)
+  - 네트워크 커넥션 타임아웃 값(milliseconds), 현재는 권장 값인 10000으로 고정 사용합니다. (Default Value : 10000)
   - 예시: 10000
 
 #### EVM Contract Configuration
@@ -667,9 +679,58 @@ logging:
   - 예시: 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63
 <br/>
 
+
+## 5.8. application-verifier.yml (Status List)
+
+- 역할: IETF Token Status List를 이용한 크리덴셜 상태 확인을 설정합니다(OID4VP로 제출된 SD-JWT VC, mso_mdoc 크리덴셜).
+
+- 위치: 외부 설정 파일입니다. `dev` 프로파일 그룹에 `verifier` 프로파일이 포함되어 있으므로, 아래 기본값을 바꿀 때만 설정 디렉토리에 `application-verifier.yml`을 만듭니다.
+
+- `verifier.status-list.fail-on-fetch-error`:
+  - status list를 가져오지 못했을 때 제출을 거부할지 여부입니다. `false`이면 상태 확인을 건너뛰고 검증을 계속합니다. (기본값: true)
+  - 예시: true
+
+- `verifier.status-list.max-cache-ttl-seconds`, `verifier.status-list.min-cache-ttl-seconds`:
+  - 가져온 status list token의 캐시 시간 상한과 하한입니다. token의 `ttl` 클레임을 이 범위 안에서 사용합니다. (기본값: 86400, 60)
+  - 예시: 86400, 60
+
+- `verifier.status-list.max-decompressed-bytes`:
+  - 압축을 푼 status list의 최대 크기입니다. 이보다 크면 거부합니다. (기본값: 1048576)
+  - 예시: 1048576
+
+- `verifier.status-list.allowed-private-hosts`:
+  - status list URI는 `http` 또는 `https`여야 하고, 루프백·사설·링크 로컬 주소로 해석되는 호스트는 거부합니다. 폐쇄망이나 로컬 개발 서버의 호스트는 여기에 등록합니다(호스트 이름이 정확히 같아야 함). (기본값: 없음)
+  - 예시: `[192.168.0.10, localhost]`
+
+## 5.9. application-lss.yml
+
+- 역할: LSS(Ledger Service Server) 연동을 설정합니다. `lss` 프로파일을 켜면 Verifier는 블록체인 대신 LSS에서 DID Document를 조회합니다.
+
+- 위치: `src/main/resources/config`
+
+- `lss.url`:
+  - LSS 서버 주소입니다.
+  - 예시: `http://127.0.0.1:8098`
+
+- LSS API Key:
+  - Verifier는 LSS API Key를 `X-API-Key` 헤더로 보냅니다. LSS에서 발급한 키를 관리자 콘솔의 Server Configuration에 `API_KEY_LSS`로 등록하세요. 등록하지 않으면 LSS 호출이 `SSRVVRF21501`로 실패합니다.
+
+## 5.10. OID4VP 설정
+
+- 역할: OID4VP 설정은 yml 파일이 아니라 `oid4vp_config` 테이블에 저장되며 관리자 콘솔에서 관리합니다. `OID4VP` 정책이 사용하는 scope는 관리자 콘솔의 DCQL Scope Mapping에서 DCQL query와 연결합니다.
+
+- `crypto.vpTokenEncryptionKey`:
+  - 저장되는 VP Token과 세션별 응답 복호화 키를 암호화하는 AES-256 키(Base64, 32바이트)입니다. 초기 데이터에는 예시 키가 들어 있으므로 **운영 전에 반드시 교체하세요.** 키 생성 예: `openssl rand -base64 32`
+  - 키를 바꾸기 전에 만든 세션은 복호화할 수 없습니다(`SSRVVRF01310`). 진행 중인 검증이 없을 때 교체하세요.
+  - 관리자 API `GET /verifier/admin/v1/oid4vp/config`는 이 키를 포함한 설정을 평문으로 돌려줍니다(관리자 콘솔 화면에서는 가려서 표시). 관리자 콘솔 접근을 제한하세요.
+
+- 고정 값:
+  - `responseMode`는 `direct_post.jwt`, 응답 암호화는 `alg` ECDH-ES, `enc` A256GCM으로 고정입니다. 다른 값으로 저장하면 실패합니다(`SSRVVRF01315`, `SSRVVRF01313`).
+
+
 # 6. 프로파일 설정 및 사용
 
-## 6.1. 프로파일 개요 (`sample`, `dev`)
+## 6.1. 프로파일 개요 (`sample`, `dev`, `lss`)
 
 Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `sample` 두 가지 프로파일을 지원합니다.
 
@@ -687,6 +748,10 @@ Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `samp
 
 `dev` 프로파일은 개발 환경에 적합한 설정을 포함하며, 개발 서버에서 사용됩니다. 이 프로파일을 사용하려면 개발 환경의 데이터베이스와 블록체인 노드에 대한 설정이 필요합니다.
 
+### 6.1.3. `lss` 프로파일
+
+`lss` 프로파일은 `dev`와 함께 사용합니다(예: `dev,lss`). Verifier가 블록체인 대신 LSS에서 DID Document를 조회하므로 블록체인 설정이 필요 없습니다. `lss.url`(5.9)을 설정하고 관리자 콘솔에 `API_KEY_LSS`를 등록하세요.
+
 ## 6.2. 프로파일 설정 방법
 
 각 구동 방법별로 프로파일을 변경하는 방법을 설명합니다.
@@ -703,7 +768,7 @@ Verifier 서버는 다양한 환경에서 실행될 수 있도록 `dev`와 `samp
 - **프로파일 지정:** 서버 구동 명령어에 `--spring.profiles.active={profile}` 옵션을 추가하여 원하는 프로파일을 활성화합니다.
   
   ```bash
-  java -jar build/libs/did-verifier-server-2.0.0.jar --spring.profiles.active={profile}
+  java -jar build/libs/did-verifier-server-3.0.0.jar --spring.profiles.active={profile}
   ```
 
 - **설정 적용:** 활성화된 프로파일에 따라 해당 설정 파일이 적용됩니다.

@@ -44,8 +44,8 @@ did-verifier-server
 │       ├── OpenDID_TableDefinition_Verifier.md
 │       └── OpenDID_TableDefinition_Verifier_ko.md
 │   └── installation
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide.md
-│       └── OpenDID_VerifierServer_InstallationAndOperation_Guide_ko.md
+│       └── OpenDID_VerifierServer_Installation_Guide.md
+│       └── OpenDID_VerifierServer_Installation_Guide_ko.md
 └── source
     └── did-verifier-admin
         ├── frontend
@@ -82,7 +82,7 @@ did-verifier-server
 ## 설치 및 운영 가이드
 
 Verifier 서버의 설치 및 구성에 대한 자세한 지침은 아래 가이드를 참조하십시오:
-- [OpenDID Verifier 서버 설치 가이드](docs/installation/OpenDID_VerifierServer_Installation_Guide.md)  
+- [OpenDID Verifier 서버 설치 가이드](docs/installation/OpenDID_VerifierServer_Installation_Guide_ko.md)  
 
 Verifier Admin Console의 운영에 대한 자세한 지침은 아래 가이드를 참조하십시오:
 - [OpenDID Verifier Admin Console 운영 가이드](docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md)  

@@ -18,8 +18,8 @@ puppeteer:
 Verifier API
 ==
 
-- 일자: 2025-05-30
-- 버전: v2.0.0
+- 일자: 2026-11-02
+- 버전: v3.0.0
 
 ## 개정 이력
 
@@ -28,6 +28,7 @@ Verifier API
 | 1.0.0       | 2024-09-03 | 최초 작성                                                 |
 | 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] 요청 데이터 수정(policyId 추가, device, service, mode 삭제) |
 | 2.0.0       | 2025-05-30 | [5. P311 - ZKP Proof 제출 프로토콜] 추가                  |
+| 3.0.0       | 2026-11-02 | [7. 프로토콜 공통 검증 API (v2)], [8. OID4VP API] 추가 |
 
 <!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
@@ -38,6 +39,8 @@ Verifier API
   - [3. API 목록](#3-api-목록)
     - [3.1. 순차 API](#31-순차-api)
     - [3.2. 단일호출 API](#32-단일호출-api)
+    - [3.3. 프로토콜 공통 검증 API (v2)](#33-프로토콜-공통-검증-api-v2)
+    - [3.4. OID4VP API](#34-oid4vp-api)
   - [4. P310 - VP 제출 프로토콜](#4-p310---vp-제출-프로토콜)
     - [4.1. Request Offer (QR)](#41-request-offer-qr)
     - [4.2. Request Profile](#42-request-profile)
@@ -49,6 +52,12 @@ Verifier API
   - [6. 단일 호출 API](#6-단일-호출-api)
     - [6.1. Issue Certificate VC](#61-issue-certificate-vc)
     - [6.2. Get Certificate Vc](#62-get-certificate-vc)
+  - [7. 프로토콜 공통 검증 API (v2)](#7-프로토콜-공통-검증-api-v2)
+    - [7.1. Initiate](#71-initiate)
+    - [7.2. Get Status](#72-get-status)
+  - [8. OID4VP API](#8-oid4vp-api)
+    - [8.1. Get Authorization Request](#81-get-authorization-request)
+    - [8.2. Receive Response](#82-receive-response)
 
 
 ## 1. 개요
@@ -106,6 +115,22 @@ Verifier API
 | ---------------------- | ---------------------- | ---------------- | ------- |
 | `issue-certificate-vc` | /api/v1/certificate-vc | Entity 등록 요청 | N       |
 | `get-certificate-vc`   | /api/v1/certificate-vc | 가입증명서 조회  | N       |
+
+### 3.3. 프로토콜 공통 검증 API (v2)
+
+| API | URL | 설명 | 표준 API |
+| --- | --- | --- | --- |
+| `initiate` | /api/v2/initiate | VP 정책으로 검증 시작(DID_VP 또는 OID4VP) | N |
+| `status` | /api/v2/status/{sessionId} | 검증 상태 조회 | N |
+
+### 3.4. OID4VP API
+
+| API | URL | 설명 | 표준 API |
+| --- | --- | --- | --- |
+| `oid4vp-request` | /oid4vp/request/{requestId} | Authorization request(request object) 조회 | Y |
+| `oid4vp-response` | /oid4vp/response | VP Token 응답 제출(direct_post.jwt) | Y |
+
+> OID4VP API는 `/verifier` 경로 아래에 있지 않다. 지갑은 authorization request의 `request_uri`와 `response_uri`로 호출한다.
 
 <div style="page-break-after: always; margin-top: 50px;"></div>
 
@@ -1266,5 +1291,458 @@ Content-Type: application/json;charset=utf-8
   ],
   "validFrom": "2024-01-01T09:50:19Z",
   "validUntil": "2025-01-01T09:50:19Z"
+}
+```
+
+<div style="page-break-after: always; margin-top: 50px;"></div>
+
+## 7. 프로토콜 공통 검증 API (v2)
+
+프로토콜을 미리 알지 않아도 검증을 시작할 수 있다. Verifier는 VP 정책의 프로토콜 유형(`DID_VP` 또는 `OID4VP`)을 읽어 해당 프로토콜을 시작한다.
+
+- `DID_VP`: P310의 `request-offer-qr`과 같다. 지갑은 이어서 `request-profile`, `request-verify`, `confirm-verify`를 호출한다.
+- `OID4VP`: OID4VP authorization request URI를 돌려준다. 지갑은 `/oid4vp/request/{requestId}`에서 request object를 받고 `/oid4vp/response`로 응답을 제출한다(8장).
+- 서비스는 `status`로 결과를 확인한다.
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+### 7.1. Initiate
+
+VP 정책으로 검증을 시작한다.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `POST` | |
+| Path | `/api/v2/initiate` |  |
+| Authorization | - | |
+
+#### 7.1.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` | |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+```c#
+def object Initiate: "검증 시작 요청"
+{
+    + string "policyId": "VP 정책 ID"
+}
+```
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.1.2. Response
+
+**■ Process**
+1. policyId로 VP 정책을 조회하고 프로토콜 유형을 확인
+1. `DID_VP`: Verify Offer 생성(`request-offer-qr`과 같음)
+1. `OID4VP`: 정책 scope에 연결된 DCQL query 조회, 응답 암호화 키 생성, OID4VP 세션 생성, authorization request URI 생성
+
+**■ Status 200 - Success**
+
+```c#
+def object _Initiate: "검증 시작 응답"
+{
+    + string "protocol"            : "프로토콜 유형", value(DID_VP, OID4VP)
+    + uuid   "sessionId"           : "트랜잭션 아이디(txId)"
+    - VerifyOfferPayload "payload" : "VP Offer payload. DID_VP만" // 데이터 명세서 참고
+    - string "authorizationRequest": "OID4VP authorization request URI. OID4VP만"
+    + object "nextEndpoints"       : "프로토콜의 다음 API 경로"
+}
+```
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00201 | VP_POLICY is not found. |
+| SSRVVRF01303 | DCQL scope mapping not found. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01301 | Protocol handler not found for the given protocol type. |
+| SSRVVRF01302 | Failed to initiate verification. |
+| SSRVVRF01305 | Failed to initiate OID4VP verification. |
+| SSRVVRF01309 | Failed to generate OID4VP encryption key pair. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.1.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/verifier/api/v2/initiate" \
+-H "Content-Type: application/json;charset=utf-8" \
+-d '{"policyId": "f1a2b3c4-d5e6-7890-1234-56789abcdef0"}'
+```
+
+**■ Response (DID_VP)**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "protocol": "DID_VP",
+  "sessionId": "70e22f4e-ca60-48d3-88ee-a43d42ad3313",
+  "payload": {
+    "offerId": "3bf6a1a0-beca-4450-a01e-4e2166819504",
+    "type": "VerifyOffer",
+    "mode": "Direct",
+    "device": "WEB",
+    "service": "login",
+    "endpoints": [
+      "http://127.0.0.1:8092/verifier/api/v1/request-verify"
+    ],
+    "validUntil": "2024-01-01T08:44:58.048519445Z",
+    "locked": false
+  },
+  "nextEndpoints": {
+    "requestProfile": "/verifier/api/v1/request-profile",
+    "requestVerify": "/verifier/api/v1/request-verify",
+    "confirmVerify": "/verifier/api/v1/confirm-verify"
+  }
+}
+```
+
+**■ Response (OID4VP)**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "protocol": "OID4VP",
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "authorizationRequest": "openid4vp://?request_uri=http%3A%2F%2F127.0.0.1%3A8092%2Foid4vp%2Frequest%2Fa1b2c3d4&client_id=decentralized_identifier%3Adid%3Aomn%3Averifier",
+  "nextEndpoints": {
+    "authorizationRequest": "/oid4vp/request/a1b2c3d4",
+    "response": "/oid4vp/response"
+  }
+}
+```
+
+### 7.2. Get Status
+
+검증 세션의 상태를 조회한다.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `GET` | |
+| Path | `/api/v2/status/{sessionId}` |  |
+| Authorization | - | |
+
+#### 7.2.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/json;charset=utf-8` | |
+
+**■ Path Parameters**
+
+| Parameter | Description | Remarks |
+| --------- | ----------- | ------- |
+| + `sessionId` | `initiate`가 돌려준 트랜잭션 아이디(txId) | |
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.2.2. Response
+
+**■ Process**
+1. sessionId로 트랜잭션 조회
+1. `PENDING` 상태에서 만료됐으면 `EXPIRED`로 응답
+1. OID4VP 제출이 완료됐으면 제출된 크리덴셜의 형식과 클레임을 함께 응답
+
+**■ Status 200 - Success**
+
+```c#
+def object _Status: "검증 상태 응답"
+{
+    + uuid   "sessionId": "트랜잭션 아이디(txId)"
+    + string "protocol" : "프로토콜 유형", value(DID_VP, OID4VP)
+    + string "status"   : "상태", value(PENDING, COMPLETED, FAILED, CANCELED, EXPIRED)
+    - string "format"   : "제출된 크리덴셜 형식. 완료된 OID4VP만"
+    - array object "claims": "제출된 클레임. 완료된 OID4VP만"
+    {
+        + string "caption": "클레임 이름"
+        + string "value"  : "클레임 값"
+    }
+}
+```
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00300 | Transaction not found. |
+
+**■ Status 500 - Server error**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 7.2.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X GET "http://${Host}:${Port}/verifier/api/v2/status/5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67"
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "protocol": "OID4VP",
+  "status": "COMPLETED",
+  "format": "dc+sd-jwt",
+  "claims": [
+    { "caption": "name", "value": "Hong Gildong" },
+    { "caption": "birth_date", "value": "1990-01-01" }
+  ]
+}
+```
+
+<div style="page-break-after: always; margin-top: 50px;"></div>
+
+## 8. OID4VP API
+
+OpenID for Verifiable Presentations(OID4VP)에서 지갑이 호출하는 API이다. 검증은 프로토콜 유형이 `OID4VP`인 정책의 `initiate`(7.1)로 시작한다.
+
+- 응답 모드는 `direct_post.jwt`로 고정이다. 지갑은 request object의 `client_metadata`에 있는 키로 응답을 JWE 암호화해야 한다(ECDH-ES, A256GCM).
+- 지원하는 크리덴셜 형식은 OID4VP 설정에 등록된 형식이다(예: `opendid_vc`, `dc+sd-jwt`, `mso_mdoc`). `mso_mdoc`은 DID 기반(`kid`) 크리덴셜만 받는다.
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+### 8.1. Get Authorization Request
+
+지갑이 `request_uri`로 서명된 authorization request(request object)를 가져간다.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `GET` | |
+| Path | `/oid4vp/request/{requestId}` | `/verifier` 경로 아님 |
+| Authorization | - | |
+
+#### 8.1.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Accept` | `application/oauth-authz-req+jwt` | |
+
+**■ Path Parameters**
+
+| Parameter | Description | Remarks |
+| --------- | ----------- | ------- |
+| + `requestId` | `request_uri`의 요청 아이디 | |
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+N/A
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.1.2. Response
+
+**■ Process**
+1. requestId로 OID4VP 세션을 조회하고 트랜잭션 유효성 확인
+1. authorization request를 만들고 Verifier `assert` 키로 서명(ES256)
+
+**■ Status 200 - Success**
+
+본문은 ES256으로 서명된 compact JWS(request object)이다.
+
+- Header: `alg` ES256, `typ` oauth-authz-req+jwt, `kid`(Verifier `assert` 키), `jwk`
+- Payload: `response_type`(vp_token), `client_id`, `response_mode`(direct_post.jwt), `nonce`, `state`, `response_uri`, `dcql_query`, `client_metadata`(응답 암호화 키 `jwks`, `encrypted_response_enc_values_supported`), `iat`
+
+**■ Status 400 - Client error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF00300 | Transaction not found. |
+| SSRVVRF00301 | Transaction status is not pending. |
+| SSRVVRF00302 | Transaction has expired. |
+| SSRVVRF01306 | OID4VP session mapping not found. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01307 | Failed to retrieve OID4VP authorization request. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.1.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X GET "http://${Host}:${Port}/oid4vp/request/a1b2c3d4"
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/oauth-authz-req+jwt
+
+eyJhbGciOiJFUzI1NiIsInR5cCI6Im9hdXRoLWF1dGh6LXJlcStqd3QiLCJraWQiOiJkaWQ6b21uOnZlcmlmaWVyP3ZlcnNpb25JZD0xI2Fzc2VydCJ9.eyJyZXNwb25zZV90eXBlIjoidnBfdG9rZW4ifQ.c2lnbmF0dXJl
+```
+
+Decoded payload (abbreviated):
+
+```json
+{
+  "response_type": "vp_token",
+  "client_id": "decentralized_identifier:did:omn:verifier",
+  "response_mode": "direct_post.jwt",
+  "nonce": "mRk9...",
+  "state": "8f3c...",
+  "response_uri": "http://127.0.0.1:8092/oid4vp/response",
+  "dcql_query": { "credentials": [ { "id": "pid", "format": "dc+sd-jwt" } ] },
+  "client_metadata": {
+    "jwks": { "keys": [ { "kty": "EC", "crv": "P-256", "kid": "...", "x": "...", "y": "..." } ] },
+    "encrypted_response_enc_values_supported": [ "A256GCM" ]
+  },
+  "iat": 1730000000
+}
+```
+
+### 8.2. Receive Response
+
+지갑이 `response_uri`로 VP Token을 제출한다.
+
+| Item | Description | Remarks |
+| ---- | ----------- | ------- |
+| Method | `POST` | |
+| Path | `/oid4vp/response` | `/verifier` 경로 아님 |
+| Authorization | - | |
+
+#### 8.2.1. Request
+
+**■ HTTP Headers**
+
+| Header | Value | Remarks |
+| ------ | ----- | ------- |
+| + `Content-Type` | `application/x-www-form-urlencoded` | |
+
+**■ Path Parameters**
+
+N/A
+
+**■ Query Parameters**
+
+N/A
+
+**■ HTTP Body**
+
+```c#
+def object Oid4vpResponse: "VP Token 응답 (application/x-www-form-urlencoded)"
+{
+    - string "response"               : "JWE(direct_post.jwt). vp_token과 state를 담음"
+    - string "vp_token"               : "VP Token(평문). 세션이 direct_post.jwt면 거부"
+    - string "state"                  : "authorization request의 state(평문)"
+    - string "presentation_submission": "presentation submission"
+    - string "error"                  : "지갑이 보낸 에러 코드"
+    - string "error_description"      : "지갑이 보낸 에러 설명"
+}
+```
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.2.2. Response
+
+**■ Process**
+1. `response`(JWE)가 있으면 JWE `kid`로 세션을 찾아 세션 개인 키로 복호화
+1. `state`를 확인하고 VP Token 검증(서명, 홀더 바인딩, nonce, 크리덴셜 상태)
+1. 제출 결과(VP History) 저장, 트랜잭션 상태 갱신
+
+**■ Status 200 - Success**
+
+```c#
+def object _Oid4vpResponse: "VP Token 응답 결과"
+{
+    + uuid   "sessionId"       : "트랜잭션 아이디(txId)"
+    + string "status"          : "결과", value(COMPLETED, FAILED)
+    - string "error"           : "에러 코드. FAILED만"
+    - string "errorDescription": "에러 설명. FAILED만"
+}
+```
+
+**■ Status 400 - Client error**
+
+검증에 실패하면 `status`가 `FAILED`인 `_Oid4vpResponse`를 돌려준다.
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01306 | OID4VP session mapping not found. |
+| SSRVVRF01311 | Failed to parse JWE header. |
+| SSRVVRF01312 | Failed to decrypt OID4VP JWE response. |
+| SSRVVRF01314 | This session requires an encrypted (direct_post.jwt) response; plaintext submission is not accepted. |
+| SSRVVRF01316 | This verifier only accepts DID-based (kid) mso_mdoc; x5chain-based mdoc is not supported. |
+
+**■ Status 500 - Server error**
+
+| Code | Description |
+| ---- | ----------- |
+| SSRVVRF01310 | Failed to load OID4VP encryption private key. |
+
+<div style="page-break-after: always; margin-top: 30px;"></div>
+
+#### 8.2.3. Example
+
+**■ Request**
+
+```shell
+curl -v -X POST "http://${Host}:${Port}/oid4vp/response" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "response=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImtpZCI6Ii4uLiJ9..."
+```
+
+**■ Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{
+  "sessionId": "5b1c2f0e-7d3a-4c8e-9f21-6a0b3d4e5f67",
+  "status": "COMPLETED"
 }
 ```

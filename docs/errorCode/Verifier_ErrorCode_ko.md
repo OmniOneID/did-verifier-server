@@ -18,13 +18,14 @@ puppeteer:
 Verifier Server Error
 ==
 
-- Date: 2025-05-28
-- Version: v2.0.0
+- Date: 2026-11-02
+- Version: v3.0.0
 
 | Version | Date       | Changes                 |
 |---------|------------|-------------------------|
 | v1.0.0  | 2024-09-03 | 최초 버전         |
 | v2.0.0  | 2025-05-28 | ZKP & ADMIN 에러 추가   |
+| v3.0.0  | 2026-11-02 | 프로토콜·OID4VP, status list, 서버 설정 에러 추가 |
 
 
 <div style="page-break-after: always;"></div>
@@ -45,6 +46,9 @@ Verifier Server Error
   - [1-10. Verifier Errors (1000-1099)](#1-10-verifier-errors-1000-1099)
   - [1-11. Admin Errors (1100-1199)](#1-11-admin-errors-1100-1199)
   - [1-12. ZKP Errors (1200-1299)](#1-12-zkp-errors-1200-1299)
+  - [1-13. Protocol and OID4VP Errors (1300-1399)](#1-13-protocol-and-oid4vp-errors-1300-1399)
+  - [1-14. Status List Errors (1400-1499)](#1-14-status-list-errors-1400-1499)
+  - [1-15. Server Configuration Errors (21500-21599)](#1-15-server-configuration-errors-21500-21599)
 
 # 모델
 ## Error Response
@@ -171,7 +175,7 @@ public class ErrorResponse {
 | SSRVVRF00604 | Failed to register Verifier DID Document: document is already registered. | 400 | 기존 문서를 사용하거나 등록을 업데이트하세요. |
 | SSRVVRF00605 | Failed to generate DID document.               | 500         | DID 문서 생성 프로세스를 확인하세요.         |
 | SSRVVRF00606 | Failed to register Verifier DID Document.      | 500         | 등록 프로세스와 요구사항을 확인하세요.  |
-| SSRVVRF00607 | Failed to find Verifier DID Document: o registration request has been made. | 400 | 먼저 등록 프로세스를 완료하세요. |
+| SSRVVRF00607 | Failed to find Verifier DID Document: no registration request has been made. | 400 | 먼저 등록 프로세스를 완료하세요. |
 | SSRVVRF00608 | Failed to register Verifier DID Document: document is already requested. | 400 | 기존 요청이 완료될 때까지 기다리세요. |
 | SSRVVRF00609 | Failed to process certificate VC: invalid JSON format. | 500 | 인증서 VC JSON 형식과 구조를 확인하세요. |
 
@@ -192,7 +196,7 @@ public class ErrorResponse {
 | Error Code   | Error Message                  | HTTP Status | Action Required                                |
 |--------------|--------------------------------|-------------|------------------------------------------------|
 | SSRVVRF00800 | Certificate VC data not found. | 500         | 인증서 VC 데이터 존재 여부와 저장소를 확인하세요. |
-| SSRVVRF00801 | VC Status is not valid.        | 400         | 발급받은 VC의 상태가 유효하지 않습니다. VC 상태를 확인하세요. |
+| SSRVVRF00801 | VC Status is not valid         | 400         | 발급받은 VC의 상태가 유효하지 않습니다. VC 상태를 확인하세요. |
 
 <br>
 
@@ -242,4 +246,48 @@ public class ErrorResponse {
 | SSRVVRF01207 | Failed to retrieve ZKP credential definition on the blockchain. | 500 | 블록체인 연결과 자격 증명 정의를 확인하세요. |
 | SSRVVRF01208 | Failed to find credential schema : credential schema not found | 400 | 자격 증명 스키마 존재 여부와 형식을 확인하세요.   |
 | SSRVVRF01209 | Failed to find proof request : proof request not found | 400         | 증명 요청 데이터와 구성을 확인하세요.    |
-    
+
+<br>
+
+## 1-13. Protocol and OID4VP Errors (1300-1399)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF01300 | Unsupported protocol type. | 400 | 지원하는 프로토콜 유형(DID_VP 또는 OID4VP)을 사용하세요. |
+| SSRVVRF01301 | Protocol handler not found for the given protocol type. | 500 | 정책에 설정된 프로토콜 유형을 확인하세요. |
+| SSRVVRF01302 | Failed to initiate verification. | 500 | 정책과 OID4VP 설정을 확인한 뒤 서버 로그를 확인하세요. |
+| SSRVVRF01303 | DCQL scope mapping not found. | 400 | 관리자 콘솔에서 정책 scope에 해당하는 DCQL scope mapping을 등록하고 활성화하세요. |
+| SSRVVRF01304 | OID4VP configuration not found. | 500 | OID4VP 설정이 등록되어 있는지 확인하세요. |
+| SSRVVRF01305 | Failed to initiate OID4VP verification. | 500 | OID4VP 설정과 scope mapping의 DCQL query를 확인하세요. |
+| SSRVVRF01306 | OID4VP session mapping not found. | 400 | 트랜잭션 또는 state 값이 유효하고 만료되지 않았는지 확인하세요. |
+| SSRVVRF01307 | Failed to retrieve OID4VP authorization request. | 500 | request ID가 유효하고 만료되지 않았는지 확인하세요. |
+| SSRVVRF01308 | Failed to process OID4VP response. | 500 | 제출된 vp_token과 서버 로그를 확인하세요. |
+| SSRVVRF01309 | Failed to generate OID4VP encryption key pair. | 500 | 서버의 암호화 환경과 서버 로그를 확인하세요. |
+| SSRVVRF01310 | Failed to load OID4VP encryption private key. | 500 | OID4VP 설정의 vpTokenEncryptionKey를 확인하세요. 키를 바꾸기 전에 만든 세션은 복호화할 수 없습니다. |
+| SSRVVRF01311 | Failed to parse JWE header. | 400 | 응답이 kid 헤더를 가진 올바른 compact JWE인지 확인하세요. |
+| SSRVVRF01312 | Failed to decrypt OID4VP JWE response. | 400 | 지갑이 요청의 client_metadata에 있는 키로 응답을 암호화했는지 확인하세요. |
+| SSRVVRF01313 | OID4VP encryption alg/enc is fixed and cannot be changed to a different value. | 400 | OID4VP 설정을 저장할 때 암호화 값은 alg ECDH-ES, enc A256GCM으로 유지하세요. |
+| SSRVVRF01314 | This session requires an encrypted (direct_post.jwt) response; plaintext submission is not accepted. | 400 | 응답을 JWE로 암호화해 제출하세요(direct_post.jwt). |
+| SSRVVRF01315 | OID4VP responseMode is fixed to direct_post.jwt and cannot be changed to a different value. | 400 | OID4VP 설정을 저장할 때 responseMode는 direct_post.jwt로 유지하세요. |
+| SSRVVRF01316 | This verifier only accepts DID-based (kid) mso_mdoc; x5chain-based mdoc is not supported. | 400 | DID 키(kid)로 서명된 mso_mdoc을 제출하세요. |
+
+<br>
+
+## 1-14. Status List Errors (1400-1499)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF01401 | Failed to fetch status list token. | 500 | status list URI(http 또는 https)에 접근할 수 있는지 확인하세요. 사설망·루프백 호스트라면 verifier.status-list.allowed-private-hosts에 추가하세요. |
+| SSRVVRF01402 | Status list token validation failed. | 400 | 발급자가 게시한 status list token의 서명, 형식, 만료를 확인하세요. |
+| SSRVVRF01403 | Credential has been revoked. | 400 | 폐기된 VC입니다. 발급자에게 새 VC를 발급받으세요. |
+| SSRVVRF01404 | Credential is suspended. | 400 | 정지된 VC입니다. 발급자에게 문의하세요. |
+| SSRVVRF01405 | Status list index is out of bounds. | 400 | VC의 status list index를 확인하세요. |
+| SSRVVRF01406 | Credential status is reserved and cannot be treated as valid. | 400 | 발급자에게 VC 상태를 확인하세요. |
+
+<br>
+
+## 1-15. Server Configuration Errors (21500-21599)
+
+| Error Code   | Error Message | HTTP Status | Action Required |
+|--------------|---------------|-------------|-----------------|
+| SSRVVRF21501 | Server configuration key not found. | 400 | 관리자 콘솔의 Server Configuration에 해당 키(예: API_KEY_LSS)를 등록하세요. |
