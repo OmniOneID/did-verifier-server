@@ -67,6 +67,7 @@ Verifier API
 ![Workflow](images/workflow_verifier.svg)
 
 - 상기 그림에서는 Verifier Service가 제공하거나 혹은 Verifier Service가 호출하는 프로토콜(Protocol)과 API를 표기하였으며, API는 가독성을 위하여 표준 API (Standard API)만을 표기하였다.
+- `VerifyOffer`는 비표준 API인 `request-offer-qr` 또는 `initiate`로, OID4VP `Authorization Request URI`는 `initiate`로 생성한다.
 - 각 용어는 2장에서 설명하며, API 목록과 호출 예시 등은 3장 이후부터 확인할 수 있다.
 
 <div style="page-break-after: always; margin-top: 50px;"></div>
