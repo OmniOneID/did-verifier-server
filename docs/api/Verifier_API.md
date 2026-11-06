@@ -18,7 +18,7 @@ puppeteer:
 Verifier API
 ==
 
-- Date: 2026-11-02
+- Date: 2026-11-06
 - Version: v3.0.0
 
 ## Revision History
@@ -28,7 +28,7 @@ Verifier API
 | 1.0.0       | 2024-09-03 | Initial release                                                  |
 | 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] Request data modified (added policyId, removed device, service, mode) |
 | 2.0.0       | 2025-05-30 | [5. P311 - ZKP Proof Submission Protocol] Added                 |
-| 3.0.0       | 2026-11-02 | [7. Protocol-Agnostic Verification API (v2)] and [8. OID4VP API] added |
+| 3.0.0       | 2026-11-06 | [7. Protocol-Agnostic Verification API (v2)] and [8. OID4VP API] added |
 
 <!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
@@ -965,11 +965,6 @@ def object _M311_RequestVerifyProof: "Request Verify Proof response"
 {    
     //--- Common Part ---
     + uuid "txId": "transaction id"
-    
-    //--- Data Part ---
-    + bool "verified": "proof verification result"
-    - string "proofType": "proof type"
-    - object "verificationDetails": "verification details"
 }
 ```
 

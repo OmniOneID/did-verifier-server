@@ -175,7 +175,7 @@ Verifier Admin Console의 사이드바 메뉴는 **Verifier 등록 상태에 따
 
 Verifier 서버가 아직 등록되지 않은 초기 상태에서는 메뉴에 **Verifier Registration** 항목만 단독으로 표시됩니다.
 
-<img src="./images/verifier-menu-before-registration.jpg" width="250"/>
+<img src="./images/verifier-menu-before-registration.jpg" width="300"/>
 
 > **중요**: OpenDID 시스템에서 Verifier는 모든 검증 정책의 기반이 되는 핵심 요소입니다. Verifier 등록이 완료되어야만 VP 및 ZKP 검증 정책을 설정할 수 있습니다.
 
@@ -299,12 +299,12 @@ Step 3: Entity 등록 및 가입증명서 발급
 
 첫 번째 단계에서는 Verifier 서버의 기본 정보를 입력하고 실제 연결 가능 여부를 확인합니다.
 
-<img src="./images/verifier-registration.png" width="600"/>
+<img src="./images/verifier-registration.png" width="800"/>
 
 | 입력 항목 | 설명 | 입력 예시 | 필수 여부 |
 |-----------|------|-----------|-----------|
-| **Name** | Verifier 서버의 고유 이름을 입력합니다. | `MyCompany-Verifier` | ✅ 필수 |
-| **Verifier URL** | Verifier 서버의 접근 URL을 입력합니다. | `http://192.168.1.100:8094/verifier` | ✅ 필수 |
+| **Name** | Verifier 서버의 이름을 입력합니다. 영문 3~20자입니다. | `ExampleVerifier` | ✅ 필수 |
+| **Verifier URL** | Verifier 서버의 접근 URL을 입력합니다(200자 이내). 기본 포트는 `8092`입니다. | `https://example.org/verifier` | ✅ 필수 |
 
 ##### **연결 테스트 기능**
 - **Test Connection** 버튼을 클릭하면 입력한 URL로 실제 연결이 가능한지 확인합니다.
@@ -325,7 +325,7 @@ Step 3: Entity 등록 및 가입증명서 발급
 
 Verifier 서버의 고유한 DID Document를 자동으로 생성합니다.
 
-<img src="./images/register-did-document-step2.png" width="600"/>
+<img src="./images/register-did-document-step2.png" width="800"/>
 
 | 버튼 | 기능 | 결과 |
 |------|------|------|
@@ -341,7 +341,7 @@ Verifier 서버의 고유한 DID Document를 자동으로 생성합니다.
 
 생성된 DID Document를 신뢰 기관(TA)에 등록 요청합니다.
 
-<img src="./images/register-did-document-step2-1.png" width="600"/>
+<img src="./images/register-did-document-step2-1.png" width="800"/>
 
 | 버튼 | 기능 | 설명 |
 |------|------|------|
@@ -354,11 +354,11 @@ Verifier 서버의 고유한 DID Document를 자동으로 생성합니다.
 
 TA 관리자가 DID Document 등록 요청을 승인했는지 확인합니다.
 
-<img src="./images/check-approval.png" width="600"/>
+<img src="./images/check-approval.png" width="800"/>
 
 | 버튼 | 기능 | 상태별 결과 |
 |------|------|-------------|
-| **CHECK** | TA 승인 상태 조회 | **승인 완료**: 초록색 메시지 + NEXT 버튼 활성화<br>**승인 거부**: 빨간색 메시지 + 사유 표시 |
+| **CHECK** | TA 승인 상태 조회 | **승인 대기**: 대기 안내 팝업<br>**승인 완료**: 초록색 메시지 + NEXT 버튼 활성화<br>**승인 거부**: 거부 안내 팝업 후 처음 화면으로 이동 |
 
 > **TA 관리자 승인 절차**는 OpenDID 생태계의 보안을 위한 필수 과정입니다. 승인이 완료될 때까지 정기적으로 상태를 확인하세요.
 
@@ -368,9 +368,9 @@ TA 관리자가 DID Document 등록 요청을 승인했는지 확인합니다.
 
 마지막 단계에서는 Verifier를 OpenDID 생태계의 정식 구성원(Entity)으로 등록하고 가입증명서를 발급받습니다.
 
-<img src="./images/verifier-regstration-step3.png" width="600"/>
+<img src="./images/verifier-regstration-step3.png" width="800"/>
 
-이 단계에서는 **TA 프로토콜 P132(사용자 등록 프로토콜)**을 자동으로 실행하여 다음 과정을 수행합니다:
+이 단계에서는 **TA 프로토콜 P120(Entity 등록 프로토콜)**을 자동으로 실행하여 다음 과정을 수행합니다:
 
 1. **Entity 등록 요청**: Verifier를 TA 서버에 Entity로 등록
 2. **인증서 발급**: 가입증명서(Certificate VC) 생성 및 수령
@@ -378,7 +378,7 @@ TA 관리자가 DID Document 등록 요청을 승인했는지 확인합니다.
 
 | 버튼 | 기능 | 처리 내용 |
 |------|------|-----------|
-| **REQUEST** | Entity 등록 프로토콜 실행 | TA 프로토콜 P132 자동 실행 |
+| **REQUEST** | Entity 등록 프로토콜 실행 | TA 프로토콜 P120 자동 실행 |
 | **FINISH** | 등록 완료 및 메인 화면 이동 | Verifier Management 화면으로 전환 |
 
 > 가입증명서(Certificate VC)는 Verifier가 신뢰할 수 있는 검증자임을 증명하는 디지털 증명서입니다. 이후 모든 검증 과정에서 Verifier의 신원을 증명하는 데 사용됩니다.
@@ -429,7 +429,7 @@ Verifier 등록이 완료되면 **Verifier Management** 메뉴에서 등록된 V
 #### **DID 등록 승인 지연 시**
 - TA 관리자에게 승인 요청 상태 문의
 - CHECK 버튼을 주기적으로 클릭하여 상태 확인
-- 승인 거부 시 사유를 확인하고 문제점 해결 후 재시도
+- 승인이 거부되면 TA 관리자에게 사유를 확인하고 문제를 해결한 뒤 다시 시도
 
 #### **Entity 등록 실패 시**
 - 네트워크 연결 상태 점검

@@ -18,7 +18,7 @@ puppeteer:
 Verifier API
 ==
 
-- 일자: 2026-11-02
+- 일자: 2026-11-06
 - 버전: v3.0.0
 
 ## 개정 이력
@@ -28,7 +28,7 @@ Verifier API
 | 1.0.0       | 2024-09-03 | 최초 작성                                                 |
 | 1.0.1 (dev) | 2024-03-31 | [4.1 Request Offer(QR)] 요청 데이터 수정(policyId 추가, device, service, mode 삭제) |
 | 2.0.0       | 2025-05-30 | [5. P311 - ZKP Proof 제출 프로토콜] 추가                  |
-| 3.0.0       | 2026-11-02 | [7. 프로토콜 공통 검증 API (v2)], [8. OID4VP API] 추가 |
+| 3.0.0       | 2026-11-06 | [7. 프로토콜 공통 검증 API (v2)], [8. OID4VP API] 추가 |
 
 <!-- TOC tocDepth:2..3 chapterDepth:2..6 -->
   
@@ -964,11 +964,6 @@ def object _M311_RequestVerifyProof: "Request Verify Proof 응답문"
 {    
     //--- Common Part ---
     + uuid "txId": "transaction id"
-    
-    //--- Data Part ---
-    + bool "verified": "증명 검증 결과"
-    - string "proofType": "증명 유형"
-    - object "verificationDetails": "검증 상세 정보"
 }
 ```
 

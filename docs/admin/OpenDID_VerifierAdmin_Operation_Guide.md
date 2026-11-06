@@ -175,7 +175,7 @@ The sidebar menu of the Verifier Admin Console **differs in screen configuration
 
 In the initial state where the Verifier server is not yet registered, only the **Verifier Registration** item is displayed alone in the menu.
 
-<img src="./images/verifier-menu-before-registration.jpg" width="250"/>
+<img src="./images/verifier-menu-before-registration.jpg" width="300"/>
 
 > **Important**: In the OpenDID system, the Verifier is a core element that forms the foundation of all verification policies. VP and ZKP verification policies can only be set up after Verifier registration is complete.
 
@@ -299,12 +299,12 @@ Registration Complete: Move to Verifier Management menu
 
 In the first step, enter the basic information of the Verifier server and check actual connectivity.
 
-<img src="./images/verifier-registration.png" width="600"/>
+<img src="./images/verifier-registration.png" width="800"/>
 
 | Input Item | Description | Input Example | Required |
 |------------|-------------|---------------|----------|
-| **Name** | Enter the unique name of the Verifier server. | `MyCompany-Verifier` | ✅ Required |
-| **Verifier URL** | Enter the access URL of the Verifier server. | `http://192.168.1.100:8094/verifier` | ✅ Required |
+| **Name** | Enter the name of the Verifier server. Use 3 to 20 English characters. | `ExampleVerifier` | ✅ Required |
+| **Verifier URL** | Enter the access URL of the Verifier server (up to 200 characters). The default port is `8092`. | `https://example.org/verifier` | ✅ Required |
 
 ##### **Connection Test Function**
 - Click the **Test Connection** button to check if actual connection is possible with the entered URL.
@@ -325,7 +325,7 @@ The second step is the process of registering the Verifier's identity on the blo
 
 Automatically generates a unique DID Document for the Verifier server.
 
-<img src="./images/register-did-document-step2.png" width="600"/>
+<img src="./images/register-did-document-step2.png" width="800"/>
 
 | Button | Function | Result |
 |--------|----------|--------|
@@ -341,7 +341,7 @@ Automatically generates a unique DID Document for the Verifier server.
 
 Request registration of the generated DID Document to the Trust Authority (TA).
 
-<img src="./images/register-did-document-step2-1.png" width="600"/>
+<img src="./images/register-did-document-step2-1.png" width="800"/>
 
 | Button | Function | Description |
 |--------|----------|-------------|
@@ -354,11 +354,11 @@ Request registration of the generated DID Document to the Trust Authority (TA).
 
 Check whether the TA administrator has approved the DID Document registration request.
 
-<img src="./images/check-approval.png" width="600"/>
+<img src="./images/check-approval.png" width="800"/>
 
 | Button | Function | Result by Status |
 |--------|----------|------------------|
-| **CHECK** | Query TA approval status | **Approved**: Green message + NEXT button activated<br>**Rejected**: Red message + reason displayed |
+| **CHECK** | Query TA approval status | **Pending**: Pending notice popup<br>**Approved**: Green message + NEXT button activated<br>**Rejected**: Rejection notice popup, then returns to the first screen |
 
 > **TA Administrator approval process** is an essential process for the security of the OpenDID ecosystem. Please check the status regularly until approval is complete.
 
@@ -368,9 +368,9 @@ Check whether the TA administrator has approved the DID Document registration re
 
 In the final step, register the Verifier as an official member (Entity) of the OpenDID ecosystem and receive a membership certificate.
 
-<img src="./images/verifier-regstration-step3.png" width="600"/>
+<img src="./images/verifier-regstration-step3.png" width="800"/>
 
-This step automatically executes **TA Protocol P132 (User Registration Protocol)** to perform the following processes:
+This step automatically executes **TA Protocol P120 (Entity Registration Protocol)** to perform the following processes:
 
 1. **Entity Registration Request**: Register Verifier as Entity on TA server
 2. **Certificate Issuance**: Generate and receive membership certificate (Certificate VC)
@@ -378,7 +378,7 @@ This step automatically executes **TA Protocol P132 (User Registration Protocol)
 
 | Button | Function | Processing Content |
 |--------|----------|-------------------|
-| **REQUEST** | Execute Entity registration protocol | Automatically execute TA Protocol P132 |
+| **REQUEST** | Execute Entity registration protocol | Automatically execute TA Protocol P120 |
 | **FINISH** | Complete registration and move to main screen | Switch to Verifier Management screen |
 
 > The membership certificate (Certificate VC) is a digital certificate that proves the Verifier is a trustworthy verifier. It is used to prove the Verifier's identity in all subsequent verification processes.
@@ -429,7 +429,7 @@ Click the **VIEW DID DOCUMENT** button to view the complete DID Document registe
 #### **DID Registration Approval Delay**
 - Contact TA administrator about approval request status
 - Periodically click CHECK button to verify status
-- If approval is rejected, check the reason and resolve issues before retrying
+- If the request is rejected, ask the TA administrator for the reason, resolve the problem, and try again
 
 #### **Entity Registration Failure**
 - Check network connection status
