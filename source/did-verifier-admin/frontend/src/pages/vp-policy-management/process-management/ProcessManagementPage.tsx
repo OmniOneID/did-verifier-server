@@ -32,8 +32,8 @@ const modeMapping: { [key: string]: string } = {
   1 : "No Authentication",
   2 : "PIN",
   4 : "BIO",
-  5 : "PIN or BIO",
-  6 : "PIN and BIO",
+  6 : "PIN or BIO",
+  32774 : "PIN and BIO",
 };
 
 
@@ -227,8 +227,8 @@ const ProcessManagementPage = (props: Props) => {
                 { value: '1', label: 'No Authentication' },
                 { value: '2', label: 'PIN' },
                 { value: '4', label: 'BIO' },
-                { value: '5', label: 'PIN or BIO' },
-                { value: '6', label: 'PIN and BIO' },
+                { value: '6', label: 'PIN or BIO' },
+                { value: '32774', label: 'PIN and BIO' },
               ],
             },
           ]}

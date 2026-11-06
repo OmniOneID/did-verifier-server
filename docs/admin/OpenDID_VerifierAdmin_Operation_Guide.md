@@ -18,7 +18,7 @@ puppeteer:
 Open DID Verifier Admin Operation Guide
 ==
 
-- Date: 2026-10-30
+- Date: 2026-11-06
 - Version: v3.0.0
 
 Revision History
@@ -28,7 +28,7 @@ Revision History
 | v1.0.0  | 2025-03-31 | Initial creation                          |
 | v1.0.1  | 2025-04-25 | Added `3.1. Verifier Registration` section |
 | v2.0.0  | 2025-05-30 | Added ZKP verification-related menus and functional changes |
-| v3.0.0  | 2026-10-30 | Updated navigation, OID4VP, API logs, settings, and screenshots |
+| v3.0.0  | 2026-11-06 | Updated navigation, OID4VP, API logs, settings, and screenshots; added example data screenshots and detailed OID4VP, log, and settings descriptions |
 
 Table of Contents
 ==
@@ -79,7 +79,12 @@ Table of Contents
     - [3.6.1. Admin List View](#361-admin-list-view)
     - [3.6.2. Admin Registration](#362-admin-registration)
   - [3.7. OID4VP Management](#37-oid4vp-management)
+    - [3.7.1. Configuration](#371-configuration)
+    - [3.7.2. DCQL Scope Management](#372-dcql-scope-management)
+    - [3.7.3. Policy Management](#373-policy-management)
   - [3.8. Log Management](#38-log-management)
+    - [3.8.1. API Log](#381-api-log)
+    - [3.8.2. Audit API Log](#382-audit-api-log)
   - [3.9. Server Configuration](#39-server-configuration)
   - [3.10. Password Policy Settings](#310-password-policy-settings)
 
@@ -475,17 +480,18 @@ The Service Management menu allows you to manage the entire lifecycle of service
 Click the **REGISTER** button to register a new service and navigate to the service registration page.
 The same screen layout is used when **UPDATE** modifying services.
 
-<img src="./images/service_registration.jpg" width="500"/>
+<img src="./images/service_registration.jpg" width="800"/>
 
 #### **Required Input Items**
 
 | Item | Description | Input Example | Constraints |
 |------|-------------|---------------|-------------|
-| **Service*** | Unique name of the service | `IDCardVerification`, `AgeProof` | Only English, numbers, hyphens, underscores allowed |
-| **Device*** | Supported device type | `PC`, `Mobile`, `Tablet` | Free text input |
+| **Service*** | Unique name of the service | `IDCardVerification`, `AgeProof` | Maximum 50 characters |
+| **Device*** | Supported device type | `PC`, `Mobile`, `Tablet` | Free text input, maximum 50 characters |
 | **Lock Status*** | Service lock status | `Unlocked` | Currently only `Unlocked` selectable |
-| **Submission Mode*** | VP submission method selection | `Direct`, `Indirect` | Select from dropdown |
+| **Submission Mode*** | VP submission method selection | `Direct` | Currently only `Direct` selectable |
 | **Verification Type*** | Verification type selection | `VP`, `ZKP` | Select according to verification method to use |
+| **Valid Seconds*** | Validity period of the verification request in seconds | `180` | 1 to 86400, default 180 |
 
 > **Note**: * indicates required input items.
 
@@ -496,6 +502,8 @@ The same screen layout is used when **UPDATE** modifying services.
 | **Direct** | User submits VP directly to Verifier | When real-time verification is needed | 
 | **Indirect** | VP delivery through intermediate server | In network-constrained environments |
 | **Proxy** | Indirect delivery through proxy server | Complex network configurations | 
+
+> **Note**: Currently only `Direct` can be selected on this screen.
 
 #### **Verification Type Details**
 
@@ -510,7 +518,7 @@ Section for managing endpoint URLs to be connected with the service.
 
 | Function | Description | URL Format Example |
 |----------|-------------|-------------------|
-| **ADD ENDPOINT** | Add new endpoint URL | `https://api.example.com/verify` |
+| **ADD ENDPOINT** | Add new endpoint URL | `https://example.org/verifier/api/v1` |
 | **Delete (🗑️)** | Remove registered endpoint | Click trash icon in each row |
 
 #### **Registration Button Functions**
@@ -547,6 +555,16 @@ Filter is a core component that determines "what VCs to require from users?", de
 | 4 | **Filter List** | Display summary information of all registered Filters | Understanding Filter status |
 | 5 | **Search and Paging** | Filter search and page-by-page navigation | Managing large amounts of data |
 
+#### **Filter List Information**
+
+| Column | Display Content | Description |
+|--------|----------------|-------------|
+| **Title** | Unique title of the Filter | Navigates to detail page when clicked |
+| **Type** | Schema type | `OsdSchemaCredential` |
+| **Created At** | Registration date/time | Date and time when first registered |
+
+> **Important**: Filters used by a Profile cannot be deleted. To delete, you must first remove the corresponding Filter from all connected Profiles.
+
 ---
 
 #### **3.3.1.2. Filter Registration / Modification**
@@ -554,19 +572,20 @@ Filter is a core component that determines "what VCs to require from users?", de
 Click the **REGISTER** button to register a new Filter and navigate to the Filter registration page.
 The same screen layout is used when **UPDATE** modifying Filters.
 
-<img src="./images/filter_registration.png" width="600"/>
+<img src="./images/filter_registration.png" width="800"/>
 
 ##### **Basic Information Input**
 
 | Item | Description | Input Example | Required |
 |------|-------------|---------------|----------|
-| **Title*** | Unique title of the Filter | `National_ID_Filter`, `Driver_License_Filter` | ✅ Required |
+| **Title*** | Unique title of the Filter | `NationalIdFilter`, `DriverLicenseFilter` | ✅ Required |
+| **ID*** | VC schema ID used for verification. It is filled in automatically when a schema is selected with the **SEARCH** button. | `https://example.org/issuer/api/v1/vc/vcschema?name=national_id` | ✅ Required |
 | **Type** | Schema type selection | `OsdSchemaCredential` | ✅ Required (fixed value) |
-| **Present All** | Whether all claims submission is required | `true` | ✅ Required (fixed value) |
+| **Present All** | Whether all claims submission is required | `true` | Default `true` |
 
 **Present All Setting Guide:**
-- **true**: All claims in the schema must be submitted (fixed value)
-- **false**: Only claims specified in Required Claims need to be submitted (selectable during implementation)
+- **true**: All claims in the schema must be submitted (default)
+- **false**: Only claims specified in Required Claims need to be submitted
 
 ##### **VC Schema Search and Selection**
 
@@ -588,12 +607,12 @@ Define claims that must be submitted during verification.
 
 | Function | Description | Operation Method |
 |----------|-------------|------------------|
-| **Claims List** | Currently set required claims | Display name and data type of each claim |
+| **Claims List** | Required claims filled in automatically when a schema is selected | Displayed as a code combining the namespace and claim ID (e.g., `org.opendid.national_id.name`) |
 
 **Claim Selection Process:**
 1. Click **SEARCH** button
 2. Display **Schema Selection Dialog**
-3. **Check schema** selection and confirm
+3. **Select a schema** and click **SELECT**
 4. **Claims based on selected schema are automatically added**
 
 ##### **Display Claims Management**
@@ -606,7 +625,7 @@ You can restrict the issuers of VCs submitted through this Filter.
 
 | Function | Description | Input Format |
 |----------|-------------|--------------|
-| **ADD Button** | Add new allowed issuer DID | DID format: `did:omn:issuer:xxx` |
+| **ADD Button** | Add new allowed issuer DID | DID format: `did:example:issuer` |
 | **Issuer DID List** | List of currently allowed issuers' DIDs | Display verification authority for each DID |
 | **Delete (🗑️)** | Remove specific issuer from allowed list | Click trash icon in corresponding DID row |
 
@@ -631,7 +650,7 @@ Process is a core component that determines "how to secure the VP submission pro
 
 #### **3.3.2.1. Process Management Screen Layout**
 
-<img src="./images/process_management.png" width="600"/>
+<img src="./images/process_management.png" width="800"/>
 
 | Number | Component | Function Description | When to Use |
 |--------|-----------|---------------------|-------------|
@@ -646,13 +665,12 @@ Process is a core component that determines "how to secure the VP submission pro
 | Column | Display Content | Description |
 |--------|----------------|-------------|
 | **Title** | Unique title of the Process | Name identifiable by administrators |
-| **Auth Type** | User authentication method | `PIN` (pin number) / `BIO` (biometric authentication) |
+| **Auth Type** | User authentication method | `PIN or BIO` (PIN or biometric authentication). This is the only value that can be selected on the registration screen. |
 | **Curve** | Elliptic curve cryptography algorithm | `Secp256r1` and other cryptographic standards |
 | **Cipher** | Symmetric key encryption algorithm | `AES-128-CBC`, `AES-256-CBC`, etc. |
-| **Padding** | Padding method | `PKCS5`, `PKCS7`, etc. |
-| **Created At** | Creation date/time | Date and time when Process was first registered |
+| **Padding** | Padding method | `PKCS5` |
 
-> **Important**: Processes with Profile Count of 1 or more cannot be deleted. To delete, you must first remove the corresponding Process from all connected Profiles.
+> **Important**: Processes used by a Profile cannot be deleted. To delete, you must first remove the corresponding Process from all connected Profiles.
 
 ---
 
@@ -661,13 +679,13 @@ Process is a core component that determines "how to secure the VP submission pro
 Click the **REGISTER** button to register a new Process and navigate to the Process registration page.</br>
 The same screen layout is used when **UPDATE** modifying Processes.
 
-<img src="./images/process_registration.png" width="400"/>
+<img src="./images/process_registration.png" width="800"/>
 
 ##### **Basic Information Input**
 
 | Item | Description | Input Example | Required |
 |------|-------------|---------------|----------|
-| **Title*** | Unique title of the Process | `Biometric_Authentication_Process` | ✅ Required |
+| **Title*** | Unique title of the Process | `NationalIdProcess` | ✅ Required |
 | **Auth Type*** | User authentication method selection | `PIN or BIO` | ✅ Required (fixed value) |
 
 ##### **ReqE2e Information (End-to-End Encryption Settings)**
@@ -686,7 +704,7 @@ Set external endpoints to handle events occurring during Process execution.
 
 | Function | Description | URL Format Example |
 |----------|-------------|-------------------|
-| **ADD Button** | Add new endpoint URL | `https://api.company.com/vp-callback` |
+| **ADD Button** | Add new endpoint URL | `https://example.org/verifier/api/v1/request-verify` |
 | **Endpoint List** | Display all currently registered URLs | Can check purpose and status of each URL |
 | **Delete Column** | Remove specific endpoint | Click Delete button in corresponding row |
 
@@ -711,7 +729,7 @@ Profile is an integrated component that defines "what VC to verify in what way?"
 
 #### **3.3.3.1. Profile Management Screen Layout**
 
-<img src="./images/profile_management.jpg" width="600"/>
+<img src="./images/profile_management.jpg" width="800"/>
 
 | Number | Component | Function Description | When to Use |
 |--------|-----------|---------------------|-------------|
@@ -725,8 +743,8 @@ Profile is an integrated component that defines "what VC to verify in what way?"
 
 | Column | Display Content | Description |
 |--------|----------------|-------------|
-| **Profile Title** | Unique title of the Profile | Name for administrator identification |
-| **Profile Description** | Profile description | Description of purpose and characteristics |
+| **Title** | Unique title of the Profile | Navigates to detail page when clicked |
+| **Description** | Profile description | Description of purpose and characteristics |
 | **Created At** | Registration date/time | Date and time when first registered |
 
 > **Warning**: Profiles already registered in Policy Management cannot be deleted. To delete, you must first remove the corresponding profile from connected Policies.
@@ -738,15 +756,15 @@ Profile is an integrated component that defines "what VC to verify in what way?"
 Click the **REGISTER** button to register a new Profile and navigate to the Profile registration page.
 The same screen layout is used when **UPDATE** modifying Profiles.
 
-<img src="./images/profile_register.jpg" width="500"/>
+<img src="./images/profile_register.jpg" width="800"/>
 
 ##### **Basic Information Input**
 
 | Item | Description | Input Example | Required |
 |------|-------------|---------------|----------|
-| **Title*** | Unique title of the Profile | `Degree_Verification_General_Profile` | ✅ Required |
+| **Title*** | Unique title of the Profile | `NationalIdProfile` | ✅ Required |
 | **Type** | Profile type | `VerifyProfile` | ✅ Required (fixed value) |
-| **Description*** | Detailed description of the Profile | `Profile for ID verification` | ✅ Required |
+| **Description** | Detailed description of the Profile | `VP profile for national ID verification` | Optional |
 | **Encoding*** | Character encoding method | `UTF-8` | ✅ Required |
 | **Language*** | Supported language | `ko` (Korean), `en` (English) | ✅ Required |
 
@@ -756,9 +774,10 @@ Verifier information is automatically entered through the membership certificate
 
 | Information Item | Auto-set Content | Source |
 |-----------------|------------------|--------|
-| **Verifier DID** | `did:omn:verifier:<identifier>` | DID generated during Verifier registration |
-| **Verifier Name** | Registered Verifier name | Name set in Verifier Management |
-| **Certificate URL** | Membership certificate access URL | Certificate VC location issued by TA |
+| **DID** | `did:example:verifier` | DID generated during Verifier registration |
+| **Name** | Registered Verifier name | Name set in Verifier Management |
+| **Cert VC Ref** | Membership certificate access URL | Certificate VC location issued by TA |
+| **Ref** | Verifier server URL | URL in Verifier Management |
 
 > **Note**: This information is important trust information that tells users "who is requesting verification?" during VP verification.
 
@@ -802,7 +821,7 @@ Policy is the final step in VP policy configuration, defining "what service to v
 
 #### **3.3.4.1. Policy Management Screen Layout**
 
-<img src="./images/policy_management.jpg" width="600"/>
+<img src="./images/policy_management.jpg" width="800"/>
 
 | Number | Component | Function Description | When to Use |
 |--------|-----------|---------------------|-------------|
@@ -816,12 +835,10 @@ Policy is the final step in VP policy configuration, defining "what service to v
 
 | Column | Display Content | Description |
 |--------|----------------|-------------|
-| **Policy Title** | Unique title of the Policy | Name for administrator identification |
-| **Service Name** | Connected Service name | Service used by this Policy |
+| **Policy Title** | Unique title of the Policy | Navigates to detail page when clicked |
+| **Payload Service** | Connected Service name | Service used by this Policy |
 | **Profile Title** | Connected Profile name | Profile used by this Policy |
 | **Created At** | Registration date/time | Date and time when first registered |
-
-> **Warning**: Policies currently in use cannot be deleted. Check usage status before deletion.
 
 ---
 
@@ -829,13 +846,13 @@ Policy is the final step in VP policy configuration, defining "what service to v
 
 Click the **REGISTER** button to register a new Policy and navigate to the Policy registration page.
 
-<img src="./images/policy_registration.png" width="600"/>
+<img src="./images/policy_registration.png" width="800"/>
 
 ##### **Basic Information Input**
 
 | Item | Description | Input Example | Required |
 |------|-------------|---------------|----------|
-| **Policy Title*** | Unique title of the Policy | `ID_Verification_Policy`, `Employee_Access_Policy` | ✅ Required |
+| **Policy Title*** | Unique title of the Policy | `NationalIdPolicy`, `IDCardVerificationPolicy` | ✅ Required |
 
 ##### **Profile Information Selection**
 
@@ -911,8 +928,8 @@ The proof request registration page allows you to input information for register
 | 4 | Cipher | Select the encryption algorithm. You can select options like "AES-256-CBC" from the dropdown menu. |
 | 5 | Padding | Select the padding method. You can select options like "PKCS5" from the dropdown menu. |
 | 6 | Requested Attributes | Section for managing attributes to request. Click the "ADD ATTRIBUTE" button to add attributes by selecting schemas from a popup. Each attribute consists of Attribute Name and Credential Definition. To delete an entered attribute, click the trash icon on the right of the corresponding item. |
-| 7 | Requested Predicates | Section for managing predicates to request. Click the "ADD ATTRIBUTE" button to add attributes by selecting schemas from a popup. Each predicate consists of Attribute Name, Predicate Type, Predicate Value, and Credential Definition. To delete an entered predicate, click the trash icon on the right of the corresponding item. |
-| 8 | Button Area | - UPDATE: Modify proof request with entered information.<br>- RESET: Initialize all input fields. In modification mode, revert to existing input values.<br>- CANCEL: Cancel input and return to previous page (proof request list). |
+| 7 | Requested Predicates | Section for managing predicates to request. Click the "ADD PREDICATE" button to add attributes by selecting schemas from a popup. Each predicate consists of Attribute Name, Predicate Type, Predicate Value, and Credential Definition. To delete an entered predicate, click the trash icon on the right of the corresponding item. |
+| 8 | Button Area | - REGISTER: Register proof request with entered information.<br>- RESET: Initialize all input fields. In modification mode, revert to existing input values.<br>- CANCEL: Cancel input and return to previous page (proof request list). |
 
  > **Note**: For detailed information about data used in ZKP verification, please refer to the Data Specification document.
 
@@ -935,7 +952,7 @@ The ZKP profile list table displays information such as Profile ID, Profile Titl
 
 The ZKP profile registration page allows you to input information for registering new ZKP profiles. This page also uses the same form when modifying profiles.
 
-<img src="./images/zkp_profile_registration.jpg" width="600"/>
+<img src="./images/zkp_profile_registration.jpg" width="800"/>
 
 | Number | Item | Description |
 |--------|------|-------------|
@@ -974,7 +991,7 @@ ZKP policy registration screen consists of the following items:
 | 1 | Policy Title | Field for entering the title of the ZKP policy. "ZKPPolicy" is entered as an example. |
 | 2 | Profile Information | Select ZKP profile information to connect to the policy. Click the "SEARCH" button to display the ZKP profile search popup, and the selected profile after search is automatically entered in this field. |
 | 3 | Payload Information | Select service information to use in the policy. Click the "SEARCH" button to display the service search popup, and the selected service after search is automatically entered in this field. |
-| 4 | Button Area | - SAVE: Save ZKP policy with entered information.<br>- RESET: Initialize all input fields. In modification mode, revert to existing input values.<br>- CANCEL: Cancel input and return to previous page (ZKP policy list). |
+| 4 | Button Area | - REGISTER: Register ZKP policy with entered information.<br>- RESET: Initialize all input fields. In modification mode, revert to existing input values.<br>- CANCEL: Cancel input and return to previous page (ZKP policy list). |
 
 Main components required for ZKP policy registration are as follows:
 - Policy Title: Unique name of the ZKP policy
@@ -995,11 +1012,11 @@ VP History provides the following main functions and information:
 |--------|------|-------------|
 | 1 | VP Submit List | Title of VP submission list. |
 | 2 | Transaction Status Filter | Filter only VP submissions of specific status (All, Completed, Pending, Failed) through dropdown menu. |
-| 3 | List Header | Headers for VP submission information such as Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, and Format. |
+| 3 | List Header | Headers for VP submission information such as Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, and Format. Protocol shows the submission method (`OpenDID` or `OID4VP`). |
 | 4 | Status Display | Distinguish VP submission status by color. Completed cases are displayed as green background 'Completed', pending cases as yellow background 'Pending', failed cases as red background 'Failed'. |
 | 5 | Transaction ID | Unique transaction identifier for each VP submission attempt is displayed. All status requests can be tracked through this. |
-| 6 | DID Information | Holder DID (DID of user who submitted VP) and submission time (Created At) for each VP submission case are displayed. For ZKP, this value is entered as an arbitrary value of "ZKP holder DID". For Pending or Failed status, it is displayed as "N/A". |
-| 7 | Pagination | Select the number of rows to display per page and navigate between pages. The screenshot shows an empty example list; actual totals vary by environment. |
+| 6 | DID Information | Holder DID (DID of user who submitted VP) and submission time (Created At) for each VP submission case are displayed. For ZKP, this value is entered as an arbitrary value of "ZKP holder DID". For Pending or Failed status, it is displayed as "-". |
+| 7 | Pagination | Select the number of rows to display per page and navigate between pages. Actual totals vary by environment. |
 
 Through VP history, administrators can perform the following tasks:
 - Understanding VP submission status of specific status (Completed, Pending, Failed)
@@ -1036,7 +1053,7 @@ When you enter the `Admin Management` menu, the list of registered administrator
 | 2      | **DELETE Button**       | Delete selected administrator account. (Only ROOT administrator can do this) |
 | 3      | **CHANGE PASSWORD Button** | Change password of selected administrator account.                    |
 | 4      | **ID**                  | Email ID of registered administrator account.                          |
-| 5      | **Role**                | Role of the administrator account (e.g., ROOT, Normal Admin, etc.)     |
+| 5      | **Role**                | Role of the administrator account (`ROOT`, `NORMAL`)     |
 | 6      | **Registered At**       | Date and time when the account was first registered.                   |
 | 7      | **Updated At**          | Date and time when last modified.                                      |
 
@@ -1046,7 +1063,7 @@ When you enter the `Admin Management` menu, the list of registered administrator
 
 Click the **REGISTER** button in the `Admin Management` screen to navigate to the registration screen as shown below.
 
-<img src="./images/admin-registration.png" width="600"/>
+<img src="./images/admin-registration.png" width="800"/>
 
 | Number | Item                        | Description                                                                |
 | ------ | --------------------------- | -------------------------------------------------------------------------- |
@@ -1061,25 +1078,260 @@ Click the **REGISTER** button in the `Admin Management` screen to navigate to th
 
 ## 3.7. OID4VP Management
 
-The `OID4VP` menu manages OpenID4VP verification settings.
+The `OID4VP` menu manages the Verifier settings and verification policies required for OpenID4VP (OID4VP) VP submission. Configure them in the following order.
+
+| Order | Menu | What It Defines |
+|-------|------|-----------------|
+| 1 | **Configuration** | Verifier information passed to the Wallet, session, encryption, and verification options |
+| 2 | **DCQL Scope Management** | Credentials and claims requested from the Wallet (DCQL Query) |
+| 3 | **Policy Management** | The link between a verification request Policy and a DCQL Scope |
 
 ### 3.7.1. Configuration
 
+`OID4VP > Configuration` sets the Verifier information used with Wallets. The server has a single configuration, and it applies to all OID4VP requests.
+
 <img src="./images/oid4vp-config.png" width="800"/>
 
-`OID4VP > Configuration` contains the Verifier base URL and client name, client ID scheme and value, session lifetime, invocation scheme, encryption settings, and verification options. Check that values match the connected Wallet before saving.
+##### **Basic Information**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Base URL*** | Verifier server address. It is the base of the request and response URLs passed to the Wallet. | `https://example.org` | ✅ Required |
+| **Client Name*** | Name displayed to Wallet users. Click the **VERIFIER** button to select the registered Verifier name. | `Example Verifier` | ✅ Required |
+
+##### **Client ID**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Client ID Scheme** | How the Verifier is identified. Select `decentralized_identifier` or `redirect_uri`. | `decentralized_identifier` | Default `decentralized_identifier` |
+| **Client ID Value*** | For `decentralized_identifier`, enter the Verifier DID. Click the **DID SEARCH** button to select the registered DID. For `redirect_uri`, `Base URL` + `/oid4vp/response` is filled in automatically and can be edited for proxy environments. | `did:example:verifier` | ✅ Required |
+| **client_id** | Preview of the final value combined from the two values above. | `decentralized_identifier:did:example:verifier` | Displayed automatically |
+
+##### **Session**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Session TTL (ms)** | OID4VP session lifetime. Enter a value from 300,000 (5 minutes) to 600,000 (10 minutes). | `300000` | Default `300000` |
+| **Invocation Scheme** | Scheme of the URI that invokes the Wallet. | `openid4vp://` | Default `openid4vp://` |
+
+##### **Encryption**
+
+This area is read only.
+
+| Item | Displayed Value | Description |
+|------|-----------------|-------------|
+| **Response Mode** | `direct_post.jwt` | Fixed value. All transactions use an encrypted response, and plaintext submissions are rejected. |
+| **VP Token Encryption Key** | Partially masked | Symmetric key for VP Token encryption. It cannot be changed on this screen and is managed through server configuration. |
+| **JWE Key Agreement (alg)** | `ECDH-ES` | Key agreement algorithm for encrypted responses. Changing it requires prior agreement with Wallets. |
+| **JWE Content Encryption (enc)** | `A256GCM` | Content encryption algorithm for encrypted responses. Changing it requires prior agreement with Wallets. |
+
+##### **Verification**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Enforce Claim Constraints** | When on, the claim constraints of the DCQL Query are enforced during VP verification. | Off | Default off |
+
+##### **Saving**
+
+| Button | Function | Operation Result |
+|--------|----------|------------------|
+| **SAVE** | Save changed settings | Enabled only when there are changes. An error is displayed if Base URL, Client Name, or Client ID Value is empty. |
+| **RESET** | Revert input | Reverts to the last saved values. |
+
+**JSON Preview** at the bottom of the screen is a read-only area that shows the entire configuration to be saved as JSON. The VP Token Encryption Key is partially masked here as well.
+
+> **Note**: Before saving, check that the values match those used with Wallets.
+
+---
 
 ### 3.7.2. DCQL Scope Management
 
+`OID4VP > DCQL Scope Management` links a Scope name to a DCQL Query. The DCQL Query defines which credentials and claims are requested from the Wallet. When OID4VP verification starts, the DCQL Query of the Scope linked to the Policy is used in the request.
+
+#### **3.7.2.1. DCQL Scope Management Screen Layout**
+
 <img src="./images/oid4vp-scope.png" width="800"/>
 
-`OID4VP > DCQL Scope Management` registers, lists, and updates the credential scopes to request. Select a list item to inspect its details.
+| Number | Component | Function Description | Usage Timing |
+|--------|-----------|----------------------|--------------|
+| 1 | **REGISTER Button** | Navigate to page for registering new Scope | When creating new Scope |
+| 2 | **UPDATE Button** | Modify selected Scope information | When changing existing Scope |
+| 3 | **DELETE Button** | Delete selected Scope | When removing unnecessary Scope |
+| 4 | **Scope List** | Display summary information of all registered Scopes | Understanding Scope status |
+| 5 | **Refresh and Paging** | Reload the list and navigate page by page | Managing large amounts of data |
+
+#### **Scope List Information**
+
+| Column | Display Content | Description |
+|--------|----------------|-------------|
+| **Scope** | Unique name of the Scope | Navigates to detail page when clicked |
+| **Description** | Scope description | Description of purpose and characteristics |
+| **Enabled** | Whether it is in use | `Yes` / `No` |
+| **Created At** | Registration date/time | Date and time when first registered |
+
+> **Caution**: A Scope linked to a Policy can also be deleted. Before deleting, check whether any Policy uses the Scope.
+
+---
+
+#### **3.7.2.2. Scope Registration / Modification**
+
+Click the **REGISTER** button to register a new Scope and navigate to the Scope registration page. The same screen layout is used when **UPDATE** modifying Scopes, where the save button is displayed as **SAVE**. The screen below is an example of the `dc+sd-jwt-did` format.
+
+<img src="./images/oid4vp-scope-registration.png" width="800"/>
+
+##### **Basic Information**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Scope*** | Unique name of the Scope. A name that is already registered cannot be used. | `VerifiableIdSD` | ✅ Required |
+| **Description** | Scope description | `Verifiable ID with selective disclosure` | Optional |
+| **Enabled** | Whether it is in use. When off, the Scope is not used for OID4VP requests and does not appear in the Scope search of Policy registration. | On | Default on |
+
+##### **CredentialQuery**
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Credential ID*** | ID that identifies the credential within the DCQL Query. Only letters, numbers, `_`, and `-` are allowed. | `pid` | ✅ Required |
+| **Format** | Credential format to request. Changing the format clears the Meta value and Claims. | `dc+sd-jwt-did` | Default `dc+sd-jwt-did` |
+
+##### **Input by Format**
+
+How Meta and Claims are entered depends on the Format.
+
+| Format | Meta Key | Meta Value Input | Claims Input |
+|--------|----------|------------------|--------------|
+| `dc+sd-jwt-did`, `vc+sd-jwt` | `vct_values` | Enter as a JSON array (e.g., `["urn:eudi:pid:1"]`) | Enter directly when using **Selective claims** |
+| `opendid_vc` | `credential_schema_id_values` | Filled in automatically when a schema is selected with **SCHEMA SEARCH** | Claims of the selected schema are filled in automatically and can only be removed |
+| `mso_mdoc`, `mso_mdoc-did` | `doctype_value` | Enter as a docType string (e.g., `org.iso.18013.5.1.mDL`) | Enter Namespace and Claim Name directly (optional) |
+
+##### **Disclosure Mode**
+
+This is not displayed for the `mso_mdoc` and `mso_mdoc-did` formats.
+
+| Mode | Description |
+|------|-------------|
+| **Full credential** | No claims are specified, so the Wallet discloses the full credential. |
+| **Selective claims** | Only the claims specified in Claims below are requested from the Wallet. |
+
+##### **Claims**
+
+Add a row with the **ADD CLAIM** button and remove it with the trash icon.
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **ID** | Claim identifier | `claim_id` | Optional |
+| **Path (JSON Array)** | Claim path. Rows left empty are not included in the DCQL Query. | `["family_name"]` | Enter for each row |
+| **Values (Optional)** | List of allowed values | `["val1","val2"]` | Optional |
+
+**`mso_mdoc` format example**
+
+Specify a claim with ID (optional), Namespace, and Claim Name.
+
+<img src="./images/oid4vp-scope-registration-mdoc.png" width="800"/>
+
+**`opendid_vc` format example**
+
+Select a VC schema registered in the TA with **SCHEMA SEARCH** to fill in the Meta value and Claims. Remove claims you do not need with the trash icon.
+
+<img src="./images/oid4vp-scope-registration-opendid.png" width="800"/>
+
+##### **DCQL Query JSON Preview**
+
+A read-only area that shows the DCQL Query built from the entered values in real time.
+
+##### **Registration Completion**
+
+| Button | Function | Operation Result |
+|--------|----------|------------------|
+| **REGISTER** | Register Scope with entered information | After validation, creates the Scope and navigates to the list page |
+| **RESET** | Clear input | Clears the entered content. The selected Format is kept. |
+| **CANCEL** | Cancel registration and move to previous page | Returns to the Scope list without saving |
+
+---
+
+#### **3.7.2.3. Scope Details**
+
+Click a Scope name in the list to navigate to the detail page.
+
+<img src="./images/oid4vp-scope-detail.png" width="800"/>
+
+| Item | Description |
+|------|-------------|
+| **Scope** | Unique name of the Scope |
+| **Description** | Scope description |
+| **Enabled** | Whether it is in use (`Yes` / `No`) |
+| **DCQL Query (JSON)** | Saved DCQL Query |
+| **BACK Button** | Returns to the Scope list |
+| **GO TO EDIT Button** | Navigates to the Scope modification page |
+
+---
 
 ### 3.7.3. Policy Management
 
+`OID4VP > Policy Management` registers and manages the Policies used for OID4VP verification. An OID4VP Policy is linked to one DCQL Scope, and this Policy is specified when OID4VP verification starts.
+
+#### **3.7.3.1. Policy Management Screen Layout**
+
 <img src="./images/oid4vp-policy.png" width="800"/>
 
-`OID4VP > Policy Management` registers and manages verification policies linked to DCQL scopes.
+| Number | Component | Function Description | Usage Timing |
+|--------|-----------|----------------------|--------------|
+| 1 | **REGISTER Button** | Navigate to page for registering new Policy | When creating new Policy |
+| 2 | **UPDATE Button** | Modify selected Policy information | When changing existing Policy |
+| 3 | **DELETE Button** | Delete selected Policy | When removing unnecessary Policy |
+| 4 | **Policy List** | Display summary information of all registered Policies | Understanding Policy status |
+| 5 | **Search and Paging** | Search by Title and navigate page by page | Managing large amounts of data |
+
+#### **Policy List Information**
+
+| Column | Display Content | Description |
+|--------|----------------|-------------|
+| **Policy Title** | Unique title of the Policy | Navigates to detail page when clicked |
+| **Scope** | Linked DCQL Scope | Scope used by this Policy |
+| **Created At** | Registration date/time | Date and time when first registered |
+
+---
+
+#### **3.7.3.2. Policy Registration / Modification**
+
+Click the **REGISTER** button to register a new Policy and navigate to the Policy registration page. The same screen layout is used when **UPDATE** modifying Policies, where the save button is displayed as **SAVE**.
+
+<img src="./images/oid4vp-policy-registration.png" width="800"/>
+
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Policy Title*** | Unique title of the Policy | `VerifiableIdSD` | ✅ Required |
+| **Scope*** | DCQL Scope to link. Select it with the **SEARCH** button. | `VerifiableIdSD` | ✅ Required |
+
+Click the **SEARCH** button to open the Scope search dialog. Only Scopes with `Enabled` turned on are displayed.
+
+<img src="./images/oid4vp-policy-scope-search.png" width="400"/>
+
+##### **Registration Completion**
+
+| Button | Function | Operation Result |
+|--------|----------|------------------|
+| **REGISTER** | Register Policy with entered information | After validation, creates the Policy and navigates to the list page |
+| **RESET** | Clear input | Clears the entered content. |
+| **CANCEL** | Cancel registration and move to previous page | Returns to the Policy list without saving |
+
+---
+
+#### **3.7.3.3. Policy Details**
+
+Click a Policy title in the list to navigate to the detail page.
+
+<img src="./images/oid4vp-policy-detail.png" width="800"/>
+
+| Item | Description |
+|------|-------------|
+| **Policy ID** | ID assigned automatically at registration |
+| **Policy Title** | Unique title of the Policy |
+| **Scope** | Linked DCQL Scope |
+| **BACK Button** | Returns to the Policy list |
+| **GO TO EDIT Button** | Navigates to the Policy modification page |
+
+---
 
 ## 3.8. Log Management
 
@@ -1087,32 +1339,111 @@ After Verifier registration, `Log Management` shows API calls in newest first or
 
 ### 3.8.1. API Log
 
+`Log Management > API Log` shows Verifier Agent and protocol API calls. The path is `/logs/api`.
+
 <img src="./images/api-log-api-example.png" width="800"/>
 
-`Log Management > API Log` shows Verifier Agent and protocol API calls. The list displays call time, HTTP method, URI, status code, result (`SUCCESS` or `FAIL`), and requester ID. Search by `URI` or `Result`. The detail dialog also shows duration, client IP, user agent, and any recorded error message. The path is `/logs/api`.
+#### **API Log List Information**
+
+| Column | Display Content | Description |
+|--------|----------------|-------------|
+| **Called At** | Call date/time | Opens the detail dialog when clicked |
+| **Method** | HTTP method | `GET`, `POST`, etc. |
+| **URI** | Called API path | `/verifier/api/v1/request-verify`, etc. |
+| **Status** | HTTP status code | `200`, `400`, etc. |
+| **Result** | Processing result | `SUCCESS` / `FAIL` |
+| **Requester ID** | Requester ID | `anonymousUser` for unauthenticated calls |
+
+Search by `URI` or `Result`.
+
+#### **API Log Details**
 
 <img src="./images/api-log-api-detail-example.png" width="800"/>
 
+In addition to the list columns, the following items are available. Each item is displayed when it was recorded.
+
+| Item | Description |
+|------|-------------|
+| **Duration Ms** | Processing time |
+| **Client IP** | IP of the calling client |
+| **User Agent** | Information about the calling client |
+| **Message** | Error message |
+
 ### 3.8.2. Audit API Log
+
+`Log Management > Audit API Log` shows administrator actions through Admin APIs. The path is `/logs/audit`.
 
 <img src="./images/api-log-audit-example.png" width="800"/>
 
-`Log Management > Audit API Log` shows administrator actions through Admin APIs. Search by action type (`CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`), target type, result, or requester ID. The detail dialog shows target ID, action description, client IP, and any recorded error message. The path is `/logs/audit`.
+#### **Audit API Log List Information**
+
+| Column | Display Content | Description |
+|--------|----------------|-------------|
+| **Called At** | Call date/time | Opens the detail dialog when clicked |
+| **Requester ID** | ID of the administrator | `admin@example.org`, etc. |
+| **Action Type** | Action type | `NONE`, `CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT` |
+| **Target Type** | Target type of the action | `SERVER_CONFIG`, `POLICY`, `SESSION`, etc. |
+| **Target ID** | Target ID of the action | `API_KEY_LSS`, etc. |
+| **Result** | Processing result | `SUCCESS` / `FAIL` |
+
+Search by `Action Type`, `Target Type`, `Result`, or `Requester ID`.
+
+#### **Audit API Log Details**
 
 <img src="./images/api-log-audit-detail-example.png" width="800"/>
+
+In addition to the list columns, the following items are available. Items other than `Description` are displayed only when they were recorded.
+
+| Item | Description |
+|------|-------------|
+| **Client IP** | IP of the client that performed the action |
+| **Description** | Action description |
+| **User Agent** | Information about the client that performed the action |
+| **Message** | Error message |
 
 > Records are created for API calls annotated with `@ArticleLog`. The screens use example logs and accounts.
 
 ## 3.9. Server Configuration
 
+`Server Configuration` manages the API Keys required to integrate with external servers.
+
 <img src="./images/server-configuration.png" width="800"/>
 
-Use `Server Configuration` to view and manage external server integration settings. Changed values must match the connected servers.
+| Item | Description | Input Example | Required |
+|------|-------------|---------------|----------|
+| **Ledger Service Server** | API Key issued by the LSS (`API_KEY_LSS`). The Verifier sends it in the `X-API-Key` header when calling the LSS. | `example-key` | ✅ Required |
+
+| Button | Function | Operation Result |
+|--------|----------|------------------|
+| **UPDATE** | Save the entered value | Enabled only when the value has changed, and saves after a confirmation dialog. |
+| **RESET** | Revert input | Reverts to the last saved value. |
+
+> **Note**: If the API Key is not registered, LSS calls fail with `SSRVVRF21501`. A changed value must match the key issued by the LSS.
 
 ## 3.10. Password Policy Settings
 
+Use `Admin Management > Password Policy Settings` to view and update password rules for administrator accounts. The rules apply when creating accounts or changing passwords.
+
 <img src="./images/password-policy.png" width="800"/>
 
-Use `Admin Management > Password Policy Settings` to view and update password rules for administrator accounts. Check the rules when creating accounts or changing passwords.
+##### **Basic Settings**
+
+| Item | Description | Input Example | Constraints |
+|------|-------------|---------------|-------------|
+| **Minimum Length** | Minimum password length | `8` | 6 to 20 characters |
+| **Password Expiration Period** | Password validity period in days | `365` | 30 to 365 days |
+
+##### **Password Composition Rules**
+
+| Item | Description | Input Example |
+|------|-------------|---------------|
+| **Uppercase Letters (A-Z)** | When on, an uppercase letter is required. | Off |
+| **Numbers (0-9)** | When on, a number is required. | Off |
+| **Special Characters (!@#$%^&\*)** | When on, a special character is required. | Off |
+
+| Button | Function | Operation Result |
+|--------|----------|------------------|
+| **UPDATE** | Save the entered policy | Enabled only when values have changed, and saves after a confirmation dialog. |
+| **RESET** | Revert input | Reverts to the last saved values. |
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md

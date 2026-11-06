@@ -169,7 +169,11 @@ const Oid4vpConfigPage = () => {
 
   const clientIdPreview = `${config.clientId.scheme}:${config.clientId.value || '(not set)'}`;
 
-  const buildJsonPreview = () => JSON.stringify(config, null, 2);
+  const buildJsonPreview = () => {
+    const key = config.crypto?.vpTokenEncryptionKey;
+    const crypto = { ...config.crypto, vpTokenEncryptionKey: key ? maskSecret(key) : key };
+    return JSON.stringify({ ...config, crypto }, null, 2);
+  };
 
   const handleSave = async () => {
     if (!config.baseUrl) {

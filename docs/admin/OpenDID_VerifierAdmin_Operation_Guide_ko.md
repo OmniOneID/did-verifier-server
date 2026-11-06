@@ -18,7 +18,7 @@ puppeteer:
 Open DID Verifier Admin Operation Guide
 ==
 
-- Date: 2026-10-30
+- Date: 2026-11-06
 - Version: v3.0.0
 
 개정 이력
@@ -28,7 +28,7 @@ Open DID Verifier Admin Operation Guide
 | v1.0.0 | 2025-03-31 | 최초 작성                  |
 | v1.0.1 | 2025-04-25 | `3.1. Verifier Registration` 장 추가 |
 | v2.0.0 | 2025-05-30 | ZKP 검증관련 메뉴 추가 및 기능 변경 반영 |
-| v3.0.0 | 2026-10-30 | 현재 사이드 메뉴, OID4VP, API Log, 설정 화면 및 캡처 갱신 |
+| v3.0.0 | 2026-11-06 | 현재 사이드 메뉴, OID4VP, API Log, 설정 화면 및 캡처 갱신, 예시 데이터 캡처와 OID4VP·로그·설정 상세 설명 추가 |
 
 목차
 ==
@@ -79,7 +79,12 @@ Open DID Verifier Admin Operation Guide
     - [3.6.1. Admin 목록 조회](#361-admin-목록-조회)
     - [3.6.2. Admin 등록](#362-admin-등록)
   - [3.7. OID4VP Management](#37-oid4vp-management)
+    - [3.7.1. Configuration](#371-configuration)
+    - [3.7.2. DCQL Scope Management](#372-dcql-scope-management)
+    - [3.7.3. Policy Management](#373-policy-management)
   - [3.8. Log Management](#38-log-management)
+    - [3.8.1. API Log](#381-api-log)
+    - [3.8.2. Audit API Log](#382-audit-api-log)
   - [3.9. Server Configuration](#39-server-configuration)
   - [3.10. Password Policy Settings](#310-password-policy-settings)
 
@@ -476,17 +481,18 @@ Service Management 메뉴에서는 서비스의 전체 생명주기를 관리할
 </br>
 서비스 수정 **UPDATE**시에도 동일한 화면으로 구성됩니다.
 
-<img src="./images/service_registration.jpg" width="500"/>
+<img src="./images/service_registration.jpg" width="800"/>
 
 #### **필수 입력 항목**
 
 | 항목 | 설명 | 입력 예시 | 제약 조건 |
 |------|------|-----------|-----------|
-| **Service*** | 서비스의 고유 이름 | `IDCardVerification`, `AgeProof` | 영문, 숫자, 하이픈, 언더스코어만 허용 |
-| **Device*** | 지원하는 디바이스 유형 | `PC`, `Mobile`, `Tablet` | 자유 텍스트 입력 |
+| **Service*** | 서비스의 고유 이름 | `IDCardVerification`, `AgeProof` | 최대 50자 |
+| **Device*** | 지원하는 디바이스 유형 | `PC`, `Mobile`, `Tablet` | 자유 텍스트 입력, 최대 50자 |
 | **Lock Status*** | 서비스 잠금 상태 | `Unlocked` | 현재는 `Unlocked`만 선택 가능 |
-| **Submission Mode*** | VP 제출 방식 선택 | `Direct`, `Indirect` | 드롭다운에서 선택 |
+| **Submission Mode*** | VP 제출 방식 선택 | `Direct` | 현재는 `Direct`만 선택 가능 |
 | **Verification Type*** | 검증 유형 선택 | `VP`, `ZKP` | 사용할 검증 방식에 따라 선택 |
+| **Valid Seconds*** | 검증 요청의 유효 시간(초) | `180` | 1~86400, 기본값 180 |
 
 > **참고**: *표시는 필수 입력 항목입니다.
 
@@ -497,6 +503,8 @@ Service Management 메뉴에서는 서비스의 전체 생명주기를 관리할
 | **Direct** | 사용자가 VP를 Verifier에 직접 제출 | 실시간 검증이 필요한 경우 | 
 | **Indirect** | 중간 서버를 통해 VP 전달 | 네트워크 제약이 있는 환경 |
 | **Proxy** | 프록시 서버를 통한 간접 전달 | 복잡한 네트워크 구성 | 
+
+> **참고**: 현재 화면에서는 `Direct`만 선택할 수 있습니다.
 
 #### **Verification Type 상세 설명**
 
@@ -511,7 +519,7 @@ Service Management 메뉴에서는 서비스의 전체 생명주기를 관리할
 
 | 기능 | 설명 | URL 형식 예시 |
 |------|------|---------------|
-| **ADD ENDPOINT** | 새로운 엔드포인트 URL 추가 | `https://api.example.com/verify` |
+| **ADD ENDPOINT** | 새로운 엔드포인트 URL 추가 | `https://example.org/verifier/api/v1` |
 | **삭제 (🗑️)** | 등록된 엔드포인트 제거 | 각 행의 휴지통 아이콘 클릭 |
 
 
@@ -548,6 +556,16 @@ Filter는 "사용자에게 어떤 VC를 요구할 것인가?"를 결정하는 �
 | 4 | **Filter 목록** | 등록된 모든 Filter의 요약 정보 표시 | Filter 현황 파악 |
 | 5 | **검색 및 페이징** | Filter 검색 및 페이지 단위 탐색 | 대량 데이터 관리 |
 
+#### **Filter 목록 정보**
+
+| 컬럼 | 표시 내용 | 설명 |
+|------|-----------|------|
+| **Title** | Filter의 고유 제목 | 클릭 시 상세 페이지로 이동 |
+| **Type** | 스키마 유형 | `OsdSchemaCredential` |
+| **Created At** | 등록 일시 | 처음 등록된 날짜와 시간 |
+
+> **중요**: Profile에서 사용 중인 Filter는 삭제할 수 없습니다. 삭제하려면 먼저 연결된 모든 Profile에서 해당 Filter를 제거해야 합니다.
+
 ---
 
 #### **3.3.1.2. Filter 등록 / 수정**
@@ -555,19 +573,20 @@ Filter는 "사용자에게 어떤 VC를 요구할 것인가?"를 결정하는 �
 새로운 Filter를 등록하기 위해 **REGISTER** 버튼을 클릭하면 Filter 등록 페이지로 이동합니다.
 Filter 수정 **UPDATE**시에도 동일한 화면으로 구성됩니다.
 
-<img src="./images/filter_registration.png" width="600"/>
+<img src="./images/filter_registration.png" width="800"/>
 
 ##### **기본 정보 입력**
 
 | 항목 | 설명 | 입력 예시 | 필수 여부 |
 |------|------|-----------|-----------|
-| **Title*** | Filter의 고유 제목 | `국민신분증_필터`, `운전면허증_필터` | ✅ 필수 |
+| **Title*** | Filter의 고유 제목 | `NationalIdFilter`, `DriverLicenseFilter` | ✅ 필수 |
+| **ID*** | 검증에 사용할 VC 스키마 ID입니다. **SEARCH** 버튼으로 스키마를 선택하면 자동으로 입력됩니다. | `https://example.org/issuer/api/v1/vc/vcschema?name=national_id` | ✅ 필수 |
 | **Type** | 스키마 유형 선택 | `OsdSchemaCredential` | ✅ 필수 (고정값) |
-| **Present All** | 모든 클레임 제출 필요 여부 | `true` | ✅ 필수 (고정값) |
+| **Present All** | 모든 클레임 제출 필요 여부 | `true` | 기본값 `true` |
 
 **Present All 설정 가이드:**
-- **true**: 스키마의 모든 클레임을 반드시 제출해야 함 (고정값)
-- **false**: Required Claims에 지정된 클레임만 제출하면 됨 (구현시 선택가능)
+- **true**: 스키마의 모든 클레임을 반드시 제출해야 함 (기본값)
+- **false**: Required Claims에 지정된 클레임만 제출하면 됨
 
 ##### **VC 스키마 검색 및 선택**
 
@@ -589,17 +608,17 @@ Filter는 특정 VC 스키마를 기반으로 동작하므로, 먼저 검증에 
 
 | 기능 | 설명 | 동작 방식 |
 |------|------|-----------|
-| **클레임 목록** | 현재 설정된 필수 클레임들 | 각 클레임의 이름과 데이터 타입 표시 |
+| **클레임 목록** | 스키마를 선택하면 자동으로 채워지는 필수 클레임 | 네임스페이스와 클레임 ID를 합친 코드로 표시 (예: `org.opendid.national_id.name`) |
 
 **클레임 선택 과정:**
 1. **SEARCH** 버튼 클릭
 2. **스키마 선택 다이얼로그** 표시
-3. **스키마 체크** 선택 및및 확인
+3. **스키마 선택** 후 **SELECT** 클릭
 4. **선택된 스키마 기반 클레임이 자동 추가**
 
 ##### **Display Claims 관리**
 
-사용자에게 표시할 클레임 정보를 설정합니다. Display Claims는 Required Claims와 별도로 관리되며, 검증 과정에서 사용자에게 어떤 정보가 요구되는지 명확히 알려주는 역할을 합니다.(구현목적상 Requierd Claim과 값이 동일합니다.)
+사용자에게 표시할 클레임 정보를 설정합니다. Display Claims는 Required Claims와 별도로 관리되며, 검증 과정에서 사용자에게 어떤 정보가 요구되는지 명확히 알려주는 역할을 합니다.(구현목적상 Required Claims와 값이 동일합니다.)
 
 ##### **Allowed Issuers 관리**
 
@@ -608,7 +627,7 @@ Filter는 특정 VC 스키마를 기반으로 동작하므로, 먼저 검증에 
 
 | 기능 | 설명 | 입력 형식 |
 |------|------|-----------|
-| **ADD 버튼** | 새로운 허용 발급자 DID 추가 | DID 형식: `did:omn:issuer:xxx` |
+| **ADD 버튼** | 새로운 허용 발급자 DID 추가 | DID 형식: `did:example:issuer` |
 | **발급자 DID 목록** | 현재 허용된 발급자들의 DID 목록 | 각 DID별 검증 권한 표시 |
 | **삭제 (🗑️)** | 특정 발급자를 허용 목록에서 제거 | 해당 DID 행의 휴지통 아이콘 클릭 |
 
@@ -634,7 +653,7 @@ Process는 "VP 제출 과정을 어떻게 보안할 것인가?"를 결정하는 
 
 #### **3.3.2.1. Process Management 화면 구성**
 
-<img src="./images/process_management.png" width="600"/>
+<img src="./images/process_management.png" width="800"/>
 
 | 번호 | 구성 요소 | 기능 설명 | 사용 시점 |
 |------|-----------|-----------|-----------|
@@ -649,13 +668,12 @@ Process는 "VP 제출 과정을 어떻게 보안할 것인가?"를 결정하는 
 | 컬럼 | 표시 내용 | 설명 |
 |------|-----------|------|
 | **Title** | Process의 고유 제목 | 관리자가 식별할 수 있는 명칭 |
-| **Auth Type** | 사용자 인증 방식 | `PIN` (핀 번호) / `BIO` (생체 인증) |
+| **Auth Type** | 사용자 인증 방식 | `PIN or BIO` (PIN 또는 생체 인증). 등록 화면에서는 이 값만 선택할 수 있습니다. |
 | **Curve** | 타원곡선 암호화 알고리즘 | `Secp256r1` 등 암호화 표준 |
 | **Cipher** | 대칭키 암호화 알고리즘 | `AES-128-CBC`, `AES-256-CBC` 등 |
-| **Padding** | 패딩 방식 | `PKCS5`, `PKCS7` 등 |
-| **Created At** | 생성 일시 | Process가 처음 등록된 날짜와 시간 |
+| **Padding** | 패딩 방식 | `PKCS5` |
 
-> **중요**: Profile Count가 1 이상인 Process는 삭제할 수 없습니다. 삭제하려면 먼저 연결된 모든 Profile에서 해당 Process를 제거해야 합니다.
+> **중요**: Profile에서 사용 중인 Process는 삭제할 수 없습니다. 삭제하려면 먼저 연결된 모든 Profile에서 해당 Process를 제거해야 합니다.
 
 ---
 
@@ -664,13 +682,13 @@ Process는 "VP 제출 과정을 어떻게 보안할 것인가?"를 결정하는 
 새로운 Process를 등록하기 위해 **REGISTER** 버튼을 클릭하면 Process 등록 페이지로 이동합니다.</br>
 Process 수정 **UPDATE**시에도 동일한 화면으로 구성됩니다.
 
-<img src="./images/process_registration.png" width="400"/>
+<img src="./images/process_registration.png" width="800"/>
 
 ##### **기본 정보 입력**
 
 | 항목 | 설명 | 입력 예시 | 필수 여부 |
 |------|------|-----------|-----------|
-| **Title*** | Process의 고유 제목 | `생체인증_프로세스` | ✅ 필수 |
+| **Title*** | Process의 고유 제목 | `NationalIdProcess` | ✅ 필수 |
 | **Auth Type*** | 사용자 인증 방식 선택 | `PIN or BIO` | ✅ 필수(고정값) |
 
 ##### **ReqE2e Information (End-to-End 암호화 설정)**
@@ -690,7 +708,7 @@ Process 실행 중 발생하는 이벤트를 처리할 외부 엔드포인트를
 
 | 기능 | 설명 | URL 형식 예시 |
 |------|------|---------------|
-| **ADD 버튼** | 새로운 엔드포인트 URL 추가 | `https://api.company.com/vp-callback` |
+| **ADD 버튼** | 새로운 엔드포인트 URL 추가 | `https://example.org/verifier/api/v1/request-verify` |
 | **엔드포인트 목록** | 현재 등록된 모든 URL 표시 | 각 URL의 용도와 상태 확인 가능 |
 | **Delete 열** | 특정 엔드포인트 제거 | 해당 행의 Delete 버튼 클릭 |
 
@@ -716,7 +734,7 @@ Profile은 "어떤 VC를 어떤 방식으로 검증할 것인가?"를 정의하�
 
 #### **3.3.3.1. Profile Management 화면 구성**
 
-<img src="./images/profile_management.jpg" width="600"/>
+<img src="./images/profile_management.jpg" width="800"/>
 
 | 번호 | 구성 요소 | 기능 설명 | 사용 시점 |
 |------|-----------|-----------|-----------|
@@ -730,8 +748,8 @@ Profile은 "어떤 VC를 어떤 방식으로 검증할 것인가?"를 정의하�
 
 | 컬럼 | 표시 내용 | 설명 |
 |------|-----------|------|
-| **Profile Title** | Profile의 고유 제목 | 관리자 식별용 명칭 |
-| **Profile Description** | Profile 설명 | 용도와 특징 설명 |
+| **Title** | Profile의 고유 제목 | 클릭 시 상세 페이지로 이동 |
+| **Description** | Profile 설명 | 용도와 특징 설명 |
 | **Created At** | 등록 일시 | 처음 등록된 날짜와 시간 |
 
 > **경고**: 이미 Policy Management에 등록된 프로파일은 삭제할 수 없습니다. 삭제하려면 먼저 연결된 Policy에서 해당 프로파일을 제거해야 합니다.
@@ -743,15 +761,15 @@ Profile은 "어떤 VC를 어떤 방식으로 검증할 것인가?"를 정의하�
 새로운 Profile을 등록하기 위해 **REGISTER** 버튼을 클릭하면 Profile 등록 페이지로 이동합니다.
 Profile을 수정 **UPDATE**시에도 동일한 화면으로 구성됩니다.
 
-<img src="./images/profile_register.jpg" width="500"/>
+<img src="./images/profile_register.jpg" width="800"/>
 
 ##### **기본 정보 입력**
 
 | 항목 | 설명 | 입력 예시 | 필수 여부 |
 |------|------|-----------|-----------|
-| **Title*** | Profile의 고유 제목 | `학위증명_일반_프로파일` | ✅ 필수 |
+| **Title*** | Profile의 고유 제목 | `NationalIdProfile` | ✅ 필수 |
 | **Type** | Profile 유형 | `VerifyProfile` | ✅ 필수 (고정값) |
-| **Description*** | Profile에 대한 상세 설명 | `신분증 검증용 프로파일` | ✅ 필수 |
+| **Description** | Profile에 대한 상세 설명 | `VP profile for national ID verification` | 선택 |
 | **Encoding*** | 문자 인코딩 방식 | `UTF-8` | ✅ 필수 |
 | **Language*** | 지원 언어 | `ko` (한국어), `en` (영어) | ✅ 필수 |
 
@@ -761,9 +779,10 @@ Verifier 정보는 가입증명서를 통해 자동으로 입력되며 수정할
 
 | 정보 항목 | 자동 설정 내용 | 출처 |
 |-----------|----------------|------|
-| **Verifier DID** | `did:omn:verifier:<식별자>` | Verifier 등록 시 생성된 DID |
-| **Verifier Name** | 등록된 Verifier 이름 | Verifier Management에서 설정한 이름 |
-| **Certificate URL** | 가입증명서 접근 URL | TA로부터 발급받은 Certificate VC 위치 |
+| **DID** | `did:example:verifier` | Verifier 등록 시 생성된 DID |
+| **Name** | 등록된 Verifier 이름 | Verifier Management에서 설정한 이름 |
+| **Cert VC Ref** | 가입증명서 접근 URL | TA로부터 발급받은 Certificate VC 위치 |
+| **Ref** | Verifier 서버 URL | Verifier Management의 URL |
 
 > **참고**: 이 정보는 VP 검증 시 사용자에게 "누가 검증을 요청하는가?"를 알려주는 중요한 신뢰 정보입니다.
 
@@ -807,7 +826,7 @@ Policy는 VP 정책 구성의 최종 단계로서, "어떤 서비스에서 어�
 
 #### **3.3.4.1. Policy Management 화면 구성**
 
-<img src="./images/policy_management.jpg" width="600"/>
+<img src="./images/policy_management.jpg" width="800"/>
 
 | 번호 | 구성 요소 | 기능 설명 | 사용 시점 |
 |------|-----------|-----------|-----------|
@@ -821,13 +840,10 @@ Policy는 VP 정책 구성의 최종 단계로서, "어떤 서비스에서 어�
 
 | 컬럼 | 표시 내용 | 설명 |
 |------|-----------|------|
-| **Profile Title** | ZKP Profile의 고유 제목 | 관리자 식별용 명칭 |
-| **Profile Description** | Profile 설명 | 용도와 특징 설명 |
-| **Proof Request** | 연결된 Proof Request 이름 | 사용하는 증명 요구사항 |
-| **Used in Policies** | 연결된 Policy 수 | 이 Profile을 사용하는 ZKP Policy 개수 |
-| **Registered At** | 등록 일시 | 처음 등록된 날짜와 시간 |
-
-> **경고**: 이미 ZKP Policy Management에 등록된 프로파일은 삭제할 수 없습니다. 삭제하려면 먼저 연결된 Policy에서 해당 프로파일을 제거해야 합니다.
+| **Policy Title** | Policy의 고유 제목 | 클릭 시 상세 페이지로 이동 |
+| **Payload Service** | 연결된 Service 이름 | 이 Policy가 사용하는 Service |
+| **Profile Title** | 연결된 Profile 이름 | 이 Policy가 사용하는 Profile |
+| **Created At** | 등록 일시 | 처음 등록된 날짜와 시간 |
 
 ---
 
@@ -835,13 +851,13 @@ Policy는 VP 정책 구성의 최종 단계로서, "어떤 서비스에서 어�
 
 새로운 Policy를 등록하기 위해 **REGISTER** 버튼을 클릭하면 Policy 등록 페이지로 이동합니다.
 
-<img src="./images/policy_registration.png" width="600"/>
+<img src="./images/policy_registration.png" width="800"/>
 
 ##### **기본 정보 입력**
 
 | 항목 | 설명 | 입력 예시 | 필수 여부 |
 |------|------|-----------|-----------|
-| **Policy Title*** | Policy의 고유 제목 | `신분증_검증_정책`, `직원_출입_정책` | ✅ 필수 |
+| **Policy Title*** | Policy의 고유 제목 | `NationalIdPolicy`, `IDCardVerificationPolicy` | ✅ 필수 |
 
 ##### **Profile Information 선택**
 
@@ -917,8 +933,8 @@ Proof Request Configuration 화면은 다음과 같은 주요 기능을 제공�
 | 4 | Cipher | 암호화 알고리즘을 선택합니다. 드롭다운 메뉴에서 "AES-256-CBC" 등의 옵션을 선택할 수 있습니다. |
 | 5 | Padding | 패딩 방식을 선택합니다. 드롭다운 메뉴에서 "PKCS5" 등의 옵션을 선택할 수 있습니다. |
 | 6 | Requested Attributes | 요청할 속성을 관리하는 섹션입니다. "ADD ATTRIBUTE" 버튼을 클릭하여 팝업에서 스키마를 선택하여 속성을 추가할 수 있습니다. 각 속성은 Attribute Name과 Credential Definition으로 구성됩니다. 입력된 속성을 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
-| 7 | Requested Predicates | 요청할 조건부를 관리하는 섹션입니다. "ADD ATTRIBUTE" 버튼을 클릭하여 팝업에서 스키마를 선택하여 속성을 추가할 수 있습니다. 각 조건부는 Attribute Name, Predicate Type, Predicate Value, Credential Definition으로 구성됩니다. 입력된 조건부를 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
-| 8 | 버튼 영역 | - UPDATE: 입력한 정보로 증명 요청을 수정합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(증명 요청 목록)로 돌아갑니다. |
+| 7 | Requested Predicates | 요청할 조건부를 관리하는 섹션입니다. "ADD PREDICATE" 버튼을 클릭하여 팝업에서 스키마를 선택하여 속성을 추가할 수 있습니다. 각 조건부는 Attribute Name, Predicate Type, Predicate Value, Credential Definition으로 구성됩니다. 입력된 조건부를 삭제하려면 해당 항목 오른쪽의 휴지통 아이콘을 클릭하세요. |
+| 8 | 버튼 영역 | - REGISTER: 입력한 정보로 증명 요청을 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(증명 요청 목록)로 돌아갑니다. |
 
  > **참고**: ZKP 검증에 사용되는 데이터 정보의 자세한 내용은 데이터 스펙 Data Specification 문서를 참고바랍니다.
 
@@ -941,7 +957,7 @@ ZKP 프로파일 목록 테이블에는 Profile ID, Profile Title, Profile Descr
 
 ZKP 프로파일 등록 페이지에서는 새로운 ZKP 프로파일을 등록하기 위한 정보를 입력할 수 있습니다. 이 페이지는 프로파일 수정 시에도 동일한 양식으로 사용됩니다.
 
-<img src="./images/zkp_profile_registration.jpg" width="600"/>
+<img src="./images/zkp_profile_registration.jpg" width="800"/>
 
 | 번호 | 항목 | 설명 |
 |------|------|------|
@@ -980,7 +996,7 @@ ZKP 정책 등록 화면은 다음과 같은 항목으로 구성됩니다:
 | 1 | Policy Title | ZKP 정책의 제목을 입력하는 필드입니다. 예시로 "ZKPPolicy"가 입력되어 있습니다. |
 | 2 | Profile Information | 정책에 연결할 ZKP 프로파일 정보를 선택합니다. "SEARCH" 버튼을 클릭하면 ZKP 프로파일 검색 팝업이 표시되며, 검색 후 선택한 프로파일이 이 필드에 자동으로 입력됩니다. |
 | 3 | Payload Information | 정책에 사용할 서비스 정보를 선택합니다. "SEARCH" 버튼을 클릭하면 서비스 검색 팝업이 표시되며, 검색 후 선택한 서비스가 이 필드에 자동으로 입력됩니다. |
-| 4 | 버튼 영역 | - SAVE: 입력한 정보로 ZKP 정책을 저장합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(ZKP 정책 목록)로 돌아갑니다. |
+| 4 | 버튼 영역 | - REGISTER: 입력한 정보로 ZKP 정책을 등록합니다.<br>- RESET: 모든 입력 필드를 초기화합니다. 수정 모드에서는 기존 입력값으로 되돌립니다.<br>- CANCEL: 입력을 취소하고 이전 페이지(ZKP 정책 목록)로 돌아갑니다. |
 
 ZKP 정책 등록 시 필요한 주요 구성 요소는 다음과 같습니다:
 - Policy Title: ZKP 정책의 고유 이름
@@ -1001,11 +1017,11 @@ VP History는 다음과 같은 주요 기능과 정보를 제공합니다:
 |------|------|------|
 | 1 | VP Submit List | VP 제출 목록 제목입니다. |
 | 2 | Transaction Status 필터 | 드롭다운 메뉴를 통해 특정 상태(All, Completed, Pending, Failed)의 VP 제출 건만 필터링할 수 있습니다. |
-| 3 | 목록 헤더 | Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, Format 등 VP 제출 정보의 헤더입니다. |
+| 3 | 목록 헤더 | Transaction Status, Protocol, Transaction ID, Holder DID, Error Code, Format 등 VP 제출 정보의 헤더입니다. Protocol은 제출 방식(`OpenDID`, `OID4VP`)을 나타냅니다. |
 | 4 | 상태 표시 | VP 제출 건의 상태를 색상으로 구분합니다. 완료된 건은 녹색 배경의 'Completed', 처리 중인 건은 노란색 배경의 'Pending', 실패한 건은 빨간색 배경의 'Failed'로 표시됩니다. |
 | 5 | Transaction ID | 각 VP 제출 시도의 고유 트랜잭션 식별자가 표시됩니다. 이를 통해 모든 상태의 요청을 추적할 수 있습니다. |
-| 6 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. Pending이나 Failed 상태의 경우 "N/A"로 표시됩니다. |
-| 7 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 캡처는 빈 예시 목록이며 실제 건수는 환경에 따라 다릅니다. |
+| 6 | DID 정보 | 각 VP 제출 건의 Holder DID(VP를 제출한 사용자의 DID)와 제출 시간(Created At)이 표시됩니다. ZKP의 경우 해당값은 "ZKP holder DID"의 임의값으로 입력됩니다. Pending이나 Failed 상태의 경우 "-"로 표시됩니다. |
+| 7 | 페이지네이션 | 한 페이지에 표시할 행 수를 선택하고, 페이지 간 이동을 할 수 있습니다. 실제 건수는 환경에 따라 다릅니다. |
 
 VP 이력을 통해 관리자는 다음과 같은 작업을 수행할 수 있습니다:
 - 특정 상태(Completed, Pending, Failed)의 VP 제출 현황 파악
@@ -1046,9 +1062,9 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 | 2    | **DELETE 버튼**         | 선택한 관리자 계정을 삭제합니다. (ROOT 관리자만 가능)              |
 | 3    | **CHANGE PASSWORD 버튼** | 선택한 관리자 계정의 비밀번호를 변경할 수 있습니다.                |
 | 4    | **ID**                  | 등록된 관리자 계정의 이메일 ID입니다.                              |
-| 5    | **Role**                | 해당 관리자 계정의 역할(Role)입니다. (예: ROOT, Normal Admin 등)   |
+| 5    | **Role**                | 해당 관리자 계정의 역할(Role)입니다. (`ROOT`, `NORMAL`)   |
 | 6    | **Registered At**       | 해당 계정이 최초 등록된 일시입니다.                               |
-| 7    | **Updated At**          | 마지막으로 수정된 일시입니다.     
+| 7    | **Updated At**          | 마지막으로 수정된 일시입니다. |
 
 <br/>
 
@@ -1056,7 +1072,7 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 `Admin Management` 화면에서 **REGISTER** 버튼을 클릭하면, 아래와 같은 등록 화면으로 이동합니다.
 
-<img src="./images/admin-registration.png" width="600"/>
+<img src="./images/admin-registration.png" width="800"/>
 
 | 번호 | 항목                        | 설명                                                                |
 | ---- | --------------------------- | ------------------------------------------------------------------- |
@@ -1073,25 +1089,260 @@ ROOT 계정은 `Admin Management` 메뉴에서 모든 기능을 수행할 수 �
 
 ## 3.7. OID4VP Management
 
-`OID4VP` 메뉴에서 OpenID4VP 검증 설정을 관리합니다.
+`OID4VP` 메뉴에서는 OpenID4VP(OID4VP) 방식의 VP 제출에 필요한 Verifier 설정과 검증 정책을 관리합니다. 아래 순서로 설정합니다.
+
+| 순서 | 메뉴 | 설정 내용 |
+|------|------|-----------|
+| 1 | **Configuration** | Wallet에 전달할 Verifier 정보, 세션, 암호화, 검증 옵션 |
+| 2 | **DCQL Scope Management** | Wallet에 요청할 자격증명과 클레임(DCQL Query) |
+| 3 | **Policy Management** | 검증 요청에 사용할 Policy와 DCQL Scope의 연결 |
 
 ### 3.7.1. Configuration
 
+`OID4VP > Configuration`에서는 Wallet과 연동할 Verifier 정보를 설정합니다. 이 설정은 서버에 하나만 있으며 모든 OID4VP 요청에 적용됩니다.
+
 <img src="./images/oid4vp-config.png" width="800"/>
 
-`OID4VP > Configuration`에서는 Verifier의 Base URL과 Client Name, Client ID 방식 및 값, 세션 유효 시간, 호출 스킴, 암호화 설정과 검증 옵션을 확인하고 설정합니다. 설정을 저장하기 전에 Wallet과 연동할 값이 일치하는지 확인하세요.
+##### **Basic Information**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Base URL*** | Verifier 서버 주소입니다. Wallet에 전달하는 요청·응답 URL의 기준이 됩니다. | `https://example.org` | ✅ 필수 |
+| **Client Name*** | Wallet 사용자에게 표시되는 이름입니다. **VERIFIER** 버튼을 누르면 등록된 Verifier 이름을 선택해 입력할 수 있습니다. | `Example Verifier` | ✅ 필수 |
+
+##### **Client ID**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Client ID Scheme** | Verifier를 식별하는 방식입니다. `decentralized_identifier` 또는 `redirect_uri`를 선택합니다. | `decentralized_identifier` | 기본값 `decentralized_identifier` |
+| **Client ID Value*** | `decentralized_identifier`는 Verifier DID를 입력하며, **DID SEARCH** 버튼으로 등록된 DID를 선택할 수 있습니다. `redirect_uri`는 `Base URL` + `/oid4vp/response`가 자동으로 입력되고 프록시 환경에서는 직접 수정할 수 있습니다. | `did:example:verifier` | ✅ 필수 |
+| **client_id** | 위 두 값을 조합한 최종 값을 미리 보여 줍니다. | `decentralized_identifier:did:example:verifier` | 자동 표시 |
+
+##### **Session**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Session TTL (ms)** | OID4VP 세션 유효 시간입니다. 300,000(5분)~600,000(10분) 범위로 입력합니다. | `300000` | 기본값 `300000` |
+| **Invocation Scheme** | Wallet을 호출하는 URI의 스킴입니다. | `openid4vp://` | 기본값 `openid4vp://` |
+
+##### **Encryption**
+
+이 영역은 조회 전용입니다.
+
+| 항목 | 표시 값 | 설명 |
+|------|---------|------|
+| **Response Mode** | `direct_post.jwt` | 고정값입니다. 모든 거래는 암호화된 응답을 사용하며 평문 제출은 거부됩니다. |
+| **VP Token Encryption Key** | 일부 가림 | VP Token 암호화에 쓰는 대칭키입니다. 화면에서 변경할 수 없으며 서버 설정으로 관리합니다. |
+| **JWE Key Agreement (alg)** | `ECDH-ES` | 암호화 응답의 키 합의 알고리즘입니다. 변경하려면 Wallet과 사전 합의가 필요합니다. |
+| **JWE Content Encryption (enc)** | `A256GCM` | 암호화 응답의 콘텐츠 암호화 알고리즘입니다. 변경하려면 Wallet과 사전 합의가 필요합니다. |
+
+##### **Verification**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Enforce Claim Constraints** | 켜면 VP 검증 때 DCQL Query의 클레임 조건을 강제합니다. | 끔 | 기본값 꺼짐 |
+
+##### **저장**
+
+| 버튼 | 기능 | 동작 결과 |
+|------|------|-----------|
+| **SAVE** | 변경한 설정 저장 | 변경 사항이 있을 때만 활성화됩니다. Base URL, Client Name, Client ID Value가 비어 있으면 오류를 표시합니다. |
+| **RESET** | 입력 내용 되돌리기 | 마지막으로 저장한 값으로 되돌립니다. |
+
+화면 아래의 **JSON Preview**는 저장될 설정 전체를 JSON으로 보여 주는 조회 전용 영역입니다. VP Token Encryption Key는 여기서도 일부를 가려 표시합니다.
+
+> **참고**: 설정을 저장하기 전에 Wallet과 연동할 값이 일치하는지 확인하세요.
+
+---
 
 ### 3.7.2. DCQL Scope Management
 
+`OID4VP > DCQL Scope Management`에서는 Scope 이름과 DCQL Query를 연결합니다. DCQL Query는 Wallet에 어떤 자격증명과 클레임을 요청할지 정의합니다. OID4VP 검증을 시작하면 Policy에 연결된 Scope의 DCQL Query가 요청에 사용됩니다.
+
+#### **3.7.2.1. DCQL Scope Management 화면 구성**
+
 <img src="./images/oid4vp-scope.png" width="800"/>
 
-`OID4VP > DCQL Scope Management`에서는 요청할 자격증명 범위를 등록하고 목록에서 조회·수정합니다. 목록의 항목을 선택하면 상세 설정을 확인할 수 있습니다.
+| 번호 | 구성 요소 | 기능 설명 | 사용 시점 |
+|------|-----------|-----------|-----------|
+| 1 | **REGISTER 버튼** | 새로운 Scope를 등록하는 페이지로 이동 | Scope 신규 생성 시 |
+| 2 | **UPDATE 버튼** | 선택한 Scope 정보를 수정 | 기존 Scope 변경 시 |
+| 3 | **DELETE 버튼** | 선택한 Scope를 삭제 | 불필요한 Scope 제거 시 |
+| 4 | **Scope 목록** | 등록된 모든 Scope의 요약 정보 표시 | Scope 현황 파악 |
+| 5 | **새로고침 및 페이징** | 목록을 다시 불러오고 페이지 단위로 탐색 | 대량 데이터 관리 |
+
+#### **Scope 목록 정보**
+
+| 컬럼 | 표시 내용 | 설명 |
+|------|-----------|------|
+| **Scope** | Scope의 고유 이름 | 클릭 시 상세 페이지로 이동 |
+| **Description** | Scope 설명 | 용도와 특징 설명 |
+| **Enabled** | 사용 여부 | `Yes` / `No` |
+| **Created At** | 등록 일시 | 처음 등록된 날짜와 시간 |
+
+> **주의**: Policy에 연결된 Scope도 삭제할 수 있습니다. 삭제하기 전에 이 Scope를 사용하는 Policy가 있는지 확인하세요.
+
+---
+
+#### **3.7.2.2. Scope 등록 / 수정**
+
+새로운 Scope를 등록하기 위해 **REGISTER** 버튼을 클릭하면 Scope 등록 페이지로 이동합니다. Scope 수정 **UPDATE** 시에도 동일한 화면으로 구성되며, 이때 저장 버튼은 **SAVE**로 표시됩니다. 아래 화면은 `dc+sd-jwt-did` 형식의 예시입니다.
+
+<img src="./images/oid4vp-scope-registration.png" width="800"/>
+
+##### **Basic Information**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Scope*** | Scope의 고유 이름입니다. 이미 등록된 이름은 사용할 수 없습니다. | `VerifiableIdSD` | ✅ 필수 |
+| **Description** | Scope 설명 | `Verifiable ID with selective disclosure` | 선택 |
+| **Enabled** | 사용 여부입니다. 끄면 OID4VP 요청에 쓰이지 않고 Policy 등록의 Scope 검색에도 나타나지 않습니다. | 켬 | 기본값 켜짐 |
+
+##### **CredentialQuery**
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Credential ID*** | DCQL Query 안에서 자격증명을 구분하는 ID입니다. 영문, 숫자, `_`, `-`만 사용할 수 있습니다. | `pid` | ✅ 필수 |
+| **Format** | 요청할 자격증명 형식입니다. 형식을 바꾸면 Meta 값과 Claims가 초기화됩니다. | `dc+sd-jwt-did` | 기본값 `dc+sd-jwt-did` |
+
+##### **Format별 입력 방법**
+
+Format에 따라 Meta와 Claims의 입력 방법이 달라집니다.
+
+| Format | Meta Key | Meta 값 입력 | Claims 입력 |
+|--------|----------|--------------|-------------|
+| `dc+sd-jwt-did`, `vc+sd-jwt` | `vct_values` | JSON 배열로 입력 (예: `["urn:eudi:pid:1"]`) | **Selective claims**일 때 직접 입력 |
+| `opendid_vc` | `credential_schema_id_values` | **SCHEMA SEARCH**로 스키마를 선택하면 자동 입력 | 선택한 스키마의 클레임이 자동 입력되며 삭제만 가능 |
+| `mso_mdoc`, `mso_mdoc-did` | `doctype_value` | docType 문자열로 입력 (예: `org.iso.18013.5.1.mDL`) | Namespace와 Claim Name을 직접 입력 (선택) |
+
+##### **Disclosure Mode**
+
+`mso_mdoc`, `mso_mdoc-did` 형식에는 표시되지 않습니다.
+
+| 모드 | 설명 |
+|------|------|
+| **Full credential** | 클레임을 지정하지 않습니다. Wallet이 자격증명 전체를 공개합니다. |
+| **Selective claims** | 아래 Claims에 지정한 클레임만 Wallet에 요청합니다. |
+
+##### **Claims**
+
+**ADD CLAIM** 버튼으로 행을 추가하고, 휴지통 아이콘으로 삭제합니다.
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **ID** | 클레임 식별자 | `claim_id` | 선택 |
+| **Path (JSON Array)** | 클레임 경로입니다. 비어 있는 행은 DCQL Query에 포함되지 않습니다. | `["family_name"]` | 행마다 입력 |
+| **Values (Optional)** | 허용할 값 목록 | `["val1","val2"]` | 선택 |
+
+**`mso_mdoc` 형식 예시**
+
+ID(선택), Namespace, Claim Name으로 클레임을 지정합니다.
+
+<img src="./images/oid4vp-scope-registration-mdoc.png" width="800"/>
+
+**`opendid_vc` 형식 예시**
+
+**SCHEMA SEARCH**로 TA에 등록된 VC 스키마를 선택하면 Meta 값과 Claims가 채워집니다. 필요 없는 클레임은 휴지통 아이콘으로 삭제합니다.
+
+<img src="./images/oid4vp-scope-registration-opendid.png" width="800"/>
+
+##### **DCQL Query JSON Preview**
+
+입력한 값으로 만들어지는 DCQL Query를 실시간으로 보여 주는 조회 전용 영역입니다.
+
+##### **등록 완료**
+
+| 버튼 | 기능 | 동작 결과 |
+|------|------|-----------|
+| **REGISTER** | 입력한 정보로 Scope 등록 | 유효성 검사 후 Scope 생성 및 목록 페이지로 이동 |
+| **RESET** | 입력 내용 초기화 | 입력한 내용을 지웁니다. 선택한 Format은 유지됩니다. |
+| **CANCEL** | 등록 취소 및 이전 페이지 이동 | 입력 내용을 저장하지 않고 Scope 목록으로 돌아감 |
+
+---
+
+#### **3.7.2.3. Scope 상세 조회**
+
+목록에서 Scope 이름을 클릭하면 상세 페이지로 이동합니다.
+
+<img src="./images/oid4vp-scope-detail.png" width="800"/>
+
+| 항목 | 설명 |
+|------|------|
+| **Scope** | Scope의 고유 이름 |
+| **Description** | Scope 설명 |
+| **Enabled** | 사용 여부 (`Yes` / `No`) |
+| **DCQL Query (JSON)** | 저장된 DCQL Query |
+| **BACK 버튼** | Scope 목록으로 돌아감 |
+| **GO TO EDIT 버튼** | Scope 수정 페이지로 이동 |
+
+---
 
 ### 3.7.3. Policy Management
 
+`OID4VP > Policy Management`에서는 OID4VP 검증에 사용할 Policy를 등록하고 관리합니다. OID4VP Policy는 DCQL Scope 하나와 연결되며, OID4VP 검증을 시작할 때 이 Policy를 지정합니다.
+
+#### **3.7.3.1. Policy Management 화면 구성**
+
 <img src="./images/oid4vp-policy.png" width="800"/>
 
-`OID4VP > Policy Management`에서는 DCQL Scope와 연결되는 검증 정책을 등록하고 관리합니다.
+| 번호 | 구성 요소 | 기능 설명 | 사용 시점 |
+|------|-----------|-----------|-----------|
+| 1 | **REGISTER 버튼** | 새로운 Policy를 등록하는 페이지로 이동 | Policy 신규 생성 시 |
+| 2 | **UPDATE 버튼** | 선택한 Policy 정보를 수정 | 기존 Policy 변경 시 |
+| 3 | **DELETE 버튼** | 선택한 Policy를 삭제 | 불필요한 Policy 제거 시 |
+| 4 | **Policy 목록** | 등록된 모든 Policy의 요약 정보 표시 | Policy 현황 파악 |
+| 5 | **검색 및 페이징** | Title로 검색하고 페이지 단위로 탐색 | 대량 데이터 관리 |
+
+#### **Policy 목록 정보**
+
+| 컬럼 | 표시 내용 | 설명 |
+|------|-----------|------|
+| **Policy Title** | Policy의 고유 제목 | 클릭 시 상세 페이지로 이동 |
+| **Scope** | 연결된 DCQL Scope | 이 Policy가 사용하는 Scope |
+| **Created At** | 등록 일시 | 처음 등록된 날짜와 시간 |
+
+---
+
+#### **3.7.3.2. Policy 등록 / 수정**
+
+새로운 Policy를 등록하기 위해 **REGISTER** 버튼을 클릭하면 Policy 등록 페이지로 이동합니다. Policy 수정 **UPDATE** 시에도 동일한 화면으로 구성되며, 이때 저장 버튼은 **SAVE**로 표시됩니다.
+
+<img src="./images/oid4vp-policy-registration.png" width="800"/>
+
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Policy Title*** | Policy의 고유 제목 | `VerifiableIdSD` | ✅ 필수 |
+| **Scope*** | 연결할 DCQL Scope입니다. **SEARCH** 버튼으로 선택합니다. | `VerifiableIdSD` | ✅ 필수 |
+
+**SEARCH** 버튼을 클릭하면 Scope 검색 창이 열립니다. `Enabled`가 켜진 Scope만 표시됩니다.
+
+<img src="./images/oid4vp-policy-scope-search.png" width="400"/>
+
+##### **등록 완료**
+
+| 버튼 | 기능 | 동작 결과 |
+|------|------|-----------|
+| **REGISTER** | 입력한 정보로 Policy 등록 | 유효성 검사 후 Policy 생성 및 목록 페이지로 이동 |
+| **RESET** | 입력 내용 초기화 | 입력한 내용을 지웁니다. |
+| **CANCEL** | 등록 취소 및 이전 페이지 이동 | 입력 내용을 저장하지 않고 Policy 목록으로 돌아감 |
+
+---
+
+#### **3.7.3.3. Policy 상세 조회**
+
+목록에서 Policy 제목을 클릭하면 상세 페이지로 이동합니다.
+
+<img src="./images/oid4vp-policy-detail.png" width="800"/>
+
+| 항목 | 설명 |
+|------|------|
+| **Policy ID** | 등록 시 자동으로 부여되는 ID |
+| **Policy Title** | Policy의 고유 제목 |
+| **Scope** | 연결된 DCQL Scope |
+| **BACK 버튼** | Policy 목록으로 돌아감 |
+| **GO TO EDIT 버튼** | Policy 수정 페이지로 이동 |
+
+---
 
 ## 3.8. Log Management
 
@@ -1099,32 +1350,111 @@ Verifier 등록이 완료되면 `Log Management`에서 API 호출 기록을 조�
 
 ### 3.8.1. API Log
 
+`Log Management > API Log`는 Verifier Agent 및 프로토콜 API 호출을 보여줍니다. 경로는 `/logs/api`입니다.
+
 <img src="./images/api-log-api-example.png" width="800"/>
 
-`Log Management > API Log`는 Verifier Agent 및 프로토콜 API 호출을 보여줍니다. 목록에는 호출 시각, HTTP 메서드, URI, 상태 코드, 결과(`SUCCESS` 또는 `FAIL`), 요청자 ID가 표시됩니다. `URI` 또는 `Result`로 검색할 수 있습니다. 상세 창에서는 처리 시간, 클라이언트 IP, User Agent, 오류 메시지가 기록된 경우 함께 확인할 수 있습니다. 경로는 `/logs/api`입니다.
+#### **API Log 목록 정보**
+
+| 컬럼 | 표시 내용 | 설명 |
+|------|-----------|------|
+| **Called At** | 호출 일시 | 클릭 시 상세 창 표시 |
+| **Method** | HTTP 메서드 | `GET`, `POST` 등 |
+| **URI** | 호출한 API 경로 | `/verifier/api/v1/request-verify` 등 |
+| **Status** | HTTP 상태 코드 | `200`, `400` 등 |
+| **Result** | 처리 결과 | `SUCCESS` / `FAIL` |
+| **Requester ID** | 요청자 ID | 인증 없는 호출은 `anonymousUser` |
+
+`URI`와 `Result`로 검색할 수 있습니다.
+
+#### **API Log 상세 정보**
 
 <img src="./images/api-log-api-detail-example.png" width="800"/>
 
+목록의 컬럼에 더해 다음 항목을 확인할 수 있습니다. 각 항목은 기록된 경우에 표시됩니다.
+
+| 항목 | 설명 |
+|------|------|
+| **Duration Ms** | 처리 시간 |
+| **Client IP** | 호출한 클라이언트 IP |
+| **User Agent** | 호출한 클라이언트 정보 |
+| **Message** | 오류 메시지 |
+
 ### 3.8.2. Audit API Log
+
+`Log Management > Audit API Log`는 Admin API의 관리자 작업 기록을 보여줍니다. 경로는 `/logs/audit`입니다.
 
 <img src="./images/api-log-audit-example.png" width="800"/>
 
-`Log Management > Audit API Log`는 Admin API의 관리자 작업 기록을 보여줍니다. 작업 유형(`CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`), 대상 유형, 결과, 요청자 ID로 검색할 수 있습니다. 상세 창에는 대상 ID, 작업 설명, 클라이언트 IP와 오류 메시지가 기록된 경우 표시됩니다. 경로는 `/logs/audit`입니다.
+#### **Audit API Log 목록 정보**
+
+| 컬럼 | 표시 내용 | 설명 |
+|------|-----------|------|
+| **Called At** | 호출 일시 | 클릭 시 상세 창 표시 |
+| **Requester ID** | 작업한 관리자 ID | `admin@example.org` 등 |
+| **Action Type** | 작업 유형 | `NONE`, `CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT` |
+| **Target Type** | 작업 대상 유형 | `SERVER_CONFIG`, `POLICY`, `SESSION` 등 |
+| **Target ID** | 작업 대상 ID | `API_KEY_LSS` 등 |
+| **Result** | 처리 결과 | `SUCCESS` / `FAIL` |
+
+`Action Type`, `Target Type`, `Result`, `Requester ID`로 검색할 수 있습니다.
+
+#### **Audit API Log 상세 정보**
 
 <img src="./images/api-log-audit-detail-example.png" width="800"/>
+
+목록의 컬럼에 더해 다음 항목을 확인할 수 있습니다. `Description` 외의 항목은 기록된 경우에만 표시됩니다.
+
+| 항목 | 설명 |
+|------|------|
+| **Client IP** | 작업한 클라이언트 IP |
+| **Description** | 작업 설명 |
+| **User Agent** | 작업한 클라이언트 정보 |
+| **Message** | 오류 메시지 |
 
 > 로그는 서버의 `@ArticleLog`가 적용된 API 호출에서 생성됩니다. 예시 화면의 로그와 계정 정보는 실제 환경과 다릅니다.
 
 ## 3.9. Server Configuration
 
+`Server Configuration`에서는 외부 서버와 연동하는 데 필요한 API Key를 관리합니다.
+
 <img src="./images/server-configuration.png" width="800"/>
 
-`Server Configuration`에서 외부 서버와의 연동 설정을 확인하고 관리합니다. 변경한 값은 연결 대상 서버의 설정과 일치해야 합니다.
+| 항목 | 설명 | 입력 예시 | 필수 여부 |
+|------|------|-----------|-----------|
+| **Ledger Service Server** | LSS에서 발급한 API Key(`API_KEY_LSS`)입니다. Verifier가 LSS를 호출할 때 `X-API-Key` 헤더로 보냅니다. | `example-key` | ✅ 필수 |
+
+| 버튼 | 기능 | 동작 결과 |
+|------|------|-----------|
+| **UPDATE** | 입력한 값 저장 | 값이 바뀌었을 때만 활성화되며, 확인 창을 거쳐 저장합니다. |
+| **RESET** | 입력 내용 되돌리기 | 마지막으로 저장한 값으로 되돌립니다. |
+
+> **참고**: API Key를 등록하지 않으면 LSS 호출이 `SSRVVRF21501`로 실패합니다. 변경한 값은 LSS에서 발급한 키와 일치해야 합니다.
 
 ## 3.10. Password Policy Settings
 
+`Admin Management > Password Policy Settings`에서 관리자 계정의 비밀번호 정책을 조회하고 변경합니다. 계정 등록과 비밀번호 변경 시 이 규칙이 적용됩니다.
+
 <img src="./images/password-policy.png" width="800"/>
 
-`Admin Management > Password Policy Settings`에서 관리자 계정의 비밀번호 정책을 조회하고 변경합니다. 계정 등록과 비밀번호 변경 시 적용되는 규칙을 확인하세요.
+##### **Basic Settings**
+
+| 항목 | 설명 | 입력 예시 | 제약 조건 |
+|------|------|-----------|-----------|
+| **Minimum Length** | 비밀번호 최소 길이 | `8` | 6~20자 |
+| **Password Expiration Period** | 비밀번호 유효 기간(일) | `365` | 30~365일 |
+
+##### **Password Composition Rules**
+
+| 항목 | 설명 | 입력 예시 |
+|------|------|-----------|
+| **Uppercase Letters (A-Z)** | 켜면 영문 대문자가 포함되어야 합니다. | 끔 |
+| **Numbers (0-9)** | 켜면 숫자가 포함되어야 합니다. | 끔 |
+| **Special Characters (!@#$%^&\*)** | 켜면 특수문자가 포함되어야 합니다. | 끔 |
+
+| 버튼 | 기능 | 동작 결과 |
+|------|------|-----------|
+| **UPDATE** | 입력한 정책 저장 | 값이 바뀌었을 때만 활성화되며, 확인 창을 거쳐 저장합니다. |
+| **RESET** | 입력 내용 되돌리기 | 마지막으로 저장한 값으로 되돌립니다. |
 
 [Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
