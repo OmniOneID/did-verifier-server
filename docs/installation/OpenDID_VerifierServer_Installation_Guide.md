@@ -242,7 +242,7 @@ did-verifier-server
         │   ├── did-crypto-sdk-server-2.0.0.jar
         │   ├── did-datamodel-sdk-server-2.0.0.jar
         │   ├── did-oid4vp-sdk-server-3.0.0.jar
-        │   ├── did-verifier-sdk-server-1.0.0.jar
+        │   ├── did-verifier-sdk-server-3.0.0.jar
         │   ├── did-wallet-sdk-server-2.0.0.jar
         │   └── did-zkp-sdk-server-2.0.1.jar
         ├── sample
