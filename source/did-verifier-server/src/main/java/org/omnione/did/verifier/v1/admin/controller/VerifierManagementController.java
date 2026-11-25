@@ -41,31 +41,32 @@ public class VerifierManagementController {
         return verifierManagementService.getVerifierInfo();
     }
 
-    @ArticleLog(name = "[VerifierManagement] Create Certificate Vc", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[VerifierManagement] Create Certificate Vc", apiType = ApiType.ADMIN, targetType = "VERIFIER", actionType = ActionType.CREATE)
     @PostMapping(value = "/certificate-vc")
     public EmptyResDto createCertificateVc(@RequestBody SendCertificateVcReqDto sendCertificateVcReqDto) {
         return verifierManagementService.createCertificateVc(sendCertificateVcReqDto);
     }
 
-    @ArticleLog(name = "[VerifierManagement] Update Entity Info", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.UPDATE)
+    @ArticleLog(name = "[VerifierManagement] Update Entity Info", apiType = ApiType.ADMIN, targetType = "VERIFIER",
+            targetId = "#sendEntityInfoReqDto.did", actionType = ActionType.UPDATE)
     @PostMapping(value = "/entity-info")
     public EmptyResDto updateEntityInfo(@RequestBody SendEntityInfoReqDto sendEntityInfoReqDto) {
         return verifierManagementService.updateEntityInfo(sendEntityInfoReqDto);
     }
 
-    @ArticleLog(name = "[VerifierManagement] Register Verifier Info", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[VerifierManagement] Register Verifier Info", apiType = ApiType.ADMIN, targetType = "VERIFIER", actionType = ActionType.CREATE)
     @PostMapping(value = "/register-verifier-info")
     public VerifierInfoResDto registerVerifierInfo(@RequestBody RegisterVerifierInfoReqDto registerVerifierInfoReqDto) {
         return verifierManagementService.registerVerifierInfo(registerVerifierInfoReqDto);
     }
 
-    @ArticleLog(name = "[VerifierManagement] Generate Verifier Did Document Auto", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[VerifierManagement] Generate Verifier Did Document Auto", apiType = ApiType.ADMIN, targetType = "VERIFIER", actionType = ActionType.CREATE)
     @PostMapping(value = "/generate-did-auto")
     public Map<String, Object> generateVerifierDidDocumentAuto() {
         return verifierManagementService.registerVerifierDidDocumentAuto();
     }
 
-    @ArticleLog(name = "[VerifierManagement] Request Register Did", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[VerifierManagement] Request Register Did", apiType = ApiType.ADMIN, targetType = "VERIFIER", actionType = ActionType.CREATE)
     @PostMapping(value = "/register-did")
     public EmptyResDto requestRegisterDid(@RequestBody RequestRegisterDidReqDto requestRegisterDidReqDto) {
         return verifierManagementService.requestRegisterDid(requestRegisterDidReqDto);
@@ -76,7 +77,7 @@ public class VerifierManagementController {
         return verifierManagementService.requestEntityStatus();
     }
 
-    @ArticleLog(name = "[VerifierManagement] Request Enroll Entity", apiType = ApiType.ADMIN, targetType = "VERIFIER_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[VerifierManagement] Request Enroll Entity", apiType = ApiType.ADMIN, targetType = "VERIFIER", actionType = ActionType.CREATE)
     @PostMapping(value = "/request-enroll-entity")
     public Map<String, Object> requestEnrollEntity() {
         return verifierManagementService.enrollEntity();

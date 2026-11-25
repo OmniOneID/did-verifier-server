@@ -45,7 +45,8 @@ public class SessionController {
     private final SessionService sessionService;
     private final JwtService jwtService;
 
-    @ArticleLog(name = "[Session] Request Admin Login", apiType = ApiType.ADMIN, targetType = "SESSION", actionType = ActionType.LOGIN)
+    @ArticleLog(name = "[Admin] Login", apiType = ApiType.ADMIN, targetType = "ADMIN",
+            targetId = "#requestAdminLoginReqDto.loginId", actionType = ActionType.LOGIN)
     @PostMapping(UrlConstant.Verifier.LOGIN)
     public LoginRes requestAdminLogin(@Valid @RequestBody RequestAdminLoginReqDto requestAdminLoginReqDto) {
         AdminDto admin = sessionService.requestAdminLogin(requestAdminLoginReqDto);

@@ -38,7 +38,8 @@ public class AdminPasswordPolicyManagementController {
         return adminPasswordPolicyManagementService.getAdminPasswordPolicy();
     }
 
-    @ArticleLog(name = "[AdminPasswordPolicyManagement] Register Admin Password Policy", apiType = ApiType.ADMIN, targetType = "ADMIN_PASSWORD_POLICY_MANAGEMENT", actionType = ActionType.CREATE)
+    @ArticleLog(name = "[AdminPasswordPolicyManagement] Register Admin Password Policy", apiType = ApiType.ADMIN,
+            targetType = "ADMIN", actionType = ActionType.UPDATE)
     @PostMapping(value = "/admin-password-policy")
     public AdminPasswordPolicyDto registerAdminPasswordPolicy(@RequestBody RegisterAdminPasswordPolicyReqDto reqDto) {
         return adminPasswordPolicyManagementService.registerAdminPasswordPolicy(reqDto);

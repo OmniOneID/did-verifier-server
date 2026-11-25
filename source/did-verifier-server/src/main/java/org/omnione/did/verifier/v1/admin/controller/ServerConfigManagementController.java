@@ -51,7 +51,8 @@ public class ServerConfigManagementController {
         return serverConfigManagementService.getServerConfigByKey(configKey);
     }
 
-    @ArticleLog(name = "[ServerConfigManagement] Update Server Configs", apiType = ApiType.ADMIN, targetType = "SERVER_CONFIG_MANAGEMENT", actionType = ActionType.UPDATE)
+    @ArticleLog(name = "[ServerConfigManagement] Update Server Configs", apiType = ApiType.ADMIN,
+            targetType = "SERVER_CONFIG", actionType = ActionType.UPDATE)
     @PutMapping(value = "/server-configs")
     public UpdateServerConfigResDto updateServerConfigs(
             @Valid @RequestBody UpdateServerConfigReqDto updateServerConfigReqDto) {
