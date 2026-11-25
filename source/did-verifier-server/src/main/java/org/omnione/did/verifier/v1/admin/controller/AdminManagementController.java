@@ -19,6 +19,7 @@ import org.omnione.did.base.annotation.ArticleLog;
 import org.omnione.did.base.constants.ActionType;
 import org.omnione.did.base.constants.ApiType;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.constants.UrlConstant;
@@ -63,10 +64,11 @@ public class AdminManagementController {
         return adminManagementService.verifyAdminIdUnique(loginId);
     }
 
-    @ArticleLog(name = "[AdminManagement] Delete Admin", apiType = ApiType.ADMIN, targetType = "ADMIN_MANAGEMENT", actionType = ActionType.DELETE)
+    @ArticleLog(name = "[AdminManagement] Delete Admin", apiType = ApiType.ADMIN, targetType = "ADMIN", actionType = ActionType.DELETE)
     @DeleteMapping(value = "/admins")
-    public EmptyResDto deleteAdmin(@RequestParam Long id) {
-        return adminManagementService.deleteAdmin(id);
+    public EmptyResDto deleteAdmin(@RequestParam Long id, HttpServletRequest request) {
+        request.setAttribute("targetId", adminManagementService.deleteAdmin(id));
+        return new EmptyResDto();
     }
 
     @ArticleLog(name = "[AdminManagement] Reset Password By Root", apiType = ApiType.ADMIN, targetType = "ADMIN_MANAGEMENT", actionType = ActionType.UPDATE)
