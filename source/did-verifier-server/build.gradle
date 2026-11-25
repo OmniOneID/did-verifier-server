@@ -89,6 +89,9 @@ dependencies {
 
     //Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     implementation 'org.apache.commons:commons-pool2:2.12.0'
     implementation('org.hyperledger.fabric:fabric-gateway-java:2.2.9')

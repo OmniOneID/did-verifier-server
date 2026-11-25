@@ -50,4 +50,6 @@
   <include file="set.4/protocol-align_oid4vp_config_vp_formats.xml" relativeToChangelogFile="true" />
 
   <include file="set.5/create-table_api_log.xml" relativeToChangelogFile="true"/>
+  <include file="set.5/expand_admin_login_password.xml" relativeToChangelogFile="true"/>
+  <include file="set.5/add-column_admin_session_version.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

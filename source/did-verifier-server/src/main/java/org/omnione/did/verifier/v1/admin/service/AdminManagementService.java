@@ -28,6 +28,7 @@ import org.omnione.did.verifier.v1.common.dto.EmptyResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 
@@ -38,10 +39,12 @@ import java.time.Instant;
 public class AdminManagementService {
     private final AdminQueryService adminQueryService;
     private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AdminDto resetPassword(ResetPasswordReqDto resetPasswordReqDto) {
         Admin admin = adminQueryService.findByLoginIdAndLoginPassword(resetPasswordReqDto.getLoginId(), resetPasswordReqDto.getOldPassword());
-        admin.setLoginPassword(resetPasswordReqDto.getNewPassword());
+        admin.setLoginPassword(passwordEncoder.encode(resetPasswordReqDto.getNewPassword()));
+        admin.setPasswordAlgo("bcrypt");
         admin.setRequirePasswordReset(false);
         admin.setLastPasswordChangedAt(Instant.now());
         admin.setPasswordResetReason(null);
@@ -68,7 +71,8 @@ public class AdminManagementService {
         Admin admin = Admin.builder()
                 .loginId(registerAdminReqDto.getLoginId())
                 .role(registerAdminReqDto.getRole())
-                .loginPassword(registerAdminReqDto.getLoginPassword())
+                .loginPassword(passwordEncoder.encode(registerAdminReqDto.getLoginPassword()))
+                .passwordAlgo("bcrypt")
                 .requirePasswordReset(true)
                 .emailVerified(false)
                 .createdBy("SYSTEM")
@@ -95,7 +99,8 @@ public class AdminManagementService {
 
     public EmptyResDto resetPasswordByRoot(ResetPasswordByRootReqDto resetPasswordByRootReqDto) {
         Admin admin = adminQueryService.findByLoginId(resetPasswordByRootReqDto.getLoginId());
-        admin.setLoginPassword(resetPasswordByRootReqDto.getNewPassword());
+        admin.setLoginPassword(passwordEncoder.encode(resetPasswordByRootReqDto.getNewPassword()));
+        admin.setPasswordAlgo("bcrypt");
         admin.setRequirePasswordReset(true);
         admin.setPasswordResetReason(PasswordResetReason.ADMIN_FORCED);
 
@@ -112,7 +117,8 @@ public class AdminManagementService {
         }
 
         admin.setLoginId(reqDto.getNewLoginId());
-        admin.setLoginPassword(reqDto.getNewPassword());
+        admin.setLoginPassword(passwordEncoder.encode(reqDto.getNewPassword()));
+        admin.setPasswordAlgo("bcrypt");
         admin.setRequirePasswordReset(false);
         admin.setLastPasswordChangedAt(Instant.now());
         admin.setPasswordResetReason(null);
